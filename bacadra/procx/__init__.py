@@ -1,10 +1,10 @@
-from . import static
+from . import lines
 
 #$ class navix
 class navix:
     #$$ --init--
     def __init__(self, dbase, pinky, pvars):
-        self.static = static.static(dbase, pinky, pvars)
+        self.lines  = lines.lines(dbase, pinky, pvars)
 
     #$$ def --enter--
     def __enter__(self):
