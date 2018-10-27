@@ -9,7 +9,7 @@ Database tools set, including table schema and parse functions.
 
 import sqlite3
 
-from ..cunit import cunit
+from ..cunit.cmath import cunit
 # from ..cunit.cmath import *
 
 
