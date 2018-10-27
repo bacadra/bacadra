@@ -9,7 +9,7 @@ Database tools set, including table schema and parse functions.
 
 import sqlite3
 
-from ..cunit import cunit
+from ..cunit.cmath import cunit
 # from ..cunit.cmath import *
 
 
@@ -104,11 +104,11 @@ class dbase:
         def easy_cunit(**kwargs):
             for key,val in kwargs.items():
                 if type(val)==cunit:
-                    kwargs[key] = val.drop_si()
+                    kwargs[key] = val.drop(system='si')
                 elif type(val)==list:
-                    kwargs[key] = [me.drop_si() if type(me) is cunit else me for me in val]
+                    kwargs[key] = [me.drop(system='si') if type(me) is cunit else me for me in val]
                 elif type(val)==tuple:
-                    kwargs[key] = (me.drop_si() if type(me) is cunit else me for me in val)
+                    kwargs[key] = (me.drop(system='si') if type(me) is cunit else me for me in val)
             return kwargs
 
         if parse_mode == 1:
@@ -934,7 +934,7 @@ class dbase:
 
         # shear force Mz
         code += '[M_y_2] REAL,'
-        
+
         # shear force Mz
         code += '[M_z_2] REAL,'
 
