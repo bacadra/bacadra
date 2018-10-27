@@ -1,7 +1,4 @@
 
-# from .units import cunit
-
-
 class CunitError(Exception):
     '''
     General cunit exception.
@@ -19,6 +16,17 @@ def fCunitIncompatibleErorr(val1, val2, name=None):
     '''
     if val1._units != val2._units:
         raise CunitIncompatibleErorr(f'Execution "{name}" failed: {val1._units} and {val2._units} can\'t be treat together')
+
+
+def f2CunitIncompatibleErorr(val1, name=None):
+    '''
+    A function can take input data only without units.
+    '''
+    if val1._units != {}:
+        raise CunitIncompatibleErorr(f'The function "{name}" failed, because they can\'t take value with units!')
+
+
+
 
 
 
