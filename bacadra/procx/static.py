@@ -1,6 +1,6 @@
 import numpy as np
 
-# np.set_printoptions(suppress=True, precision=5)
+np.set_printoptions(suppress=True)
 
 #$ ____ class static _______________________________________________________ #
 
@@ -261,7 +261,7 @@ class static:
         #     return np.allclose(a, a.T, atol=tol)
 
         # print(check_symmetric(kg_stif))
-        print(kg_stif)
+        # print(kg_stif)
         return kg_stif
 
 
@@ -1028,7 +1028,7 @@ class static:
             if self.pvars.get('system_dof') in ['2t','2d']:
                 # vector of local displacement sorted like dofs
                 q_loc = np.array([q1[0], q1[2], q2[0], q2[2]])
-                print(q_loc)
+                # print(q_loc)
 
                 # change of length
                 ΔL = np.array([-Cx, -Cz, Cx, Cz]).dot(q_loc)
@@ -1109,7 +1109,7 @@ class static:
                 [rz]
             FROM [113:nodes:sresu] WHERE [lcase]="{lcase}" AND [node]="{n1id}"
             ''')[0]
-            
+
             # second node, look upper comment
             q2 = self.dbase.get(f'''
             SELECT

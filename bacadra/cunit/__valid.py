@@ -126,6 +126,34 @@ class TestMe(unittest.TestCase):
         bcdr.cunit.acc = 1,1
         self.assertEqual((1564896.01236456*m)._value, 1564896.01236456)
 
+    def test_system_006(self):
+        '''
+        '''
+        bcdr.cunit.mode = 'pretty'
+        bcdr.cunit.acc = 1,1
+        self.assertEqual(repr(1564896.01236456*m), '2000000 [m]')
+
+    def test_system_007(self):
+        '''
+        '''
+        bcdr.cunit.mode = 'pretty'
+        bcdr.cunit.acc = 1,100
+        self.assertEqual(repr(1564896.01236456*m), '1564896 [m]')
+
+    def test_system_008(self):
+        '''
+        '''
+        bcdr.cunit.mode = 'pretty'
+        bcdr.cunit.acc = 2,12
+        self.assertEqual(repr(1564896.01236456*m), '1564896.01 [m]')
+
+    def test_system_009(self):
+        '''
+        '''
+        bcdr.cunit.mode = 'latex'
+        bcdr.cunit.acc = 2,12
+        self.assertEqual(repr(1564896.01236456*m), r'1564896.01~\textrm{m}')
+
 
 
 #$$ ________ convert _______________________________________________________ #
