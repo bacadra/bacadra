@@ -10,11 +10,11 @@ from ..cunit.cmath import *
 
 class main:
     #$$ def --init--
-    def __init__(self, dbase, pinky, pvars):
+    def __init__(self, core):
         self.dbase = dbase
         self.pinky = pinky
-        self.pvars = pvars
-        self.pnb83 = pnb83(self.dbase, self.pinky, self.pvars)
+        self.setts = setts
+        self.pnb83 = pnb83(self.dbase, self.pinky, self.setts)
 
 
 #$ ____ class pnb83 ________________________________________________________ #
@@ -24,10 +24,10 @@ class pnb83:
     PN-B-02482 1983
     '''
     #$$ def --init--
-    def __init__(self, dbase, pinky, pvars):
+    def __init__(self, core):
         self.dbase = dbase
         self.pinky = pinky
-        self.pvars = pvars
+        self.setts = setts
 
 
     def techfact(self, lay):

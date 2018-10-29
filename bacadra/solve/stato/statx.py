@@ -2,14 +2,12 @@ import numpy as np
 
 np.set_printoptions(suppress=True)
 
-#$ ____ class static _______________________________________________________ #
+#$ ____ class statx ________________________________________________________ #
 
-class static:
+class statx:
     #$$ def --init--
-    def __init__(self, dbase, pinky, pvars):
-        self.dbase = dbase
-        self.pinky = pinky
-        self.pvars = pvars
+    def __init__(self, core):
+        self.core = core
 
         self._ndof     = None # dof of single node
         self._ndof_sum = None # summary dof in system
@@ -87,11 +85,11 @@ class static:
             self._reactions()
 
             # store results
-            self._store_RQ(lcase=lcase)
+            # self._store_RQ(lcase=lcase)
 
             # post evaluating
             # TODO: postevaluate should better work after static, then can download full table of results and work, hmm
-            self._posts(lcase=lcase)
+            # self._posts(lcase=lcase)
 
         # if lcase is input as list
         elif type_lcase == list:
@@ -118,7 +116,7 @@ class static:
         # [DX, DY, DZ, RX, RY, RZ, RW]
 
         # get the settings about dof system
-        system_dof = self.pvars.get('system_dof')
+        system_dof = self.core.mdata.setts.get('system_dof')
 
         if type(system_dof) is list:
             self._ldof = system_dof
@@ -170,14 +168,14 @@ class static:
         Optimize nodes numbering. Create noG rows in topoz table.
         '''
 
-        nodes = self.dbase.get('SELECT [id] FROM [111:nodes:topos]')
+        nodes = self.core.dbase.get('SELECT [id] FROM [111:nodes:topos]')
 
         # TODO: optimize numbering
         # now the optimize is in sort order number ...
 
         noG = 0
         for node in nodes:
-            self.dbase.add(
+            self.core.dbase.add(
                 table = '[111:nodes:optim]',
                 cols  = '[id],[noG]',
                 data  = (node[0], noG)
@@ -191,7 +189,7 @@ class static:
         Estimate count of nodal degree of freedom of our structure. Get the max node number in actual building.
         '''
 
-        self.max_node_noG = self.dbase.get('''
+        self.max_node_noG = self.core.dbase.get('''
         SELECT max([noG]) FROM [111:nodes:optim]
         ''')[0][0]
 
@@ -261,7 +259,7 @@ class static:
         #     return np.allclose(a, a.T, atol=tol)
 
         # print(check_symmetric(kg_stif))
-        # print(kg_stif)
+        print(kg_stif)
         return kg_stif
 
 
@@ -275,13 +273,13 @@ class static:
         '''
 
         # get elements from database
-        trusses = self.dbase.get('''
+        trusses = self.core.dbase.get('''
         SELECT
             [TS].[id],
             [TS].[L],
-            [TS].[delta_X],
-            [TS].[delta_Y],
-            [TS].[delta_Z],
+            [TS].[ΔX],
+            [TS].[ΔY],
+            [TS].[ΔZ],
             [N1].[noG],
             [N2].[noG],
             [CS].[A],
@@ -289,7 +287,7 @@ class static:
         FROM [121:truss:topos]      AS [TS]
         LEFT JOIN [111:nodes:optim] AS [N1] ON [TS].[n1]   = [N1].[id]
         LEFT JOIN [111:nodes:optim] AS [N2] ON [TS].[n2]   = [N2].[id]
-        LEFT JOIN [021:usec1:unics] AS [CS] ON [TS].[sect] = [CS].[id]
+        LEFT JOIN [021:usec1:value] AS [CS] ON [TS].[sect] = [CS].[id]
         LEFT JOIN [011:mates:umate] AS [MT] ON [CS].[mate] = [MT].[id]
         ''')
 
@@ -308,7 +306,7 @@ class static:
     def _kg_truss(self, E_1, A, L, Δx, Δy, Δz):
 
         # check system
-        system = self.pvars.get('system_dof')
+        system = self.core.mdata.setts.get('system_dof')
 
         # calculate sin,cos itd
         Cx, Cy, Cz = Δx/L, Δy/L, Δz/L
@@ -349,13 +347,13 @@ class static:
         '''
 
         # get elements from database
-        beams = self.dbase.get('''
+        beams = self.core.dbase.get('''
         SELECT
             [BM].[id],
             [BM].[L],
-            [BM].[delta_X],
-            [BM].[delta_Y],
-            [BM].[delta_Z],
+            [BM].[ΔX],
+            [BM].[ΔY],
+            [BM].[ΔZ],
             [N1].[noG],
             [N2].[noG],
             [CS].[A],
@@ -367,7 +365,7 @@ class static:
         FROM [131:beams:topos]      AS [BM]
         LEFT JOIN [111:nodes:optim] AS [N1] ON [BM].[n1]   = [N1].[id]
         LEFT JOIN [111:nodes:optim] AS [N2] ON [BM].[n2]   = [N2].[id]
-        LEFT JOIN [021:usec1:unics] AS [CS] ON [BM].[sect] = [CS].[id]
+        LEFT JOIN [021:usec1:value] AS [CS] ON [BM].[sect] = [CS].[id]
         LEFT JOIN [011:mates:umate] AS [MT] ON [CS].[mate] = [MT].[id]
         ''')
 
@@ -386,7 +384,7 @@ class static:
     def _kg_beams(self, Δx, Δy, Δz, L, E_1, A, I_y, I_z, I_t, G_1):
 
         # check system
-        system = self.pvars.get('system_dof')
+        system = self.core.mdata.setts.get('system_dof')
 
         if system == '2t':
             raise ValueError('Element type error. The actual system does not provide rotational dof')
@@ -652,7 +650,7 @@ class static:
 
         # TODO: kinematic loads is inactive
         # get elements from database
-        loads = self.dbase.get(f'''
+        loads = self.core.dbase.get(f'''
         SELECT
             [NZ].[noG],
             [NZ].[id],
@@ -726,7 +724,7 @@ class static:
         Set boundary condition on the K matrix.
         '''
 
-        nodes = self.dbase.get('''
+        nodes = self.core.dbase.get('''
         SELECT
             [NZ].[noG],
             [NS].[fix],
@@ -762,12 +760,15 @@ class static:
                     # add blocked dof to list, it will be used to bc_F and more
                     self._cdof.append(add1)
 
-                    # insert zeros in full wide row and col
-                    self._K_stif[add1,:] = 0  # zero row
-                    self._K_stif[:,add1] = 0  # zero col
+        self._K11 = np.delete(np.delete(self._K_stif, self._cdof, axis=0),
+            self._cdof, axis=1)
 
-                    # insert unit at cross of row and col
-                    self._K_stif[add1,add1] = 1
+        self._K22 = self._K_stif[np.ix_(self._cdof,self._cdof)]
+
+        self._K21 = np.delete(self._K_stif[np.ix_(self._cdof)],
+            self._cdof, axis=1)
+
+        self._K12 = self._K21.T
 
 
 
@@ -778,9 +779,10 @@ class static:
         Set boundary condition on the F vector.
         '''
 
-        # loop over list created while bc_K set.
-        for add1 in self._cdof:
-            self._F_load[add1] = 0
+        self._F1 = np.delete(self._F_load, self._cdof)
+        self._F2 = self._F_load[np.ix_(self._cdof)]
+
+        self._Q2 = np.zeros(len(self._cdof))
 
 
 #$$$ ____________ def -bc-pattern __________________________________________ #
@@ -795,7 +797,7 @@ class static:
             print(f'warning bc-dof-101:\nThe support at node {node_id} is noneffective, because global {dof} dof is inactive')
 
         # get the settings about dof system
-        system_dof = self.pvars.get('system_dof')
+        system_dof = self.core.mdata.setts.get('system_dof')
 
         # if-block depend on static load type
 
@@ -883,7 +885,7 @@ class static:
         Calculate node displacement as result of system solve.
         '''
         # set displacement vector
-        self._Q_disp = np.linalg.solve(self._K_stif, self._F_load)
+        self._Q1 = np.linalg.solve(self._K11, self._F1 - self._K12.dot(self._Q2))
 
 
 #$$$ ____________ def -reactions ____________________________________________ #
@@ -891,13 +893,10 @@ class static:
     def _reactions(self):
         '''
         Calculate reaction in supports.
-        R = K*Q - F
         '''
 
-        # TODO: im not sure that below method are optimal... we need to create copy of K and F vector and then calculate full system, so maybe do not copy full matrix (vector), but copy only selected rows?
-
         # calculate reaction depend on unconstrained K and F data
-        self._R_reac = self._K_free.dot(self._Q_disp) - self._F_free
+        self._F2 = self._K21.dot(self._Q1) + self._K22.dot(self._Q2)
 
 
 #$$$ ____________ def -store-db ____________________________________________ #
@@ -914,7 +913,7 @@ class static:
             adof = noG*self._ndof
             # TODO: get all elements at one kwerend, then get from matrix
             # find id of node
-            id = self.dbase.get(f'''
+            id = self.core.dbase.get(f'''
                 SELECT [id] FROM [111:nodes:optim] WHERE [noG] = {noG}
             ''')[0][0]
 
@@ -925,7 +924,7 @@ class static:
                 id    = id,
                 adof  = adof)
 
-            self.dbase.add(
+            self.core.dbase.add(
                 table = '[113:nodes:sresu]',
                 cols  = cols,
                 data  = data,
@@ -977,13 +976,13 @@ class static:
 #$$$ ____________ def -s-truss _____________________________________________ #
 
     def _p_truss(self, lcase):
-        trusses = self.dbase.get('''
+        trusses = self.core.dbase.get('''
         SELECT
             [TS].[id],
             [TS].[L],
-            [TS].[delta_X],
-            [TS].[delta_Y],
-            [TS].[delta_Z],
+            [TS].[ΔX],
+            [TS].[ΔY],
+            [TS].[ΔZ],
             [N1].[noG],
             [N1].[id],
             [N2].[noG],
@@ -993,7 +992,7 @@ class static:
         FROM [121:truss:topos]      AS [TS]
         LEFT JOIN [111:nodes:optim] AS [N1] ON [TS].[n1]   = [N1].[id]
         LEFT JOIN [111:nodes:optim] AS [N2] ON [TS].[n2]   = [N2].[id]
-        LEFT JOIN [021:usec1:unics] AS [CS] ON [TS].[sect] = [CS].[id]
+        LEFT JOIN [021:usec1:value] AS [CS] ON [TS].[sect] = [CS].[id]
         LEFT JOIN [011:mates:umate] AS [MT] ON [CS].[mate] = [MT].[id]
         ''')
 
@@ -1004,7 +1003,7 @@ class static:
 
             # first node, must return only one node
             # TODO: validate return of 1 node
-            q1 = self.dbase.get(f'''
+            q1 = self.core.dbase.get(f'''
             SELECT
                 [dx],
                 [dy],
@@ -1013,7 +1012,7 @@ class static:
             ''')[0]
 
             # second node, look upper comment
-            q2 = self.dbase.get(f'''
+            q2 = self.core.dbase.get(f'''
             SELECT
                 [dx],
                 [dy],
@@ -1025,16 +1024,16 @@ class static:
             Cx, Cy, Cz = Δx/L, Δy/L, Δz/L
 
             # change of length
-            if self.pvars.get('system_dof') in ['2t','2d']:
+            if self.core.mdata.setts.get('system_dof') in ['2t','2d']:
                 # vector of local displacement sorted like dofs
                 q_loc = np.array([q1[0], q1[2], q2[0], q2[2]])
-                # print(q_loc)
+                print(q_loc)
 
                 # change of length
                 ΔL = np.array([-Cx, -Cz, Cx, Cz]).dot(q_loc)
 
 
-            elif self.pvars.get('system_dof') in ['3t','3d','3d7']:
+            elif self.core.mdata.setts.get('system_dof') in ['3t','3d','3d7']:
                 # vector of local displacement sorted like dofs
                 q_loc = np.array([q1[0], q1[1], q1[2], q2[0], q2[1], q2[2]])
 
@@ -1051,16 +1050,16 @@ class static:
             N_x = σ_x * A
 
             # send to static results
-            self.dbase.add(
+            self.core.dbase.add(
                 table = '[123:truss:sresu]',
-                cols  = '[id],[lcase],[N],[delta_L],[eps_x]',
+                cols  = '[id],[lcase],[N],[ΔL],[ε_x]',
                 data  = (id, lcase, N_x, ΔL, ε_x),
             )
 
             # send to design results
-            self.dbase.add(
+            self.core.dbase.add(
                 table = '[124:truss:desig]',
-                cols  = '[id],[lcase],[sig_x]',
+                cols  = '[id],[lcase],[σ_x]',
                 data  = (id, lcase, σ_x),
             )
 
@@ -1068,13 +1067,13 @@ class static:
 #$$$ ____________ def -s-beams _____________________________________________ #
 
     def _p_beams(self, lcase):
-        beams = self.dbase.get('''
+        beams = self.core.dbase.get('''
         SELECT
             [BM].[id],
             [BM].[L],
-            [BM].[delta_X],
-            [BM].[delta_Y],
-            [BM].[delta_Z],
+            [BM].[ΔX],
+            [BM].[ΔY],
+            [BM].[ΔZ],
             [N1].[noG],
             [N1].[id],
             [N2].[noG],
@@ -1088,7 +1087,7 @@ class static:
         FROM [131:beams:topos]      AS [BM]
         LEFT JOIN [111:nodes:optim] AS [N1] ON [BM].[n1]   = [N1].[id]
         LEFT JOIN [111:nodes:optim] AS [N2] ON [BM].[n2]   = [N2].[id]
-        LEFT JOIN [021:usec1:unics] AS [CS] ON [BM].[sect] = [CS].[id]
+        LEFT JOIN [021:usec1:value] AS [CS] ON [BM].[sect] = [CS].[id]
         LEFT JOIN [011:mates:umate] AS [MT] ON [CS].[mate] = [MT].[id]
         ''')
 
@@ -1099,7 +1098,7 @@ class static:
 
             # first node, must return only one node
             # TODO: validate return of 1 node
-            q1 = self.dbase.get(f'''
+            q1 = self.core.dbase.get(f'''
             SELECT
                 [dx],
                 [dy],
@@ -1111,7 +1110,7 @@ class static:
             ''')[0]
 
             # second node, look upper comment
-            q2 = self.dbase.get(f'''
+            q2 = self.core.dbase.get(f'''
             SELECT
                 [dx],
                 [dy],
@@ -1139,7 +1138,7 @@ class static:
             data = tuple(np.append(np.array([id,lcase]), forces))
 
             # send to static results
-            self.dbase.add(
+            self.core.dbase.add(
                 table = '[133:beams:sresu]',
                 cols  = '[id],[lcase],[N_1],[V_y_1],[V_z_1],[M_x_1],[M_y_1],[M_z_1],[N_2],[V_y_2],[V_z_2],[M_x_2],[M_y_2],[M_z_2]',
                 data  = data
@@ -1150,7 +1149,7 @@ class static:
 
 
             # change of length
-            if self.pvars.get('system_dof') in ['2d']:
+            if self.core.mdata.setts.get('system_dof') in ['2d']:
                 pass
                 # # vector of local displacement sorted like dofs
                 # q_loc = np.array([q1[0],q1[2],q1[4],q2[0],q2[2],q2[4]])
@@ -1179,7 +1178,7 @@ class static:
                 # data = tuple(np.append(np.array([id,lcase]), forces))
                 #
                 # # send to static results
-                # self.dbase.add(
+                # self.core.dbase.add(
                 #     table = '[133:beams:sresu]',
                 #     cols  = '[id],[lcase],[N_1],[V_z_1],[M_y_1],[N_2],[V_z_2],[M_y_2]',
                 #     data  = data,
@@ -1187,7 +1186,7 @@ class static:
 
 
 
-            elif self.pvars.get('system_dof') in ['3d','3d7']:
+            elif self.core.mdata.setts.get('system_dof') in ['3d','3d7']:
 
                 # vector of local displacement sorted like dofs
                 q_loc = np.append(q1,q2)
@@ -1231,7 +1230,7 @@ class static:
                 # data = tuple(np.append(np.array([id,lcase]), forces))
                 #
                 # # send to static results
-                # self.dbase.add(
+                # self.core.dbase.add(
                 #     table = '[133:beams:sresu]',
                 #     cols  = '[id],[lcase],[N_1],[V_y_1],[V_z_1],[M_x_1],[M_y_1],[M_z_1],[N_2],[V_y_2],[V_z_2],[M_x_2],[M_y_2],[M_z_2]',
                 #     data  = data
@@ -1241,7 +1240,7 @@ class static:
                 # M_y_1 = E_1 * I_y / L * (4*q1[4]+2*q2[4]-6*(q2[2]-q1[2])/L)
                 # M_y_2 = E_1 * I_y / L * (4*q2[4]+2*q1[4]-6*(q2[2]-q1[2])/L)
 
-            # elif self.pvars.get('system_dof') in ['3d','3d7']:
+            # elif self.core.mdata.setts.get('system_dof') in ['3d','3d7']:
             #     # vector of local displacement sorted like dofs
             #     q_loc = np.array([q1[0], q1[1], q1[2], q2[0], q2[1], q2[2]])
             #
@@ -1262,16 +1261,16 @@ class static:
 
 
             # # send to static results
-            # self.dbase.add(
+            # self.core.dbase.add(
             #     table = '[133:beams:sresu]',
-            #     cols  = '[id],[lcase],[N_1],[delta_L],[eps_x_N]',
+            #     cols  = '[id],[lcase],[N_1],[ΔL],[ε_x_N]',
             #     data  = (id, lcase, N_x, ΔL, ε_x_N),
             # )
             #
             # # send to design results
-            # self.dbase.add(
+            # self.core.dbase.add(
             #     table = '[134:beams:desig]',
-            #     cols  = '[id],[lcase],[sig_x_N]',
+            #     cols  = '[id],[lcase],[σ_x_N]',
             #     data  = (id, lcase, σ_x_N),
             # )
 

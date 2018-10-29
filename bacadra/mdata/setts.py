@@ -1,21 +1,20 @@
 
-from ..cunit.ce import m
+from ..cunit.units import cunit
 
-#$ ____ class pvars ________________________________________________________ #
+#$ ____ class setts ________________________________________________________ #
 
-class pvars:
-    def __init__(self, dbase, pinky):
+class setts:
+    def __init__(self, dbase):
         self.dbase = dbase
-        self.pinky = pinky
 
-        self._pvars = {
+        self._setts = {
             '_cates_ldef'   : None,
             '_lcase_ldef'   : None,
             '_mates_ldef'   : None,
             '_usec1_ldef'   : None,
             'nodes_fix'     : None,
             'system_dof'    : None,
-            'node_tol'      : 0.01*m,
+            'node_tol'      : 0.01*cunit(1, {'m':1}),
             'xy->xz'        : True,
         }
 
@@ -29,18 +28,18 @@ class pvars:
 
     def add(self, ndict, redefine=False):
         '''
-        Add new key to pvars. You can add new if not exists or add/mod new (also if key exists).
+        Add new key to setts. You can add new if not exists or add/mod new (also if key exists).
         '''
 
         if redefine:
             for key,val in ndict.items():
-                self._pvars.update({key:val})
+                self._setts.update({key:val})
         else:
             for key,val in ndict.items():
-                if key in self._pvars:
+                if key in self._setts:
                     raise ValueError('Key does not exists!')
                 else:
-                    self._pvars.update({key:val})
+                    self._setts.update({key:val})
 
 
 
@@ -50,8 +49,8 @@ class pvars:
         '''
 
         for key,val in ndict.items():
-            if key in self._pvars:
-                self._pvars.update({key:val})
+            if key in self._setts:
+                self._setts.update({key:val})
             else:
                 raise ValueError('Key does not exists!')
 
@@ -60,17 +59,11 @@ class pvars:
         Get value of already exists keys. As input needed is string or list with strings.
         '''
         if   type(name) == str:
-            return self._pvars[name]
+            return self._setts[name]
         elif type(name) == list:
-            return [self._pvars[name1] for name1 in name]
+            return [self._setts[name1] for name1 in name]
         else:
-            return self._pvars
+            return self._setts
 
 
-class nannex:
 
-    def load(self, path):
-        '''
-        Load national annex variables from external text file.
-        '''
-        pass

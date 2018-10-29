@@ -2,14 +2,12 @@
 
 
 
-#$ ____ class unics ________________________________________________________ #
+#$ ____ class value ________________________________________________________ #
 
-class unics:
+class value:
     #$$ def --init--
-    def __init__(self, dbase, pinky, pvars):
-        self.dbase = dbase
-        self.pinky = pinky
-        self.pvars = pvars
+    def __init__(self, core):
+        self.core = core
 
     #$$ def --enter--
     def __enter__(self):
@@ -23,14 +21,14 @@ class unics:
     def add(self, id=None, mate=None, A=None, A_y=None, A_z=None, I_t=None, I_ω=None, I_y=None, I_z=None, u=None, m_g=None, ttl=None, _subcl=None):
 
         # overwrite last defined unit section 1d
-        self.pvars.set({'_usec1_ldef':id})
+        self.core.mdata.setts.set({'_usec1_ldef':id})
 
-        # if mate is not defined then use cat last one material
+        # if mate is not defined then use last one material
         if mate is None:
-            mate = self.pvars.get('_mates_ldef')
+            mate = self.core.mdata.setts.get('_mates_ldef')
 
         # parse universal units section 1d data
-        cols,data = self.dbase.parse(
+        cols,data = self.core.dbase.parse(
             id    = id,
             mate  = mate,
             A     = A,
@@ -47,8 +45,8 @@ class unics:
         )
 
         # add universal unit section 1d data
-        self.dbase.add(
-            table = '[021:usec1:unics]',
+        self.core.dbase.add(
+            table = '[021:usec1:value]',
             cols  = cols,
             data  = data,
         )

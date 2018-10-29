@@ -1,12 +1,5 @@
-#$ definicja stalych
-import math
-pi  = math.pi
-π   = math.pi
-e   = math.e
-del math
-
 #$ definicja jednostek
-from .units import cunit # przypisanie klasy do zmiennej, mniej pisania
+from ..units import cunit # przypisanie klasy do zmiennej, mniej pisania
 cunit.system = 'ce'
 kN   = cunit('kN')
 m    = cunit('m')

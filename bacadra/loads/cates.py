@@ -5,10 +5,8 @@
 
 class cates:
     #$$ def --init--
-    def __init__(self, dbase, pinky, pvars):
-        self.dbase = dbase
-        self.pinky = pinky
-        self.pvars = pvars
+    def __init__(self, core):
+        self.core = core
 
     #$$ def --enter--
     def __enter__(self):
@@ -21,10 +19,10 @@ class cates:
     def add(self, id=None, gamu=None, gamf=None, gama=None, gam1=None, gam2=None, gam3=None, psi0=None, psi1=None,psi1s=None,psi2=None, ttl=None):
 
         # overwrite last defined category
-        self.pvars.set({'_cates_ldef':id})
+        self.core.mdata.setts.set({'_cates_ldef':id})
 
         # parse data
-        cols,data = self.dbase.parse(
+        cols,data = self.core.dbase.parse(
             id    = id,
             gamu  = gamu,
             gamf  = gamf,
@@ -40,7 +38,7 @@ class cates:
         )
 
         # add data
-        self.dbase.add(
+        self.core.dbase.add(
             table = '[051:loads:cates]',
             cols  = cols,
             data  = data,

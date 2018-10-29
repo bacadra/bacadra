@@ -1,11 +1,11 @@
-from . import geomf
-from . import geome
+from . import setts
+from . import annex
 
 #$ class index
 class index:
-    def __init__(self, core):
-        self.geomf = geomf.index(core=core)
-        self.geome = geome.index(core=core)
+    def __init__(self, dbase):
+        self.setts = setts.setts(dbase)
+        self.annex = annex.annex(dbase)
 
     #$$ def --enter--
     def __enter__(self):

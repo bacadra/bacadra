@@ -1,11 +1,8 @@
-from . import geomf
-from . import geome
-
 #$ class index
 class index:
+    #$$ --init--
     def __init__(self, core):
-        self.geomf = geomf.index(core=core)
-        self.geome = geome.index(core=core)
+        pass
 
     #$$ def --enter--
     def __enter__(self):

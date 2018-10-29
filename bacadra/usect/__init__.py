@@ -1,10 +1,14 @@
 from . import usec1
+from . import usec2
+from . import usec3
 
-#$ class navix
-class navix:
+#$ class index
+class index:
     #$$ --init--
-    def __init__(self, dbase, pinky, pvars):
-        self.usec1 = usec1.navix(dbase, pinky, pvars)
+    def __init__(self, core):
+        self.usec1 = usec1.index(core=core)
+        self.usec2 = usec1.index(core=core)
+        self.usec3 = usec1.index(core=core)
 
     #$$ def --enter--
     def __enter__(self):

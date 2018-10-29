@@ -5,10 +5,8 @@
 
 class nodes:
     #$$ def --init--
-    def __init__(self, dbase, pinky, pvars):
-        self.dbase = dbase
-        self.pinky = pinky
-        self.pvars = pvars
+    def __init__(self, core):
+        self.core = core
 
     #$$ def --enter--
     def __enter__(self):
@@ -22,10 +20,10 @@ class nodes:
 
         # if lcase is not defined then use lcase last one defined
         if lcase is None:
-            lcase = self.pvars.get('_lcase_ldef')
+            lcase = self.core.mdata.setts.get('_lcase_ldef')
 
         # parse data
-        cols,data = self.dbase.parse(
+        cols,data = self.core.dbase.parse(
             lcase = lcase,
             node  = node,
             px    = px,
@@ -44,7 +42,7 @@ class nodes:
         )
 
         # add data
-        self.dbase.add(
+        self.core.dbase.add(
             table = '[112:nodes:loads]',
             cols  = cols,
             data  = data,

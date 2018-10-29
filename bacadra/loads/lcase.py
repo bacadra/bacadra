@@ -4,10 +4,8 @@
 
 class lcase:
     #$$ def --init--
-    def __init__(self, dbase, pinky, pvars):
-        self.dbase = dbase
-        self.pinky = pinky
-        self.pvars = pvars
+    def __init__(self, core):
+        self.core = core
 
     #$$ def --enter--
     def __enter__(self):
@@ -29,14 +27,14 @@ class lcase:
     # TODO: add method should provide interface to modify coefficient gamu-psi etc. In DB now cols should be created.
 
         # overwrite last one defined lcase
-        self.pvars.set({'_lcase_ldef':id})
+        self.core.mdata.setts.set({'_lcase_ldef':id})
 
         # if cates is not defined then use cat last one defined
         if cates is None:
-            cates = self.pvars.get('_cates_ldef')
+            cates = self.core.mdata.setts.get('_cates_ldef')
 
         # parse data
-        cols,data = self.dbase.parse(
+        cols,data = self.core.dbase.parse(
             id    = id,
             cates = cates,
             fact  = fact,
@@ -44,7 +42,7 @@ class lcase:
         )
 
         # add data
-        self.dbase.add(
+        self.core.dbase.add(
             table = '[052:loads:lcase]',
             cols  = cols,
             data  = data,

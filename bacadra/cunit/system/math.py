@@ -1,7 +1,10 @@
 import math
-from .units import cunit
-from .ndict import ndict
-from . import verrs
+from ..units import cunit
+from ..ndict import ndict
+from .. import verrs
+
+π   = math.pi
+e   = math.e
 
 def sin(x):
     if type(x) == cunit:

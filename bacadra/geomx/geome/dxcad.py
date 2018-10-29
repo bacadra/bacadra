@@ -7,18 +7,15 @@ from .. import geomf
 # TODO: add transfrom XY plane to 3d plane,
 # constrain it with global system settings
 
-#$ ____ class dxfin ________________________________________________________ #
+#$ ____ class dxcad ________________________________________________________ #
 
-class dxfin:
+class dxcad:
     #$$ def --init--
-    def __init__(self, dbase, pinky, pvars):
-        self.dbase = dbase
-        self.pinky = pinky
-        self.pvars = pvars
+    def __init__(self, core):
+        self.core = core
 
         self._pack = {}
-
-        self.geomf = geomf.navix(self.dbase, self.pinky, self.pvars)
+        self._geomf = geomf.index(core=core)
 
 
 
@@ -63,8 +60,8 @@ class dxfin:
                     id = node_name + str(node_nami)
                     node_nami += 1
 
-                if self.pvars.get('system_dof') in ['2d','2t'] and self.pvars.get('2dXY2XZ'):
-                    self.geomf.nodes.add(
+                if self.setts.get('system_dof') in ['2d','2t'] and self.setts.get('2dXY2XZ'):
+                    self._geomf.nodes.add(
                         id  = id,
                         x   = +insert.insert[0],
                         z   = -insert.insert[1],
@@ -73,7 +70,7 @@ class dxfin:
                     )
 
                 else:
-                    self.geomf.nodes.add(
+                    self._geomf.nodes.add(
                         id  = id,
                         x   = +insert.insert[0],
                         y   = +insert.insert[1],
@@ -91,12 +88,12 @@ class dxfin:
         for line in all_lines:
             if line.layer[:5] == 'bcdr-':
 
-                ε = self.pvars.get('node_tol').drop('m')
+                ε = self.setts.get('node_tol').drop('m')
 
                 l1 = line.start
 
-                if self.pvars.get('system_dof') in ['2d','2t'] and self.pvars.get('xy->xz'):
-                    node1 = self.dbase.get(f'''
+                if self.setts.get('system_dof') in ['2d','2t'] and self.setts.get('xy->xz'):
+                    node1 = self.core.dbase.get(f'''
                     SELECT [id] FROM [111:nodes:topos]
                     WHERE
                         ([x] BETWEEN ''' + str(l1[0]-ε) + ' AND ' + str(l1[0]+ε) + ''')
@@ -105,7 +102,7 @@ class dxfin:
                     ''')
 
                 else:
-                    node1 = self.dbase.get(f'''
+                    node1 = self.core.dbase.get(f'''
                     SELECT [id] FROM [111:nodes:topos]
                     WHERE
                         ([x] BETWEEN ''' + str(l1[0]-ε) + ' AND ' + str(l1[0]+ε) + ''')
@@ -125,8 +122,8 @@ class dxfin:
 
 
                 l2 = line.end
-                if self.pvars.get('system_dof') in ['2d','2t'] and self.pvars.get('2dXY2XZ'):
-                    node2 = self.dbase.get(f'''
+                if self.setts.get('system_dof') in ['2d','2t'] and self.setts.get('2dXY2XZ'):
+                    node2 = self.core.dbase.get(f'''
                     SELECT [id] FROM [111:nodes:topos]
                     WHERE
                         ([x] BETWEEN ''' + str(l2[0]-ε) + ' AND ' + str(l2[0]+ε) + ''')
@@ -135,7 +132,7 @@ class dxfin:
                     ''')
 
                 else:
-                    node2 = self.dbase.get(f'''
+                    node2 = self.core.dbase.get(f'''
                     SELECT [id] FROM [111:nodes:topos]
                     WHERE
                         ([x] BETWEEN ''' + str(l2[0]-ε) + ' AND ' + str(l2[0]+ε) + ''')
@@ -157,7 +154,7 @@ class dxfin:
                 pack = self._pack[line.layer[5:]]
 
                 if pack['etype'] == 'truss':
-                    self.geomf.truss.add(
+                    self._geomf.truss.add(
                         id   = line_name + str(line_nami),
                         n1   = node1[0],
                         n2   = node2[0],
@@ -165,7 +162,7 @@ class dxfin:
                     )
 
                 elif pack['etype'] == 'beams':
-                    self.geomf.beams.add(
+                    self._geomf.beams.add(
                         id   = line_name + str(line_nami),
                         n1   = node1[0],
                         n2   = node2[0],

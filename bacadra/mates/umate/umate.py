@@ -1,21 +1,8 @@
-#$ **** module concs **** __________________________________________________ #
-
-#$$ ________ import ________________________________________________________ #
-
-# from ..cunit.ce import *
-# from ..cunit.cmath import *
-
-# import numpy  as np
-# import pandas as pd
-
-#$ ____ class umate ________________________________________________________ #
 
 class umate:
     #$$ def --init--
-    def __init__(self, dbase, pinky, pvars):
-        self.dbase = dbase
-        self.pinky = pinky
-        self.pvars = pvars
+    def __init__(self, core):
+        self.core = core
 
     #$$ def --enter--
     def __enter__(self):
@@ -41,10 +28,10 @@ class umate:
             E_1 = G_1 * (2 * (1 + v_1))
 
         # overwrite last defined material
-        self.pvars.set({'_mates_ldef':id})
+        self.core.mdata.setts.set({'_mates_ldef':id})
 
         # parse data do univeral material
-        cols,data = self.dbase.parse(
+        cols,data = self.core.dbase.parse(
             id    = id,
             rho   = ρ,
             E_1   = E_1,
@@ -56,7 +43,7 @@ class umate:
         )
 
         # add universal material
-        self.dbase.add(
+        self.core.dbase.add(
             table = '[011:mates:umate]',
             cols  = cols,
             data  = data,

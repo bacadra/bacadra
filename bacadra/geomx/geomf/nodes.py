@@ -10,10 +10,8 @@
 
 class nodes:
     #$$ def --init--
-    def __init__(self, dbase, pinky, pvars):
-        self.dbase = dbase
-        self.pinky = pinky
-        self.pvars = pvars
+    def __init__(self, core):
+        self.core = core
 
     #$$ def --enter--
     def __enter__(self):
@@ -27,12 +25,12 @@ class nodes:
 
         # if fix is none, then use default setting
         if fix is None:
-            fix = self.pvars.get('nodes_fix')
+            fix = self.core.mdata.setts.get('nodes_fix')
 
         # reference type if-block
         if ucst == 'node':
             # if reference object is node, then add ref node coor to user input
-            Δnode = self.dbase.get(f'''
+            Δnode = self.core.dbase.get(f'''
             SELECT [x],[y],[z] FROM [111:nodes:topos] WHERE [id] = {ucsi}
             ''')[0]
 
@@ -42,7 +40,7 @@ class nodes:
 
 
         # parse data do nodes data
-        cols,data = self.dbase.parse(
+        cols,data = self.core.dbase.parse(
             id    = id,
             x     = x,
             y     = y,
@@ -54,7 +52,7 @@ class nodes:
         )
 
         # add nodes data
-        self.dbase.add(
+        self.core.dbase.add(
             table = '[111:nodes:topos]',
             cols  = cols,
             data  = data,
@@ -65,7 +63,7 @@ class nodes:
     def edit(self, where, id=None, x=None, y=None, z=None, ucst=None, ucsi=None, fix=None, ttl=None):
 
         # parse data do nodes data
-        cols,data = self.dbase.parse( parse_mode='update',
+        cols,data = self.core.dbase.parse( parse_mode='update',
             id    = id,
             x     = x,
             y     = y,
@@ -77,7 +75,7 @@ class nodes:
         )
 
         # edit nodes data
-        self.dbase.edit(
+        self.core.dbase.edit(
             table = '[111:nodes:topos]',
             cols  = cols,
             data  = data,

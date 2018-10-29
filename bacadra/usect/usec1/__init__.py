@@ -1,10 +1,10 @@
-from . import unics
+from . import value
 
-#$ class navix
-class navix:
+#$ class index
+class index:
     #$$ --init--
-    def __init__(self, dbase, pinky, pvars):
-        self.unics = unics.unics(dbase, pinky, pvars)
+    def __init__(self, core):
+        self.value = value.value(core=core)
 
     #$$ def --enter--
     def __enter__(self):
