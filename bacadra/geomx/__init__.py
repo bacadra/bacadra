@@ -1,11 +1,11 @@
 from . import geomf
-from . import geomd
+from . import geome
 
-#$ class navix
-class navix:
-    def __init__(self, dbase, pinky, pvars):
-        self.geomf = geomf.navix(dbase, pinky, pvars)
-        self.geomd = geomd.navix(dbase, pinky, pvars)
+#$ class index
+class index:
+    def __init__(self, core):
+        self.geomf = geomf.index(core=core)
+        self.geome = geome.index(core=core)
 
     #$$ def --enter--
     def __enter__(self):

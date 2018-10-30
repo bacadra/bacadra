@@ -16,7 +16,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://www.facebook.com/bacadra",
-    download_url="https://github.com/bacadra/bacadra",
+    download_url="https://github.com/bacadra",
     packages=setuptools.find_packages(),
     install_requires=[
         "matplotlib",
