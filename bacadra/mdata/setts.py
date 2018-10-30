@@ -13,8 +13,8 @@ class setts:
             '_mates_ldef'   : None,
             '_usec1_ldef'   : None,
             'nodes_fix'     : None,
-            'system_dof'    : None,
-            'node_tol'      : 0.01*cunit(1, {'m':1}),
+            'system_space'  : None,
+            'node_tol'      : 0.01*cunit('m'),
             'xy->xz'        : True,
         }
 
@@ -53,6 +53,7 @@ class setts:
                 self._setts.update({key:val})
             else:
                 raise ValueError('Key does not exists!')
+
 
     def get(self, name=None):
         '''

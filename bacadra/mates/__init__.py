@@ -1,5 +1,6 @@
 from .umate import umate
 from .conce import conce
+from .steea import steea
 from .soils import soils
 
 #$ class index
@@ -8,6 +9,7 @@ class index:
     def __init__(self, core):
         self.umate = umate.umate(core=core)
         self.conce = conce.conce(core=core)
+        self.steea = steea.steea(core=core)
         self.soils = soils.soils(core=core)
 
     #$$ def --enter--

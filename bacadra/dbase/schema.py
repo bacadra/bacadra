@@ -4,7 +4,7 @@
 class schema:
         code = ''
 
-#$$ ________ ***** [000:---model-data--------] ***** ______________________ #
+#$$ ________ *** [000:---model-data--------] *** __________________________ #
 
         code += 'CREATE TABLE IF NOT EXISTS [000:---model-data--------] ('
 
@@ -129,14 +129,12 @@ class schema:
         code += '[G_1] REAL,'
 
         # wspolczynnik rozszerzalnosci termicznej
-        code += '[texp] REAL,'
+        code += '[t_e] REAL,'
 
         # nazwa uzytkownika
         code += '[ttl] TEXT,'
 
-        # ------------------------------------- #
-        # below cols are calculated automaticly #
-        # ------------------------------------- #
+        # ----- auto-zone ------------------------------------------- #
 
         # submaterial eg. concrete (C), steel (A) (S), wood (T)
         code += '[subcl] TEXT'
@@ -158,56 +156,56 @@ class schema:
         # klasa betonu
         code += '[cclass] TEXT,'
 
-        # characteristic compressive strength
+        # Characteristic compressive cylinder strength of concrete at 28 days
         code += '[f_ck] REAL,'
 
         # cubic characteristic compressive strength
         code +='[f_ck_cube] REAL,'
 
-        # medium compressive strength
+        # Mean value of concrete cylinder cornpressive strength
         code +='[f_cm] REAL,'
 
-        # metdium tension strength of concrete due to bending test
+        # Mean value of axial tensile strength of concrete
         code +='[f_ctm] REAL,'
 
-        # medium tension strength of concrete due to bending test 0.05% prob
+        # Characteristic axial tensile strength of concrete 0.05% prob
         code +='[f_ctk_005] REAL,'
 
-        # medium tension strength of concrete due to bending test 0.95% prob
-        code +='[f_ctm_095] REAL,'
+        # Characteristic axial tensile strength of concrete 0.95% prob
+        code +='[f_ctk_095] REAL,'
 
-        # secant stiffness module
+        # Secant modulus of elasticity of concrete
         code +='[E_cm] REAL,'
 
-        # first plastic compresive strain
+        # first ompressive strain in the concrete at the peak stress fc
         code +='[ε_c1] REAL,'
 
-        # first ultimate compressive strain
+        # first ultimate compressive strain in the concrete
         code +='[ε_cu1] REAL,'
 
-        # second plastic compresive strain
+        # first ompressive strain in the concrete at the peak stress fc
         code +='[ε_c2] REAL,'
 
-        # second ultimate compressive strain
+        # first ultimate compressive strain in the concrete
         code +='[ε_cu2] REAL,'
 
         # power of inelastic function
         code +='[n_c] REAL,'
 
-        # third plastic compresive strain
+        # first ompressive strain in the concrete at the peak stress fc
         code +='[ε_c3] REAL,'
 
-        # third ultimate compressive strain
-        code +='[ε_cu3] REAL'
+        # first ultimate compressive strain in the concrete
+        code +='[ε_cu3] REAL,'
 
+        # Partial factor for a material property, taking account of uncertainties in the material property itself, in geometric deviation and in  the design model used
+        code +='[γ_M] REAL'
 
         # close table def!
         code += ');'
 
 
-
 #$$$$ ________________ [012:mates:stees] ___________________________________ #
-
 
         # tablica materialy general
         code += 'CREATE TABLE IF NOT EXISTS [012:mates:stees] ('
@@ -252,11 +250,41 @@ class schema:
         code += '   ON CONFLICT FAIL'
         code += '   NOT NULL REFERENCES [011:mates:umate] ([id]),'
 
-        # charakterystyczna granica plastycznosci stali
+        # klasa stali
+        code += '[cclass] TEXT,'
+
+        # max thickness
+        code += '[max_t] REAL,'
+
+        # yield strength
         code += '[f_yk] REAL,'
 
-        # charakterystyczna wytrzymalosc na rozciaganie
-        code += '[f_uk] REAL'
+        # ultimate strength
+        code += '[f_uk] REAL,'
+
+        # modulus of elasticity
+        code += '[E_a] REAL,'
+
+        # yield strain
+        code += '[ε_yk] REAL,'
+
+        # ultimate strain
+        code += '[ε_uk] REAL,'
+
+        # partial factor for resistance of cross-sections whatever the class is
+        code += '[γ_M0] REAL,'
+
+        # partial factor for resistance of members to instability assessed by member checks
+        code += '[γ_M1] REAL,'
+
+        # partial factor for resistance of cross-sections in tension to fracture
+        code += '[γ_M2] REAL,'
+
+        # partial factor for silos
+        code += '[γ_M3] REAL,'
+        code += '[γ_M4] REAL,'
+        code += '[γ_M5] REAL,'
+        code += '[γ_M6] REAL'
 
         # close table def!
         code += ');'
@@ -369,9 +397,7 @@ class schema:
         # nazwa uzytkownika
         code += '[ttl] TEXT,'
 
-        # ------------------------------------- #
-        # below cols are calculated automaticly #
-        # ------------------------------------- #
+        # ----- auto-zone ------------------------------------------- #
 
         # subclass, type of section
         code += '[subcl] TEXT'
@@ -387,16 +413,16 @@ class schema:
 #$$$$ ________________ [023:usec1:point] ___________________________________ #
 
         # tablica na wartosci charakterystyk przekrojowych preta
-        code +='CREATE TABLE IF NOT EXISTS [021:usec1:point] ('
-
-        # nazwa porzadkowa
-        code += '[id] TEXT PRIMARY KEY,'
+        code +='CREATE TABLE IF NOT EXISTS [023:usec1:point] ('
 
         # przekroj referencyjny
-        code += '[sect] INTEGER REFERENCES [021:usec1:value] ([id]),'
+        code += '[sect] TEXT REFERENCES [021:usec1:value] ([id]),'
+
+        # nazwa porzadkowa
+        code += '[id] TEXT,'
 
         # material referencyjny
-        code += '[mref] INTEGER REFERENCES [011:mates:umate] ([id]),'
+        code += '[mate] TEXT REFERENCES [011:mates:umate] ([id]),'
 
         # wspolrzedna punktu
         code += '[y] REAL,'
@@ -405,7 +431,10 @@ class schema:
         code += '[z] REAL,'
 
         # nazwa uzytkownika
-        code += '[ttl] TEXT'
+        code += '[ttl] TEXT,'
+
+        # set primary key
+        code += 'PRIMARY KEY ([sect], [id])'
 
         # close table def!
         code += ');'
@@ -492,7 +521,7 @@ class schema:
 
 
 
-#$$ ________ ***** [100:---finite-elements---] ***** ______________________ #
+#$$ ________ *** [100:---finite-elements---] *** __________________________ #
 
         code += 'CREATE TABLE IF NOT EXISTS [100:---finite-elements---] ('
 
@@ -536,9 +565,7 @@ class schema:
         # nazwa uzytkownika
         code += '[ttl] TEXT'
 
-        # ------------------------------------- #
-        # below cols are calculated automaticly #
-        # ------------------------------------- #
+        # ----- auto-zone ------------------------------------------- #
 
         # close table def!
         code += ');'
@@ -656,9 +683,7 @@ class schema:
         # nazwa uzytkownika
         code += '[ttl] TEXT,'
 
-        # ------------------------------------- #
-        # below cols are calculated automaticly #
-        # ------------------------------------- #
+        # ----- auto-zone ------------------------------------------- #
 
         # length
         code += '[L] REAL,'
@@ -754,9 +779,7 @@ class schema:
         # nazwa uzytkownika
         code += '[ttl] TEXT,'
 
-        # ------------------------------------- #
-        # below cols are calculated automaticly #
-        # ------------------------------------- #
+        # ----- auto-zone ------------------------------------------- #
 
         # length
         code += '[L] REAL,'
@@ -863,7 +886,7 @@ class schema:
         code += ');'
 
 
-#$$ ________ ***** [200:---struct-elements---] ***** ______________________ #
+#$$ ________ *** [200:---struct-elements---] *** __________________________ #
 
         code += 'CREATE TABLE IF NOT EXISTS [200:---struct-elements---] ('
 
@@ -874,7 +897,7 @@ class schema:
         code += ');'
 
 
-#$$ ________ ***** [300:---design-elements---] ***** ______________________ #
+#$$ ________ *** [300:---design-elements---] *** __________________________ #
 
         code += 'CREATE TABLE IF NOT EXISTS [300:---design-elements---] ('
 

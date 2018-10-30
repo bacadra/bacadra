@@ -1,7 +1,7 @@
-from . import cates
-from . import lcase
-from . import nodes
-from . import handy
+from .ltree import cates
+from .ltree import lcase
+from .assig import nodes
+from .assig import handy
 
 #$ class index
 class index:

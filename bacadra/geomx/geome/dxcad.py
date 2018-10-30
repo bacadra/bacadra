@@ -60,7 +60,7 @@ class dxcad:
                     id = node_name + str(node_nami)
                     node_nami += 1
 
-                if self.setts.get('system_dof') in ['2d','2t'] and self.setts.get('2dXY2XZ'):
+                if self.setts.get('system_space') in ['2d','2t'] and self.setts.get('2dXY2XZ'):
                     self._geomf.nodes.add(
                         id  = id,
                         x   = +insert.insert[0],
@@ -92,7 +92,7 @@ class dxcad:
 
                 l1 = line.start
 
-                if self.setts.get('system_dof') in ['2d','2t'] and self.setts.get('xy->xz'):
+                if self.setts.get('system_space') in ['2d','2t'] and self.setts.get('xy->xz'):
                     node1 = self.core.dbase.get(f'''
                     SELECT [id] FROM [111:nodes:topos]
                     WHERE
@@ -122,7 +122,7 @@ class dxcad:
 
 
                 l2 = line.end
-                if self.setts.get('system_dof') in ['2d','2t'] and self.setts.get('2dXY2XZ'):
+                if self.setts.get('system_space') in ['2d','2t'] and self.setts.get('2dXY2XZ'):
                     node2 = self.core.dbase.get(f'''
                     SELECT [id] FROM [111:nodes:topos]
                     WHERE

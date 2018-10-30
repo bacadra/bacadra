@@ -1,10 +1,10 @@
-from .statx import statx
+from .linex import linex
 
 #$ class index
 class index:
     #$$ --init--
     def __init__(self, core):
-        self.statx  = statx.statx(core=core)
+        self.linex  = linex.linex(core=core)
 
     #$$ def --enter--
     def __enter__(self):

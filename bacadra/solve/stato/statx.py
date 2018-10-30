@@ -116,40 +116,40 @@ class statx:
         # [DX, DY, DZ, RX, RY, RZ, RW]
 
         # get the settings about dof system
-        system_dof = self.core.mdata.setts.get('system_dof')
+        system_space = self.core.mdata.setts.get('system_space')
 
-        if type(system_dof) is list:
-            self._ldof = system_dof
+        if type(system_space) is list:
+            self._ldof = system_space
 
-        elif system_dof == '2t':
+        elif system_space == '2t':
             # planar truss
             self._ldof = ['dx','dz']
 
-        elif system_dof == '3t':
+        elif system_space == '3t':
             # space truss
             self._ldof = ['dx','dy','dz']
 
-        elif system_dof == '2d':
+        elif system_space == '2d':
             # planar beams
             self._ldof = ['dx','dz','ry']
 
-        elif system_dof == '3d':
+        elif system_space == '3d':
             # space beams
             self._ldof = ['dx','dy','dz','rx','ry','rz']
 
-        elif system_dof == '3d7':
+        elif system_space == '3d7':
             # space beams with warping dof
             self._ldof = ['dx','dy','dz','rx','ry','rz','rw']
 
-        elif system_dof == 'ss':
+        elif system_space == 'ss':
             # plain stress
             self._ldof = ['dx','dz','rz']
 
-        elif system_dof == 'sn':
+        elif system_space == 'sn':
             # plain strain
             self._ldof = ['dx','dz','rz']
 
-        elif system_dof == 'as':
+        elif system_space == 'as':
             # axial symetry
             self._ldof = ['dx','dz','rz']
 
@@ -306,7 +306,7 @@ class statx:
     def _kg_truss(self, E_1, A, L, Δx, Δy, Δz):
 
         # check system
-        system = self.core.mdata.setts.get('system_dof')
+        system = self.core.mdata.setts.get('system_space')
 
         # calculate sin,cos itd
         Cx, Cy, Cz = Δx/L, Δy/L, Δz/L
@@ -384,7 +384,7 @@ class statx:
     def _kg_beams(self, Δx, Δy, Δz, L, E_1, A, I_y, I_z, I_t, G_1):
 
         # check system
-        system = self.core.mdata.setts.get('system_dof')
+        system = self.core.mdata.setts.get('system_space')
 
         if system == '2t':
             raise ValueError('Element type error. The actual system does not provide rotational dof')
@@ -797,7 +797,7 @@ class statx:
             print(f'warning bc-dof-101:\nThe support at node {node_id} is noneffective, because global {dof} dof is inactive')
 
         # get the settings about dof system
-        system_dof = self.core.mdata.setts.get('system_dof')
+        system_space = self.core.mdata.setts.get('system_space')
 
         # if-block depend on static load type
 
@@ -1024,7 +1024,7 @@ class statx:
             Cx, Cy, Cz = Δx/L, Δy/L, Δz/L
 
             # change of length
-            if self.core.mdata.setts.get('system_dof') in ['2t','2d']:
+            if self.core.mdata.setts.get('system_space') in ['2t','2d']:
                 # vector of local displacement sorted like dofs
                 q_loc = np.array([q1[0], q1[2], q2[0], q2[2]])
                 print(q_loc)
@@ -1033,7 +1033,7 @@ class statx:
                 ΔL = np.array([-Cx, -Cz, Cx, Cz]).dot(q_loc)
 
 
-            elif self.core.mdata.setts.get('system_dof') in ['3t','3d','3d7']:
+            elif self.core.mdata.setts.get('system_space') in ['3t','3d','3d7']:
                 # vector of local displacement sorted like dofs
                 q_loc = np.array([q1[0], q1[1], q1[2], q2[0], q2[1], q2[2]])
 
@@ -1149,7 +1149,7 @@ class statx:
 
 
             # change of length
-            if self.core.mdata.setts.get('system_dof') in ['2d']:
+            if self.core.mdata.setts.get('system_space') in ['2d']:
                 pass
                 # # vector of local displacement sorted like dofs
                 # q_loc = np.array([q1[0],q1[2],q1[4],q2[0],q2[2],q2[4]])
@@ -1186,7 +1186,7 @@ class statx:
 
 
 
-            elif self.core.mdata.setts.get('system_dof') in ['3d','3d7']:
+            elif self.core.mdata.setts.get('system_space') in ['3d','3d7']:
 
                 # vector of local displacement sorted like dofs
                 q_loc = np.append(q1,q2)
@@ -1240,7 +1240,7 @@ class statx:
                 # M_y_1 = E_1 * I_y / L * (4*q1[4]+2*q2[4]-6*(q2[2]-q1[2])/L)
                 # M_y_2 = E_1 * I_y / L * (4*q2[4]+2*q1[4]-6*(q2[2]-q1[2])/L)
 
-            # elif self.core.mdata.setts.get('system_dof') in ['3d','3d7']:
+            # elif self.core.mdata.setts.get('system_space') in ['3d','3d7']:
             #     # vector of local displacement sorted like dofs
             #     q_loc = np.array([q1[0], q1[1], q1[2], q2[0], q2[1], q2[2]])
             #

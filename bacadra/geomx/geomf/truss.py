@@ -48,15 +48,15 @@ class truss:
 
         # parse data
         cols,data = self.core.dbase.parse(
-            id      = id,
-            n1      = n1,
-            n2      = n2,
-            sect    = sect,
-            ttl     = ttl,
-            L       = L,
-            delta_X = Δx,
-            delta_Y = Δy,
-            delta_Z = Δz,
+            id    = id,
+            n1    = n1,
+            n2    = n2,
+            sect  = sect,
+            ttl   = ttl,
+            L     = L,
+            Δx    = Δx,
+            Δy    = Δy,
+            Δz    = Δz,
         )
 
         # add data

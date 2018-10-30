@@ -16,7 +16,7 @@ class cates:
     def __exit__(self, type, value, traceback):
         pass
 
-    def add(self, id=None, gamu=None, gamf=None, gama=None, gam1=None, gam2=None, gam3=None, psi0=None, psi1=None,psi1s=None,psi2=None, ttl=None):
+    def add(self, id=None, γ_u=None, γ_f=None, γ_a=None, γ_1=None, γ_2=None, γ_3=None, ψ_0=None, ψ_1=None, ψ_1s=None, ψ_2=None, ttl=None):
 
         # overwrite last defined category
         self.core.mdata.setts.set({'_cates_ldef':id})
@@ -24,16 +24,16 @@ class cates:
         # parse data
         cols,data = self.core.dbase.parse(
             id    = id,
-            gamu  = gamu,
-            gamf  = gamf,
-            gama  = gama,
-            gam1  = gam1,
-            gam2  = gam2,
-            gam3  = gam3,
-            psi0  = psi0,
-            psi1  = psi1,
-            psi1s = psi1s,
-            psi2  = psi2,
+            γ_u  = γ_u,
+            γ_f  = γ_f,
+            γ_a  = γ_a,
+            γ_1  = γ_1,
+            γ_2  = γ_2,
+            γ_3  = γ_3,
+            ψ_0  = ψ_0,
+            ψ_1  = ψ_1,
+            ψ_1s = ψ_1s,
+            ψ_2  = ψ_2,
             ttl   = ttl,
         )
 

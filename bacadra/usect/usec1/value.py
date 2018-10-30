@@ -35,7 +35,7 @@ class value:
             A_y   = A_y,
             A_z   = A_z,
             I_t   = I_t,
-            I_w   = I_ω,
+            I_ω   = I_ω,
             I_y   = I_y,
             I_z   = I_z,
             u     = u,
