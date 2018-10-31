@@ -815,7 +815,7 @@ class schema:
         code += '[lcase] TEXT REFERENCES [052:loads:lcase] ([id]),'
 
         # axial force
-        code += '[N_1] REAL,'
+        code += '[N_x_1] REAL,'
 
         # shear force Vy
         code += '[V_y_1] REAL,'
@@ -833,7 +833,7 @@ class schema:
         code += '[M_z_1] REAL,'
 
         # axial force
-        code += '[N_2] REAL,'
+        code += '[N_x_2] REAL,'
 
         # shear force Vy
         code += '[V_y_2] REAL,'

@@ -2,6 +2,7 @@
 /setup.bat
 *__setup.bat
 *__setup.py
+*_backup/
 
 __pycache__/
 *.py[cod]
