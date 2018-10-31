@@ -13,6 +13,7 @@ class stiff:
 
         # call method to different type of elements
         eleme.truss.stiff(core, self) # +truss
+        eleme.beams.stiff(core, self) # +beams
 
 
     #$$$ def -K-assembly

@@ -12,6 +12,7 @@ class nodes:
     #$$ def --init--
     def __init__(self, core):
         self.core = core
+        self._id_auto_last = 0
 
     #$$ def --enter--
     def __enter__(self):
@@ -21,11 +22,14 @@ class nodes:
     def __exit__(self, type, value, traceback):
         pass
 
-    def add(self, id=None, x=0, y=0, z=0, ucst=None, ucsi=None, fix=None, ttl=None):
+    def add(self, id=None, x=0, y=0, z=0, ucst=None, ucsi=None, fix=None, id_auto=False, ttl=None):
 
         # if fix is none, then use default setting
         if fix is None:
             fix = self.core.mdata.setts.get('nodes_fix')
+
+        if id_auto and not id:
+            id = self._id_auto(True)
 
         # reference type if-block
         if ucst == 'node':
@@ -82,3 +86,7 @@ class nodes:
             where = where,
         )
 
+    def _id_auto(self, add=False):
+        if add:
+            self._id_auto_last += 1
+        return 'a-' + str(self._id_auto_last)
