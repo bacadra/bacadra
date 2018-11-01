@@ -80,6 +80,9 @@ class space:
         # TODO: optimize numbering
         # now the optimize is in sort order number ...
 
+        # first delete old glob
+        othe.core.dbase.exe('DELETE FROM [111:nodes:optim]')
+
         noG = 0
         for node in nodes:
             othe.core.dbase.add(

@@ -12,6 +12,9 @@ class bound:
         Set boundary condition on the K matrix.
         '''
 
+        # create cdof list
+        self.prog._cdof = []
+
         # build constrained dof list
         self._build_cdof()
 
