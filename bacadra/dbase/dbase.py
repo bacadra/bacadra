@@ -10,17 +10,12 @@ Team members who develop this file:
 - Sebastian Balcerowiak <asiloisad; asiloisad.93@gmail.com>
 
 ------------------------------------------------------------------------------
-Changelog:
-- ...
-
-------------------------------------------------------------------------------
 '''
 
 import sqlite3
 
 from . import schema
 from . import parse
-from ..cunit.units import cunit
 
 
 #$ ____ class dbase ________________________________________________________ #
@@ -32,9 +27,12 @@ class dbase:
 
     #$$ def --init--
     def __init__(self):
-        self.path = ':memory:' # can be ":memory:"
+        self.path        = ':memory:' # can be ":memory:"
+        self.timeout     = 0          # None = lock will not interupt auto
+        self.multithread = True       # multithread connection to db
+                                      # please be becarefull - sql threat bool
+                                      # negattve as we do it
 
-        # TODO: set path as the actual input file, impossible in ipython?
 
     #$$ def --enter--
     def __enter__(self):
@@ -44,35 +42,54 @@ class dbase:
     def __exit__(self, type, value, traceback):
         pass
 
+
     #$$ def connect
     def connect(self, path=None, clear=False):
-        if path:
-            self.path = path
-        self.cb = sqlite3.connect(self.path)
+        '''
+        Create database system.
+        '''
+
+        # if user use path, then create local copy of db; otherwise :memory:
+        if path:     self.path = path
+
+        # connect to database
+        # use timeomet and multithread options
+        self.cb = sqlite3.connect(
+            database          = self.path,
+            timeout           = self.timeout,
+            check_same_thread = self.multithread is False
+        )
+
+        # create cursor object
         self.db = self.cb.cursor()
+
+        # if clear is True, then redefine all table
         if clear:
             self.delete_table()
+
+        # create tables if they not exists
         self.create_system()
 
+
     #$$ def close
-    def close(self, save=False):
-        # try:
-        #     if save:
-        #         self.save()
-        #     self.cb.close()
-        # except Exception as e:
-        #     print(e)
+    def close(self, save=True):
+        '''
+        Close connection to database. As defualt all changes will be commited (.save=True).
+        '''
+
         if save:
             self.save()
         self.cb.close()
 
+
     #$$ def clear-lock
     def clear_lock(self):
-        try:
-            self.close()
-            self.connect()
-        except:
-            pass
+        '''
+        Clear lock of database. Locks occure if last quary was start and not finished yet (eg. side effects of python exception). Locks occure if dbase.timeout is set to None - then automaticly lock removes is disabled.
+        '''
+
+        self.cb.interrupt()
+
 
     #$$ def exe
     def exe(self, code, data=None):
@@ -84,12 +101,14 @@ class dbase:
         else:
             self.db.execute(code)
 
+
     #$$ def exem
     def exem(self, code, data=None):
         '''
         Execution of single query. The method provide security interface with (?,?,?) and (a,b,c) data. Data should be inserted in list, as [(a,b), (c,d)].
         '''
         self.db.executemany(code, data)
+
 
     #$$ def exes
     def exes(self, code):
@@ -98,12 +117,14 @@ class dbase:
         '''
         self.db.executescript(code)
 
+
     #$$ def get
     def get(self, code):
         '''
         Get data from database. Dev need to write query with SELECT base. The data will be fetched in all quantity.
         '''
         return self.db.execute(code).fetchall()
+
 
     def add(self, table, cols, data):
         '''
@@ -112,6 +133,7 @@ class dbase:
         cols_noname = ''.join(['?,' for col in cols.split(',')])[:-1]
         self.exe(f"INSERT INTO {table}({cols}) VALUES({cols_noname})", data)
 
+
     def addm(self, table, cols, data):
         '''
         Add many data into system. Dev need to provide information about table, list of column and data list eg. [(a,b),(c,d)].
@@ -119,11 +141,13 @@ class dbase:
         cols_noname = ''.join(['?,' for col in cols.split(',')])[:-1]
         self.exem(f"INSERT INTO {table}({cols}) VALUES({cols_noname})", data)
 
+
     def edit(self, table, cols, data, where):
         '''
         Edit data into system. Dev need to provide information about table, list of oclumns, data list and WHERE statment.
         '''
         self.exe(f"UPDATE {table} SET {cols} WHERE {where}", data)
+
 
     #$$ def save
     def save(self):
@@ -131,6 +155,7 @@ class dbase:
         Commit changes.
         '''
         self.cb.commit()
+
 
     #$$ def delete-table
     def delete_table(self, mode=1):

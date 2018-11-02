@@ -26,3 +26,12 @@ def f3SolveStatxSystemError():
 def f4SolveStatxSystemError(ldof, noG):
         if noG not in ldof:
             raise SolveStatxSystemError('The DOF must be blocked if you want to input imposed displacement')
+
+
+class SolveBConditionWarning(Warning):
+    '''
+    '''
+    pass
+
+def f1SolveBConditionWarning(ldof, dof):
+    print(f'***** SolveBConditionWarning: The boundary condition <{dof}> can\'t be applied into system, because the corresponding to him dof is inactive.\nList of current active dofs <{ldof}>')

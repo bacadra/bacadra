@@ -86,8 +86,8 @@ class RegME:
     def eval(self):
         '''Detect math in string.'''
         def root(text):
-            old = cunit.mode
-            cunit.mode = 'latex'
+            old = cunit.style
+            cunit.style = 'latex'
             a = [text.find('@')]
             i = 0
             while True:
@@ -105,7 +105,7 @@ class RegME:
                     if i % 2 == 1:
                         new += str(eval(self.text[a[i] + 1:a[i + 1]], self.dict))
                 text = new
-            cunit.mode = old
+            cunit.style = old
             return text
 
 

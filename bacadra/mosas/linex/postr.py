@@ -10,3 +10,4 @@ class postr:
 
         # call method to different type of elements
         eleme.truss.postr(core, self, lcase) # +truss post-processing
+        eleme.beams.postr(core, self, lcase) # +beams post-processing

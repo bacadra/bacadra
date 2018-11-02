@@ -1051,6 +1051,10 @@ class cunit(object, metaclass=cunitmeta):
         elif self._units=={}:
             return self._value == othe
 
+        # treat bool and None types
+        elif othe in [True, False, None]:
+            return self._value == othe
+
         # else raise error
         else:
             verrs.fCunitUndefinedOperationError('__eq__', self, othe)
@@ -1090,6 +1094,10 @@ class cunit(object, metaclass=cunitmeta):
 
         # if self units is empty, again, just return self without unit
         elif self._units=={}:
+            return self._value != othe
+
+        # treat bool and None types
+        elif othe in [True, False, None]:
             return self._value != othe
 
         # else raise error

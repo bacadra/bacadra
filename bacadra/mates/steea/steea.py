@@ -1,3 +1,5 @@
+import pandas as pd
+
 from .  import mdata
 from .. import umate
 
@@ -80,3 +82,20 @@ class steea:
             cols  = cols,
             data  = data,
         )
+
+
+    def echo(self):
+        from tabulate import tabulate
+        df = pd.read_sql_query(
+            "SELECT [id],[cclass],[f_yk],[E_a] FROM [013:mates:steea]",
+            self.core.dbase.cb)
+
+        df.to_html('test.html')
+        print(tabulate(df.values,df.columns, tablefmt="pipe"))
+        from tabulate import tabulate
+        print(tabulate(df, tablefmt="markdown", headers="keys"))
+
+        # df.to_csv("test.md", tablefmt="markdown", headers="keys")
+        return df
+        # data = self.core.dbase.get('SELECT * FROM [013:mates:steea]')
+        # return data

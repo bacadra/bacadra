@@ -1,5 +1,7 @@
 import numpy as np
 
+from . import verrs
+
 class bound:
     #$$ def --init--
     def __init__(self, core, prog):
@@ -11,6 +13,9 @@ class bound:
         '''
         Set boundary condition on the K matrix.
         '''
+
+        # create cdof list
+        self.prog._cdof = []
 
         # build constrained dof list
         self._build_cdof()
@@ -167,3 +172,13 @@ class bound:
 
         else:
             raise ValueError('Unknow boundary condition name')
+
+
+    def _chk_bc(self, dof):
+        # TODO: unfinished
+        if dof in self.prog._ldof:
+            return self.prog._ldof.index(dof)
+        else:
+            verrs.f1SolveBConditionError(self.prog._ldof, dof)
+            return None
+

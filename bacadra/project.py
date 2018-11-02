@@ -1,16 +1,14 @@
-
-from . import pinky as _pinky
-from . import dbase as _dbase
-from . import mdata as _mdata
-from . import gtech as _gtech
-from . import loads as _loads
-from . import usect as _usect
-from . import mates as _mates
-from . import geomx as _geomx
-from . import solve as _solve
-
 class project:
     def __init__(self):
+        from . import pinky as _pinky
+        from . import dbase as _dbase
+        from . import mdata as _mdata
+        from . import gtech as _gtech
+        from . import loads as _loads
+        from . import usect as _usect
+        from . import mates as _mates
+        from . import geomx as _geomx
+        from . import mosas as _mosas
 
         self.dbase = _dbase.dbase()
         self.mdata = _mdata.index(dbase=self.dbase)
@@ -31,7 +29,7 @@ class project:
 
 
         self.loads = _loads.index(core=core)
-        self.solve = _solve.index(core=core)
+        self.mosas = _mosas.index(core=core)
         self.gtech = _gtech.index(core=core)
 
     #$$ def --enter--

@@ -19,7 +19,7 @@ class linex:
 
         self._ldof = []   # list of named dofs in one node
         self._sdof = None # summary dof in system
-        self._cdof = []   # list of constrained dof
+        self._cdof = None # list of constrained dof
 
         self._K    = None # stiffness matrix full
         self._K11  = None # stiffness matrix part
