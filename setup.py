@@ -9,7 +9,7 @@ if sys.version_info[0] == 3 and sys.version_info[1] < 5:
 
 setuptools.setup(
     name="bacadra",
-    version="v0.1",
+    version="v0.2a",
     author="bacadra",
     author_email="bacadra@gmail.com",
     description="FEM package for Civil Engineering task's",
