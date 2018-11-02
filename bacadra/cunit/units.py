@@ -31,8 +31,8 @@ class cunit(object, metaclass=cunitmeta):
     # accuracy of printed value
     acc = (None,None)
 
-    # print mode, style of print
-    mode = 'pretty'
+    # print style, style of print
+    style = 'pretty'
 
     # system definition
     # the system atribute type must be dictonary. Inside them we need include the fallowing type:
@@ -207,6 +207,9 @@ class cunit(object, metaclass=cunitmeta):
         # get value
         cval  = self._value
 
+        if cval == 0:
+            return cunit(cval, {})
+
         # copy unit dictonary
         cdict = self._units.copy()
 
@@ -324,23 +327,23 @@ class cunit(object, metaclass=cunitmeta):
 
 #$$ ________ def edit ______________________________________________________ #
 
-    def edit(self, units=None, acc=None, mode=None):
+    def edit(self, units=None, acc=None, style=None):
         '''
-        Change self in-place like acc, mode or units.
+        Change self in-place like acc, style or units.
         '''
         if acc:   self.acc  = acc
-        if mode:  self.mode = mode
+        if style:  self.style = style
         if units: self.iconvert(units)
         return self
 
 
 #$$ ________ def show ______________________________________________________ #
 
-    def show(self, units=None, acc=None, mode=None):
+    def show(self, units=None, acc=None, style=None):
         '''
-        Change self only to print, like acc, mode or units.
+        Change self only to print, like acc, style or units.
         '''
-        return self.copy().edit(acc=acc, units=units, mode=mode)
+        return self.copy().edit(acc=acc, units=units, style=style)
 
 
 #$$ ________ magic behaviour _______________________________________________ #
@@ -360,6 +363,10 @@ class cunit(object, metaclass=cunitmeta):
             # then primary units self and othe
             s = self.primary()
             o = othe.primary()
+
+            # below if-block is neccesary, because we want that 0*m**3 + 0*kN shoud work correctly. fix-zero value
+            if s._value == 0: return o
+            if o._value == 0: return s
 
             # check compability
             verrs.fCunitIncompatibleErorr(s, o, '__(ri)add__')
@@ -427,6 +434,10 @@ class cunit(object, metaclass=cunitmeta):
             s = self.primary()
             o = othe.primary()
 
+            # below if-block is neccesary, because we want that 0*m**3 + 0*kN shoud work correctly. fix-zero value
+            if s._value == 0: return -o
+            if o._value == 0: return s
+
             # check compability
             verrs.fCunitIncompatibleErorr(s, o, '__sub__')
 
@@ -469,6 +480,10 @@ class cunit(object, metaclass=cunitmeta):
             # then primary units self and othe
             s = self.primary()
             o = othe.primary()
+
+            # below if-block is neccesary, because we want that 0*m**3 + 0*kN shoud work correctly. fix-zero value
+            if s._value == 0: return o
+            if o._value == 0: return -s
 
             # check compability
             verrs.fCunitIncompatibleErorr(s, o, '__rsub__')
@@ -572,10 +587,14 @@ class cunit(object, metaclass=cunitmeta):
         # now if-block of data type
         # if second variable is also cunit
         if othe_type == cunit:
+            if self._value == 0 or othe._value == 0:
+                return cunit(0, {})
+
             # then primary units self and othe
             # note: we do not need to check compability units, we can multiply any two units
             s = self.primary()
             o = othe.primary()
+
 
             # return new cunit, with multipled value and summed units
             return cunit(s._value * o._value, ndict.dsum(s._units, o._units))
@@ -622,6 +641,9 @@ class cunit(object, metaclass=cunitmeta):
         # now if-block of data type
         # if second variable is also cunit
         if othe_type == cunit:
+            if self._value == 0:
+                return cunit(0, {})
+
             # then primary units self and othe
             # note: we do not need to check compability units, we can multiply any two units
             s = self.primary()
@@ -655,6 +677,9 @@ class cunit(object, metaclass=cunitmeta):
         # now if-block of data type
         # if second variable is also cunit
         if othe_type == cunit:
+            if othe._value == 0:
+                return cunit(0, {})
+
             # then primary units self and othe
             # note: we do not need to check compability units, we can multiply any two units
             s = self.primary()
@@ -753,13 +778,13 @@ class cunit(object, metaclass=cunitmeta):
         # prepare numeric data
         new = self.__nstyle__(self.acc)
 
-        # convert mode to lowercase
-        self.mode = cunit.mode.lower()
+        # convert style to lowercase
+        self.style = cunit.style.lower()
 
         # if-block depend on presentation style
-        if   self.mode == 'pretty': return self.__repr__pretty(new)
-        elif self.mode == 'python': return self.__repr__python(new)
-        elif self.mode == 'latex' : return self.__repr__latex(new)
+        if   self.style == 'pretty': return self.__repr__pretty(new)
+        elif self.style == 'python': return self.__repr__python(new)
+        elif self.style == 'latex' : return self.__repr__latex(new)
 
 
     @staticmethod
@@ -905,6 +930,9 @@ class cunit(object, metaclass=cunitmeta):
         # now if-block of data type
         # if second variable is also cunit
         if othe_type == cunit:
+            if othe._value == 0 or self._value == 0:
+                return self._value < othe._value
+
             # then primary units self and othe
             s = self.primary()
             o = othe.primary()
@@ -943,6 +971,9 @@ class cunit(object, metaclass=cunitmeta):
         # now if-block of data type
         # if second variable is also cunit
         if othe_type == cunit:
+            if othe._value == 0 or self._value == 0:
+                return self._value <= othe._value
+
             # then primary units self and othe
             s = self.primary()
             o = othe.primary()
@@ -961,7 +992,7 @@ class cunit(object, metaclass=cunitmeta):
 
         # if self units is empty, again, just return self without unit
         elif self._units=={}:
-            return self._value < othe
+            return self._value <= othe
 
         # else raise error
         else:
@@ -997,6 +1028,9 @@ class cunit(object, metaclass=cunitmeta):
         # now if-block of data type
         # if second variable is also cunit
         if othe_type == cunit:
+            if othe._value == 0 or self._value == 0:
+                return self._value == othe._value
+
             # then primary units self and othe
             s = self.primary()
             o = othe.primary()
@@ -1017,6 +1051,10 @@ class cunit(object, metaclass=cunitmeta):
         elif self._units=={}:
             return self._value == othe
 
+        # treat bool and None types
+        elif othe in [True, False, None]:
+            return self._value == othe
+
         # else raise error
         else:
             verrs.fCunitUndefinedOperationError('__eq__', self, othe)
@@ -1035,6 +1073,9 @@ class cunit(object, metaclass=cunitmeta):
         # now if-block of data type
         # if second variable is also cunit
         if othe_type == cunit:
+            if othe._value == 0 or self._value == 0:
+                return self._value != othe._value
+
             # then primary units self and othe
             s = self.primary()
             o = othe.primary()
@@ -1053,6 +1094,10 @@ class cunit(object, metaclass=cunitmeta):
 
         # if self units is empty, again, just return self without unit
         elif self._units=={}:
+            return self._value != othe
+
+        # treat bool and None types
+        elif othe in [True, False, None]:
             return self._value != othe
 
         # else raise error
@@ -1160,7 +1205,7 @@ class cunit(object, metaclass=cunitmeta):
     #
     # def __call__(self):
     #     print(
-    #           'mode  = ', self.mode,
+    #           'style  = ', self.style,
     #         '\nacc   = ', self.acc,
     #         '\nvalue = ', self._value,
     #         '\nunits = ', self._units)

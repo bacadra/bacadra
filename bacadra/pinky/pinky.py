@@ -1046,7 +1046,7 @@ class pinky(TeXM, object, metaclass=pinkymeta):
         # path to destination folder
     sname          = 'pinky.py'
         # name of source file
-    rootdir        = os.path.dirname(os.path.realpath(__file__))
+    rootdir        = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'template')
         # path to folder of templates
     inherit        = False
          # insert code into db (False) or return tex code (true)
@@ -1123,7 +1123,7 @@ class pinky(TeXM, object, metaclass=pinkymeta):
 
 
     #$$ --init--
-    def __init__(self, root=None, dbase=None, **kwargs):
+    def __init__(self, root=None, dbase=None, mdata=None, **kwargs):
         for key, val in kwargs.items():
             self.__dict__[key] = val
         if root is not None:
@@ -1265,7 +1265,7 @@ class pinky(TeXM, object, metaclass=pinkymeta):
 
     def _bib_update(self):
         basepath = os.path.dirname(os.path.realpath(__file__))
-        os.system(os.path.join(basepath, 'bibme.bat'))
+        os.system(os.path.join(basepath, r'template\bibme.bat'))
 
     #$$ def -copy-temp
     def _copy_temp(self):

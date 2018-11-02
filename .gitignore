@@ -1,6 +1,8 @@
 # Byte-compiled / optimized / DLL files
-/__init__.py
 /setup.bat
+*__setup.bat
+*__setup.py
+*_backup/
 
 __pycache__/
 *.py[cod]

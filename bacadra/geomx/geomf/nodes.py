@@ -1,19 +1,13 @@
 
-# from ..cunit.ce import m
-# from ..cunit.cmath import *
-
-# import numpy  as np
-# import pandas as pd
-
+# from ...cunit import cunit
 
 #$ ____ class nodes ________________________________________________________ #
 
 class nodes:
     #$$ def --init--
-    def __init__(self, dbase, pinky, pvars):
-        self.dbase = dbase
-        self.pinky = pinky
-        self.pvars = pvars
+    def __init__(self, core):
+        self.core = core
+        self._id_auto_last = 0
 
     #$$ def --enter--
     def __enter__(self):
@@ -23,64 +17,118 @@ class nodes:
     def __exit__(self, type, value, traceback):
         pass
 
-    def add(self, id=None, x=0, y=0, z=0, ucst=None, ucsi=None, fix=None, ttl=None):
+    def add(self, id=None, x=0, y=0, z=0, ucst=None, ucid=None, fix=None, id_auto=False, ttl=None):
+        '''
+        Add node into FEM system.abs
+
+        :ucst: name of reference element, e.g. "node".
+        "ucid: id of reference element.
+        '''
 
         # if fix is none, then use default setting
         if fix is None:
-            fix = self.pvars.get('nodes_fix')
+            fix = self.core.mdata.setts.get('nodes_fix')
+
+        if id_auto and not id:
+            id = self._id_auto(True)
 
         # reference type if-block
-        if ucst == 'node':
-            # if reference object is node, then add ref node coor to user input
-            Δnode = self.dbase.get(f'''
-            SELECT [x],[y],[z] FROM [111:nodes:topos] WHERE [id] = {ucsi}
-            ''')[0]
-
-            x += Δnode[0]
-            y += Δnode[1]
-            z += Δnode[2]
-
+        x,y,z = self._reference(ucst=ucst, ucid=ucid, x=x, y=y, z=z)
 
         # parse data do nodes data
-        cols,data = self.dbase.parse(
+        cols,data = self.core.dbase.parse(
             id    = id,
             x     = x,
             y     = y,
             z     = z,
             ucst  = ucst,
-            ucsi  = ucsi,
+            ucid  = ucid,
             fix   = fix,
             ttl   = ttl,
         )
 
         # add nodes data
-        self.dbase.add(
+        self.core.dbase.add(
             table = '[111:nodes:topos]',
             cols  = cols,
             data  = data,
         )
 
 
+    def addm(self, cols, data, defs={}):
+        '''
+        Data are parsed due to multi parser. All specific of multiparser are avaiable, like defs
 
-    def edit(self, where, id=None, x=None, y=None, z=None, ucst=None, ucsi=None, fix=None, ttl=None):
+        e.g. defs={"x+f":mm, "z+d"=100} set factor for x column - please note that factor is applied only to non True,False and None and only if value is valid; second command set default value for z column, it will be apply if value in row occur as None - please note that factor is not applied to default value.
+
+        Tip: if some value will form in non-perfomed way (user want somethink other), but the tools addm is very consistet to problem, then single rows in db can be edited by edit method.
+        '''
+
+        # TODO: consider redef method
+        # it can in more clever way call to add method (like inherit in pinky)
+        # and use multiadd data do database (much faster)
+
+        # parse data by multiparser
+        # it return list of dictonary which can be used as **kwargs
+        cols,data = self.core.dbase.parse(parse_mode='addm',
+            cols  = cols,
+            data  = data,
+            defs  = defs,
+        )
+
+        # loop over list with kwargs and apply it to defualt add method
+        for row in data:
+
+            # unpack cols data
+            self.add(**row)
+
+
+
+    def edit(self, where, id=None, x=None, y=None, z=None, ucst=None, ucid=None, fix=None, ttl=None):
 
         # parse data do nodes data
-        cols,data = self.dbase.parse( parse_mode='update',
+        cols,data = self.core.dbase.parse( parse_mode='update',
             id    = id,
             x     = x,
             y     = y,
             z     = z,
             ucst  = ucst,
-            ucsi  = ucsi,
+            ucid  = ucid,
             fix   = fix,
             ttl   = ttl,
         )
 
         # edit nodes data
-        self.dbase.edit(
+        self.core.dbase.edit(
             table = '[111:nodes:topos]',
             cols  = cols,
             data  = data,
             where = where,
         )
+
+
+    def _id_auto(self, add=False):
+        if add:
+            self._id_auto_last += 1
+        return 'a-' + str(self._id_auto_last)
+
+
+    def _reference(self, ucst, ucid, x, y, z):
+        '''
+        Method return new nodal coordinate due to reference object.
+        '''
+
+        if ucst == 'node':
+            # if reference object is node, then add ref node coor to user input
+            Δnode = self.core.dbase.get(f'''
+            SELECT [x],[y],[z] FROM [111:nodes:topos] WHERE [id] = {ucid}
+            ''')[0]
+
+            return x+Δnode[0], y+Δnode[1], z+Δnode[2]
+
+        elif ucst==None:
+            return x,y,z
+
+        else:
+            raise ValueError('Undefined reference type')
 

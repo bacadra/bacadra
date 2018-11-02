@@ -2,13 +2,13 @@ from . import nodes
 from . import truss
 from . import beams
 
-#$ class navix
-class navix:
+#$ class index
+class index:
     #$$ --init--
-    def __init__(self, dbase, pinky, pvars):
-        self.nodes = nodes.nodes(dbase, pinky, pvars)
-        self.truss = truss.truss(dbase, pinky, pvars)
-        self.beams = beams.beams(dbase, pinky, pvars)
+    def __init__(self, core):
+        self.nodes = nodes.nodes(core=core)
+        self.truss = truss.truss(core=core)
+        self.beams = beams.beams(core=core)
 
     #$$ def --enter--
     def __enter__(self):
