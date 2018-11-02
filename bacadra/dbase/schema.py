@@ -557,7 +557,7 @@ class schema:
         code += '[ucst] TEXT,'
 
         # reference number, eg. 1001, 'lala'
-        code += '[ucsi] TEXT,'
+        code += '[ucid] TEXT,'
 
         # blokada stopni swobody
         code += '[fix] INTEGER,'

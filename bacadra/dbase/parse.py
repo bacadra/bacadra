@@ -1,5 +1,7 @@
 
+from . import verrs
 from ..cunit import cunit
+
 
 #$ class parse
 class parse:
@@ -25,6 +27,11 @@ class parse:
         elif parse_mode == 'update':
             return self.prep_edit(**kwargs)
 
+        elif parse_mode == 'addm':
+            return self.prep_addm(**kwargs)
+
+        else:
+            verrs.f1ParseErorr(parse_mode)
 
 
 #$$ ________ parse data ____________________________________________________ #
@@ -120,6 +127,43 @@ class parse:
         return J,C
 
 
+    #$$$ def prer-addm
+    def prep_addm(self, cols, data, defs={}):
+        ldict = []
 
+        #save length of cols header
+        cols_len = len(cols)
 
+        # loop over data row in data argument
+        for i in range(len(data)):
 
+            # at first check consist of data, like length
+            if len(data[i]) != cols_len:
+                verrs.f1ParseMultiError(len(data[i]), cols_len, data[i])
+
+            idict = {}
+            # loop over data in row
+            for j in range(cols_len):
+
+                # if factor of col is defined
+                if cols[j]+'+f' in defs:
+                    # check that value is valid form
+                    if data[i][j] not in [True, False, None] and data[i][j]:
+                        # if value is valid then multiply it by factor
+                        # factor can consist of units
+                        # TODO: how to miss doubled unit by factor
+                        #       method should or not multiply cunit?
+                        data[i][j] *= defs[cols[j]+'+f']
+
+                # if default value of col is defined then replace None value
+                if cols[j]+'+d' in defs:
+                    # then check that val is undefined (None)
+                    if data[i][j] in [None]:
+                        # if it is, then replace it with default value
+                        data[i][j] = defs[cols[j]+'+d']
+
+                idict.update({cols[j]:data[i][j]})
+
+            ldict.append(idict)
+
+        return tuple(cols),ldict
