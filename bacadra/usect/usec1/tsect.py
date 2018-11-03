@@ -20,12 +20,7 @@ class tsect:
     #$$ def add
     def add(self, id=None, mate=None, h_w=None, t_w=None, t_f_1=None, b_f_1=None, t_f_2=None, b_f_2=None, ttl=None):
 
-        # TODO: double def, again in value...
-        # if mate is not defined then use last one material
-        if mate is None:
-            mate = self.core.mdata.setts.get('_mates_ldef')
-
-        A,A_y,A_z,I_t,I_ω,I_y,I_z,u,m_g = self._calc(mate,h_w,t_w,t_f_1,b_f_1,t_f_2,b_f_2)
+        A,A_y,A_z,I_t,I_ω,I_y,I_z,u = self._calc(mate,h_w,t_w,t_f_1,b_f_1,t_f_2,b_f_2)
 
         # parse universal units section 1d data
         self._value.add(
@@ -39,7 +34,6 @@ class tsect:
             I_y    = I_y,
             I_z    = I_z,
             u      = u,
-            m_g    = m_g,
             ttl    = ttl,
             _subcl = 'tsect',
         )
@@ -87,13 +81,9 @@ class tsect:
             h_w * 2
         )
 
-        ρ_o = self.core.dbase.get(f'SELECT [ρ_o] FROM [011:mates:umate] WHERE [id]={mate}')[0][0]
-
-        m_g = A * ρ_o
-
         A_y, A_z, I_t, I_ω = None, None, None, None
 
-        return A,A_y,A_z,I_t,I_ω,I_y,I_z,u,m_g
+        return A,A_y,A_z,I_t,I_ω,I_y,I_z,u
 
 
     def _spt(self, sect=None, mate=None, h_w=None, t_w=None, t_f_1=None, b_f_1=None, t_f_2=None, b_f_2=None):
