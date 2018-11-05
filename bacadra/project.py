@@ -1,4 +1,6 @@
-class project:
+from .tools.index import root_index
+
+class project(root_index):
     def __init__(self):
         from . import pinky as _pinky
         from . import dbase as _dbase

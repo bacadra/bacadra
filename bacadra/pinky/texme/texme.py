@@ -3,7 +3,6 @@
 #$ ____ import _____________________________________________________________ #
 
 import os
-import sys
 import subprocess
 import shutil
 import inspect
@@ -14,7 +13,6 @@ from IPython.display import Image, Latex, Markdown
 from IPython.display import display as ipdisplay
 
 from ... import tools
-from ...cunit.units import cunit
 from .regme import RegME
 
 import importlib.util
