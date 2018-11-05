@@ -13,6 +13,7 @@ from ..cunit import cunit
 
 from . import wgraf
 from .simpl import simpl
+from .canva.canva import canva
 
 
 # #$$ ________ local library/application _____________________________________ #

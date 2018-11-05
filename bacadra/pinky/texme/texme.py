@@ -1256,7 +1256,7 @@ class texme(TeXM, object, metaclass=texmemeta):
         elif type(inherit)==str:
             self.store(inherit, tex)
         elif inherit is False:
-            self.data = [tex + '\n%']
+            self.data += [tex + '\n%']
             if self.echo:
                 print('[texme.' + name + ']\n' + tex)
 
