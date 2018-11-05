@@ -28,7 +28,7 @@ class dbase:
     #$$ def --init--
     def __init__(self):
         self.path        = ':memory:' # can be ":memory:"
-        self.timeout     = 0          # None = lock will not interupt auto
+        self.timeout     = 0.1        # None = lock will not interupt auto
         self.multithread = True       # multithread connection to db
                                       # please be becarefull - sql threat bool
                                       # negattve as we do it

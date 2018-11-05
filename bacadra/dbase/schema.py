@@ -388,6 +388,18 @@ class schema:
         # moment bezwladnosci preta na zginanie wzgledem osi z-z
         code += '[I_z] REAL,'
 
+        # moment bezwladnosci preta na zginanie wzgledem osi y-y
+        code += '[I_ξ] REAL,'
+
+        # moment bezwladnosci preta na zginanie wzgledem osi z-z
+        code += '[I_η] REAL,'
+
+        # Biegunowy moment bezwładności względem środka ścinania
+        code += '[I_p] REAL,'
+
+        # kat obrotu osi glownych
+        code += '[α] REAL,'
+
         # obwod przekroju
         code += '[u] REAL,'
 
@@ -398,6 +410,14 @@ class schema:
         code += '[ttl] TEXT,'
 
         # ----- auto-zone ------------------------------------------- #
+
+        # współrzędna środka ciężkości
+        code += '[y_gc] REAL,'
+        code += '[z_gc] REAL,'
+
+        # współrzędna środka ścinania
+        code += '[y_sc] REAL,'
+        code += '[z_sc] REAL,'
 
         # subclass, type of section
         code += '[subcl] TEXT'
