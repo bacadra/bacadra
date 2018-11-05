@@ -1123,7 +1123,7 @@ class pinky(TeXM, object, metaclass=pinkymeta):
 
 
     #$$ --init--
-    def __init__(self, root=None, dbase=None, mdata=None, **kwargs):
+    def __init__(self, root=None, core=None, **kwargs):
         for key, val in kwargs.items():
             self.__dict__[key] = val
         if root is not None:

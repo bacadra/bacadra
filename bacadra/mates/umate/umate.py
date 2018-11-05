@@ -1,4 +1,3 @@
-
 class umate:
     #$$ def --init--
     def __init__(self, core):
@@ -47,7 +46,7 @@ class umate:
         '''
         Calc third value of material constant
         '''
-        
+
         if E and v and not G:
             G = (E) / (2 * (1 + v))
 
@@ -58,3 +57,48 @@ class umate:
             E = G * (2 * (1 + v))
 
         return E,v,G
+
+    def echo(self, mode='1', save=False, inherit=False):
+        data = self.core.dbase.get('''
+            SELECT
+                [id],
+                [ρ_o],
+                [E_1],
+                [v_1],
+                [G_1],
+                [t_e],
+                [ttl]
+            FROM [011:mates:umate]
+        ''')
+
+        self.core.pinky.rstme.table(
+            caption= 'General material properties',
+            wrap   = [False, False, False, False, False, False, True],
+            width  = [True,True,True,True,True,True,True],
+            halign = ['l','c','c','c','c','c','l'],
+            valign = ['u','u','u','u','u','u','u'],
+            dtype  = ['t','e','e','e','e','e','t'],
+            header = ['id','ρ_o','E_1','v_1','G_1','t_e','ttl'],
+            data   = data,
+            precision = 2,
+            inherit = inherit,
+        )
+
+        self.core.pinky.rstme.table(
+            wrap   = [False, False, False, True],
+            width  = [8, 8, 2,True],
+            halign = ['r','l','c','l'],
+            valign = ['u','u','u','u'],
+            dtype  = ['t','t','t','t'],
+            data   = [
+                ['id' , ''       , '-', 'identificator'   ],
+                ['ρ_o', '[kg/m3]', '-', 'densinity'       ],
+                ['E_1', '[N/m2]' , '-', 'Young\'s modulus'],
+                ['v_1', '[1]'    , '-', 'poisson ratio'   ],
+                ['G_1', '[1]'    , '-', 'Kirchoff modulus'],
+                ['t_e', '[1/°C]' , '-', 'Kirchoff modulus'],
+                ['ttl', ''       , '-', 'title'           ],
+            ],
+            border = False,
+        )
+

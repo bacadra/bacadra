@@ -1,4 +1,4 @@
 from .cunit import cunit
-from . import pinky
+from .pinky.texme.texme import texme
 from . import sofix
 from .project import project

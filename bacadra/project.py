@@ -12,12 +12,13 @@ class project:
 
         self.dbase = _dbase.dbase()
         self.mdata = _mdata.index(dbase=self.dbase)
-        self.pinky = _pinky.index(dbase=self.dbase, mdata=self.mdata)
+        self.pinky = _pinky.index(dbase=self.dbase,
+                                  mdata=self.mdata)
 
         class core:
             dbase = self.dbase
-            pinky = self.pinky
             mdata = self.mdata
+            pinky = self.pinky
 
         self.mates = _mates.index(core=core)
         self.usec1 = _usect.index(core=core).usec1
@@ -26,7 +27,6 @@ class project:
 
         self.geomf = _geomx.index(core=core).geomf
         self.geome = _geomx.index(core=core).geome
-
 
         self.loads = _loads.index(core=core)
         self.mosas = _mosas.index(core=core)

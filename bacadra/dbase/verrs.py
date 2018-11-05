@@ -1,4 +1,10 @@
 
+class DatabaseError(Exception):
+    pass
+
+def openDatabaseError():
+    raise DatabaseError('Connection to database is not established.\nTip1: Open database with .connect(path=.., clear=True/False) method in dbase module.\nTip2: Database can be opened in memory, then just type path=":memory:".')
+
 class ParseError(Exception):
     '''
     General parser exception.

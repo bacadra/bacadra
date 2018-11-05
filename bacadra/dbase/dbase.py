@@ -14,6 +14,7 @@ Team members who develop this file:
 
 import sqlite3
 
+from . import verrs
 from . import schema
 from . import parse
 
@@ -32,7 +33,10 @@ class dbase:
         self.multithread = True       # multithread connection to db
                                       # please be becarefull - sql threat bool
                                       # negattve as we do it
-
+        self.cb          = None       # database instant
+        self.db          = None       # cursor instant
+        self._connection = False      # flag (True|False) of database connection
+                                      # init state is False of course
 
     #$$ def --enter--
     def __enter__(self):
@@ -52,23 +56,26 @@ class dbase:
         # if user use path, then create local copy of db; otherwise :memory:
         if path:     self.path = path
 
-        # connect to database
-        # use timeomet and multithread options
-        self.cb = sqlite3.connect(
-            database          = self.path,
-            timeout           = self.timeout,
-            check_same_thread = self.multithread is False
-        )
+        # first check if connection is established
+        if not self._connection:
+            # connect to database
+            # use timeomet and multithread options
+            self.cb = sqlite3.connect(
+                database          = self.path,
+                timeout           = self.timeout,
+                check_same_thread = self.multithread is False
+            )
+            self._connection = True
 
-        # create cursor object
-        self.db = self.cb.cursor()
+            # create cursor object
+            self.db = self.cb.cursor()
 
-        # if clear is True, then redefine all table
-        if clear:
-            self.delete_table()
+            # if clear is True, then redefine all table
+            if clear:
+                self.delete_table()
 
-        # create tables if they not exists
-        self.create_system()
+            # create tables if they not exists
+            self.create_system()
 
 
     #$$ def close
@@ -77,9 +84,12 @@ class dbase:
         Close connection to database. As defualt all changes will be commited (.save=True).
         '''
 
-        if save:
-            self.save()
-        self.cb.close()
+        # first check if connection is established
+        if self._connection:
+            if save:
+                self.save()
+            self.cb.close()
+            self._connection = False
 
 
     #$$ def clear-lock
@@ -87,8 +97,9 @@ class dbase:
         '''
         Clear lock of database. Locks occure if last quary was start and not finished yet (eg. side effects of python exception). Locks occure if dbase.timeout is set to None - then automaticly lock removes is disabled.
         '''
-
-        self.cb.interrupt()
+        # first check if connection is established
+        if not self._connection:
+            self.cb.interrupt()
 
 
     #$$ def exe
@@ -96,6 +107,8 @@ class dbase:
         '''
         Execution of single query. The method provide security interface with (?,?,?) and (a,b,c) data.
         '''
+        self._check_connection()
+
         if data:
             self.db.execute(code, data)
         else:
@@ -107,6 +120,7 @@ class dbase:
         '''
         Execution of single query. The method provide security interface with (?,?,?) and (a,b,c) data. Data should be inserted in list, as [(a,b), (c,d)].
         '''
+        self._check_connection()
         self.db.executemany(code, data)
 
 
@@ -115,6 +129,7 @@ class dbase:
         '''
         Execution of multi querys. Query must be sepparated by ";" symbol.
         '''
+        self._check_connection()
         self.db.executescript(code)
 
 
@@ -123,6 +138,7 @@ class dbase:
         '''
         Get data from database. Dev need to write query with SELECT base. The data will be fetched in all quantity.
         '''
+        self._check_connection()
         return self.db.execute(code).fetchall()
 
 
@@ -130,6 +146,7 @@ class dbase:
         '''
         Add data into system. Dev need to provide information about table, list of oclumns and data tuple eg. (a,b).
         '''
+        self._check_connection()
         cols_noname = ''.join(['?,' for col in cols.split(',')])[:-1]
         self.exe(f"INSERT INTO {table}({cols}) VALUES({cols_noname})", data)
 
@@ -138,6 +155,7 @@ class dbase:
         '''
         Add many data into system. Dev need to provide information about table, list of column and data list eg. [(a,b),(c,d)].
         '''
+        self._check_connection()
         cols_noname = ''.join(['?,' for col in cols.split(',')])[:-1]
         self.exem(f"INSERT INTO {table}({cols}) VALUES({cols_noname})", data)
 
@@ -146,6 +164,7 @@ class dbase:
         '''
         Edit data into system. Dev need to provide information about table, list of oclumns, data list and WHERE statment.
         '''
+        self._check_connection()
         self.exe(f"UPDATE {table} SET {cols} WHERE {where}", data)
 
 
@@ -154,6 +173,7 @@ class dbase:
         '''
         Commit changes.
         '''
+        self._check_connection()
         self.cb.commit()
 
 
@@ -162,6 +182,7 @@ class dbase:
         '''
         Delete data in database
         '''
+        self._check_connection()
         if mode==1:
             res = self.db.execute(
                 "SELECT name FROM sqlite_master WHERE type='table'")
@@ -177,6 +198,7 @@ class dbase:
         '''
         Call to schema class in schema.py file.
         '''
+        self._check_connection()
         self.exes(schema.schema.code)
 
     #$$ def parse
@@ -184,3 +206,7 @@ class dbase:
     def parse(parse_mode=1, **kwargs):
         return parse.parse().run(parse_mode=parse_mode, **kwargs)
 
+    #$$ def -check-connection
+    def _check_connection(self):
+        if not self._connection:
+            verrs.openDatabaseError()

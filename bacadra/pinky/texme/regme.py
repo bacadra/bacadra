@@ -1,7 +1,7 @@
 import re
 import regex
-from .. import tools
-from ..cunit.units import cunit
+from ... import tools
+from ...cunit.units import cunit
 
 #$ ____ class RegME ________________________________________________________ #
 
