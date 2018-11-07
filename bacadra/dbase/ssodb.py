@@ -1,7 +1,6 @@
 
 
-
-class schema:
+class ssodb:
         code = ''
 
 #$$ ________ *** [000:---model-data--------] *** __________________________ #
@@ -198,7 +197,7 @@ class schema:
         # first ultimate compressive strain in the concrete
         code +='[ε_cu3] REAL,'
 
-        # Partial factor for a material property, taking account of uncertainties in the material property itself, in geometric deviation and in  the design model used
+        # Partial factor for a material property, taking account of uncertainties in the material property itself, in geometric deviation and in the design model used
         code +='[γ_M] REAL'
 
         # close table def!
@@ -825,61 +824,42 @@ class schema:
 
 #$$$$ ________________ [133:beams:sresu] ___________________________________ #
 
-        # tablica z rezultatami dla kratownic
+        # tablica z rezultatami dla belek
         code += 'CREATE TABLE IF NOT EXISTS [133:beams:sresu] ('
 
-        # numer preta kratownicowego
-        code += '[id] TEXT REFERENCES [131:beams:topos] ([id]),'
-
-        # numer przypadku obicazenia
+        # numer przypadku obciazenia
         code += '[lcase] TEXT REFERENCES [052:loads:lcase] ([id]),'
 
-        # axial force
-        code += '[N_x_1] REAL,'
+        # numer preta
+        code += '[id] TEXT REFERENCES [131:beams:topos] ([id]),'
 
-        # shear force Vy
-        code += '[V_y_1] REAL,'
-
-        # shear force Vz
-        code += '[V_z_1] REAL,'
-
-        # bending moment Mx
-        code += '[M_x_1] REAL,'
-
-        # shear force Mz
-        code += '[M_y_1] REAL,'
-
-        # shear force Mz
-        code += '[M_z_1] REAL,'
+        # x coor in x-local way
+        code += '[x] REAL,'
 
         # axial force
-        code += '[N_x_2] REAL,'
+        code += '[N_x] REAL,'
 
         # shear force Vy
-        code += '[V_y_2] REAL,'
+        code += '[V_y] REAL,'
 
         # shear force Vz
-        code += '[V_z_2] REAL,'
+        code += '[V_z] REAL,'
 
         # bending moment Mx
-        code += '[M_x_2] REAL,'
+        code += '[M_x] REAL,'
 
         # shear force Mz
-        code += '[M_y_2] REAL,'
+        code += '[M_y] REAL,'
 
         # shear force Mz
-        code += '[M_z_2] REAL,'
+        code += '[M_z] REAL,'
 
         code += '[ΔL] REAL,'
         code += '[Δk_y] REAL,'
         code += '[ε_x_N] REAL,'
 
-
-
-
-
         # set primary key
-        code += 'PRIMARY KEY ([id], [lcase]) ON CONFLICT REPLACE'
+        code += 'PRIMARY KEY ([id], [lcase], [x]) ON CONFLICT REPLACE'
 
         # close table def!
         code += ');'
@@ -887,14 +867,17 @@ class schema:
 
 #$$$$ ________________ [134:beams:desig] ___________________________________ #
 
-        # tablica z rezultatami dla kratownic
+        # tablica z rezultatami
         code += 'CREATE TABLE IF NOT EXISTS [134:beams:desig] ('
 
-        # numer preta kratownicowego
+        # numer przypadku obciazenia
+        code += '[lcase] INTEGER REFERENCES [052:loads:lcase] ([id]),'
+
+        # numer preta
         code += '[id] INTEGER REFERENCES [121:beams:topos] ([id]),'
 
-        # numer przypadku obicazenia
-        code += '[lcase] INTEGER REFERENCES [052:loads:lcase] ([id]),'
+        # x coor in x-local way
+        code += '[x] REAL,'
 
         # naprezenia osiowe w precie
         code += '[σ_x_N] REAL,'

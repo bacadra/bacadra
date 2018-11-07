@@ -2,42 +2,35 @@ import os
 import subprocess
 import glob
 
-class out1p:
-    sofi_e18 = r'c:\Program Files\SOFiSTiK\2018\SOFiSTiK 2018'
-    sofi_e16 = r'c:\Program Files\SOFiSTiK\2016\ANALYSIS_33_X64'
-    sofi_env = None
-    sofi_wps = r'wps.exe'
-    sofi_sps = r'sps.exe'
-    sofi_urs = r'ursula.exe'
-    magi_707 = r'c:\Program Files\ImageMagick-7.0.7-Q16'
-    magi_env = None
-    magi_mck = r'magick.exe'
+from . import sbase
+from . import tools
+from . import verrs
+
+class wgraf:
+    sbase = sbase()
+
     size     = {'h':'2023x1296+289+289',
                 'v':'2023x2668+289+289',
                 's':'2139x1266+229+242'}
 
-    def __init__(self, cdb, wdata, delete=True, output=None, active=False):
+    def __init__(self, cdb, wdata, delete=True, output='.', active=False):
         self.active = active
         self.cdb    = cdb
         self.wdata  = wdata
             # wdata[0] active state: True or False
             # wdata[1] paper type, eg. 's'
             # wdata[2] wingraf name
-        self.output = output if output is not None else '.'
+        self.output = output
         self.delete = delete
 
         # start system while class object defined
         self._start_system()
 
 
-    def _check_cdb(self):
-        if not os.path.exists(self.cdb):
-            raise ValueError('.cdb does not exists! path: ' + str(os.path.abspath(self.cdb)))
-
     def _check_gra(self, path):
         path = os.path.join(os.path.dirname(self.cdb), path)
         if not os.path.exists(path):
-            raise ValueError('.gra does not exists! path: ' + str(os.path.abspath(path)))
+            raise verrs.gracheckBCDRsofixError(str(os.path.abspath(path)))
 
 
     def _sofi_system_path(self):
@@ -188,7 +181,8 @@ class out1p:
     def _start_system(self):
         if self.active:
             # check that cdb exists
-            self._check_cdb()
+            if not os.path.exists(self.cdb):
+                raise verrs.BCDRsofixError(str(os.path.abspath(self.cdb)))
 
             # check sofistik system
             self._sofi_system_path()
@@ -222,3 +216,21 @@ class out1p:
                     self._jpg_convert(data[2], data[1])
 
 
+
+class wgran:
+    def __init__(self, output, cdb, wdata, delete=True, active=True):
+        self.active = active
+        self.output = output
+        self.cdb    = cdb
+        self.wdata  = wdata
+        self.delete = delete
+
+        self._start_system()
+
+    def _start_system(self):
+        if self.active:
+            for cdb in self.cdb:
+
+                output_path = os.path.join(self.output, os.path.basename(cdb[1]))
+
+                wgraf(cdb=cdb[1], wdata=self.wdata, delete=self.delete, output=output_path, active=cdb[0])

@@ -1,5 +1,35 @@
+from ctypes import *
+
+class bStructure(Structure):
+    def __repr__(self):
+        data = self.convert()
+        return str(data)
+
+    def convert(self):
+        data = {}
+        for field in self._fields_:
+            val = getattr(self, field[0])
+
+            try:
+                val_unpack = []
+                for val1 in val:
+                    try:
+                        val2_unpack = []
+                        for val2 in val1:
+                            val2_unpack += [val2]
+                        val_unpack = val2_unpack
+                    except:
+                        val_unpack += [val1]
+                val = val_unpack
+
+            except:
+                val = val
+
+            data.update({field[0]: val})
+        return data
+
 #+============================================================================
-#| Company:   SOFiSTiK AG 
+#| Company:   SOFiSTiK AG
 #|      sofistik_daten.py
 #|      automatically generated header, no use to modify!
 #+============================================================================
@@ -8,15 +38,15 @@
 from ctypes import *
 
 
-class CREC_VERS(Structure):        # -999/-999  Revision number of generating cdbase.txt
+class CREC_VERS(bStructure):        # -999/-999  Revision number of generating cdbase.txt
    _fields_ = [
          ('m_vers', c_int)         #        version
       ]
 crec_vers = CREC_VERS()
 
-class CREC_INDX(Structure):        # -999/-998  Sorted index on structure names
+class CREC_INDX(bStructure):        # -999/-998  Sorted index on bStructure names
    _fields_ = [
-         ('m_name', c_int * 2),    #        Name of this structure
+         ('m_name', c_int * 2),    #        Name of this bStructure
          ('m_kwh', c_int),         #        Kwh
          ('m_kwl', c_int),         #        Kwl
          ('m_sel1', c_int * 2),    #        Selection string of first integer value
@@ -24,33 +54,33 @@ class CREC_INDX(Structure):        # -999/-998  Sorted index on structure names
       ]
 crec_indx = CREC_INDX()
 
-class CREC_PUB(Structure):         # -999/-997:1  public REC
+class CREC_PUB(bStructure):         # -999/-997:1  public REC
    _fields_ = [
          ('m_id', c_int),          #        Identification 1/2
          ('m_kwh', c_int),         #        Kwh
          ('m_kwl', c_int),         #        Kwl (may be NR/LC or number)
          ('m_sel1', c_int * 2),    #        Selection string of first integer value
          ('m_sel2', c_int * 2),    #        Selection string of second integer value
-         ('m_name', c_int * 2),    #        name of this structure
+         ('m_name', c_int * 2),    #        name of this bStructure
          ('m_version', c_int),     #        Version number of description
          ('m_option', c_int)       #        options  0 = default
       ]
 crec_pub = CREC_PUB()
 
-class CREC_INT(Structure):         # -999/-997:2  internal REC
+class CREC_INT(bStructure):         # -999/-997:2  internal REC
    _fields_ = [
          ('m_id', c_int),          #        Identification 1/2
          ('m_kwh', c_int),         #        Kwh
          ('m_kwl', c_int),         #        Kwl (may be NR/LC or number)
          ('m_sel1', c_int * 2),    #        Selection string of first integer value
          ('m_sel2', c_int * 2),    #        Selection string of second integer value
-         ('m_name', c_int * 2),    #        name of this structure
+         ('m_name', c_int * 2),    #        name of this bStructure
          ('m_version', c_int),     #        Version number of description
          ('m_option', c_int)       #        options  0 = default
       ]
 crec_int = CREC_INT()
 
-class CREC_DAD(Structure):         # -999/-997:3  public DAD
+class CREC_DAD(bStructure):         # -999/-997:3  public DAD
    _fields_ = [
          ('m_id', c_int),          #        Identification 3
          ('m_kwh', c_int),         #        Kwh
@@ -58,7 +88,7 @@ class CREC_DAD(Structure):         # -999/-997:3  public DAD
       ]
 crec_dad = CREC_DAD()
 
-class CREC_DESC(Structure):        # -999/-997:4  description string to last entry or item
+class CREC_DESC(bStructure):        # -999/-997:4  description string to last entry or item
    _fields_ = [
          ('m_id', c_int),          #        Identification 4
          ('m_lang', c_int),        #        Language of this item
@@ -66,7 +96,7 @@ class CREC_DESC(Structure):        # -999/-997:4  description string to last ent
       ]
 crec_desc = CREC_DESC()
 
-class CREC_ITM5_STRU(Structure):   #        Names of the structure elements
+class CREC_ITM5_STRU(bStructure):   #        Names of the bStructure elements
    _fields_ = [
          ('m_name', c_int * 2),
          ('m_dim', c_int),
@@ -74,7 +104,7 @@ class CREC_ITM5_STRU(Structure):   #        Names of the structure elements
       ]
 crec_itm5_stru = CREC_ITM5_STRU()
 
-class CREC_ITM5(Structure):        # -999/-997:5  item of a record (obsoleted)
+class CREC_ITM5(bStructure):        # -999/-997:5  item of a record (obsoleted)
    _fields_ = [
          ('m_id', c_int),          #        Identification 5
          ('m_nr', c_int),          #        number of the item
@@ -88,11 +118,11 @@ class CREC_ITM5(Structure):        # -999/-997:5  item of a record (obsoleted)
          ('m_dim2', c_int),        #        second dimension
          ('m_beg2', c_int),        #        first index of second dimension
          ('m_bits', c_int),        #        additional information Bits
-         ('m_structur',  CREC_ITM5_STRU * 20)  #        Names of the structure elements
+         ('m_structur',  CREC_ITM5_STRU * 20)  #        Names of the bStructure elements
       ]
 crec_itm5 = CREC_ITM5()
 
-class CREC_ITEM_STRU(Structure):   #        Names of the structure elements
+class CREC_ITEM_STRU(bStructure):   #        Names of the bStructure elements
    _fields_ = [
          ('m_name', c_int * 2),
          ('m_dim', c_int),
@@ -101,7 +131,7 @@ class CREC_ITEM_STRU(Structure):   #        Names of the structure elements
       ]
 crec_item_stru = CREC_ITEM_STRU()
 
-class CREC_ITEM(Structure):        # -999/-997:6  item of a record
+class CREC_ITEM(bStructure):        # -999/-997:6  item of a record
    _fields_ = [
          ('m_id', c_int),          #        Identification 6
          ('m_nr', c_int),          #        number of the item
@@ -116,11 +146,11 @@ class CREC_ITEM(Structure):        # -999/-997:6  item of a record
          ('m_dim2', c_int),        #        second dimension
          ('m_beg2', c_int),        #        first index of second dimension
          ('m_bits', c_int),        #        additional information Bits
-         ('m_structur',  CREC_ITEM_STRU * 20)  #        Names of the structure elements
+         ('m_structur',  CREC_ITEM_STRU * 20)  #        Names of the bStructure elements
       ]
 crec_item = CREC_ITEM()
 
-class CREC_MIX_MIXI(Structure):    #        Mixinfo
+class CREC_MIX_MIXI(bStructure):    #        Mixinfo
    _fields_ = [
          ('m_typ', c_int),
          ('m_keytyp', c_int),
@@ -128,7 +158,7 @@ class CREC_MIX_MIXI(Structure):    #        Mixinfo
       ]
 crec_mix_mixi = CREC_MIX_MIXI()
 
-class CREC_MIX(Structure):         # -999/-997:11  mixinfo of a record
+class CREC_MIX(bStructure):         # -999/-997:11  mixinfo of a record
    _fields_ = [
          ('m_id', c_int),          #        Identification 11/12
          ('m_nkey', c_int),
@@ -139,7 +169,7 @@ class CREC_MIX(Structure):         # -999/-997:11  mixinfo of a record
       ]
 crec_mix = CREC_MIX()
 
-class CREC_MHD_MIXI(Structure):    #        Mixinfo
+class CREC_MHD_MIXI(bStructure):    #        Mixinfo
    _fields_ = [
          ('m_typ', c_int),
          ('m_keytyp', c_int),
@@ -147,7 +177,7 @@ class CREC_MHD_MIXI(Structure):    #        Mixinfo
       ]
 crec_mhd_mixi = CREC_MHD_MIXI()
 
-class CREC_MHD(Structure):         # -999/-997:12  mixinfo of a record header
+class CREC_MHD(bStructure):         # -999/-997:12  mixinfo of a record header
    _fields_ = [
          ('m_id', c_int),          #        Identification 11/12
          ('m_nkey', c_int),
@@ -158,7 +188,7 @@ class CREC_MHD(Structure):         # -999/-997:12  mixinfo of a record header
       ]
 crec_mhd = CREC_MHD()
 
-class CCTRL_010(Structure):        # 0/01:999  AccessInfo Last Program
+class CCTRL_010(bStructure):        # 0/01:999  AccessInfo Last Program
    _fields_ = [
          ('m_id', c_int),          #        Identifier 999
          ('m_acce', c_int),        #        Number of access
@@ -168,7 +198,7 @@ class CCTRL_010(Structure):        # 0/01:999  AccessInfo Last Program
       ]
 cctrl_010 = CCTRL_010()
 
-class CCTRL_011(Structure):        # 0/01:?  Messages
+class CCTRL_011(bStructure):        # 0/01:?  Messages
    _fields_ = [
          ('m_id', c_int),          #        Level
          ('m_iderr', c_int * 2),   #        Number of errortext
@@ -180,7 +210,7 @@ class CCTRL_011(Structure):        # 0/01:?  Messages
       ]
 cctrl_011 = CCTRL_011()
 
-class CCTRL_OBJ(Structure):        # 0/01:101  involved objects
+class CCTRL_OBJ(bStructure):        # 0/01:101  involved objects
    _fields_ = [
          ('m_id', c_int),          #        Identifier = 101
          ('m_id2', c_int),         #        bitpattern of specified data
@@ -192,14 +222,14 @@ class CCTRL_OBJ(Structure):        # 0/01:101  involved objects
       ]
 cctrl_obj = CCTRL_OBJ()
 
-class CCTRL_OID(Structure):        # 0/01:102  GUId
+class CCTRL_OID(bStructure):        # 0/01:102  GUId
    _fields_ = [
          ('m_id', c_int),          #        identifier 102
          ('m_idbim', c_int * 36)   #        256 Bit GUId Identifier of preceeding element
       ]
 cctrl_oid = CCTRL_OID()
 
-class CSSD_SPE(Structure):         # 0/96:1  SSD-Spezial
+class CSSD_SPE(bStructure):         # 0/96:1  SSD-Spezial
    _fields_ = [
          ('m_id', c_int),          #        id==1
          ('m_type', c_int),        #        type of information
@@ -209,7 +239,7 @@ class CSSD_SPE(Structure):         # 0/96:1  SSD-Spezial
       ]
 cssd_spe = CSSD_SPE()
 
-class CVIS_LC0(Structure):         # 0/97:0  active Loadcase
+class CVIS_LC0(bStructure):         # 0/97:0  active Loadcase
    _fields_ = [
          ('m_id', c_int),          #        id==0
          ('m_lfnr', c_int),        #        Loadcase number
@@ -217,7 +247,7 @@ class CVIS_LC0(Structure):         # 0/97:0  active Loadcase
       ]
 cvis_lc0 = CVIS_LC0()
 
-class CVIS_LC(Structure):          # 0/97:1  Loadcase visualisation
+class CVIS_LC(bStructure):          # 0/97:1  Loadcase visualisation
    _fields_ = [
          ('m_id', c_int),          #        id==1
          ('m_lfnr', c_int),        #        Loadcase number
@@ -225,7 +255,7 @@ class CVIS_LC(Structure):          # 0/97:1  Loadcase visualisation
       ]
 cvis_lc = CVIS_LC()
 
-class CCTRL(Structure):            # 0/99:*  PrintControl
+class CCTRL(bStructure):            # 0/99:*  PrintControl
    _fields_ = [
          ('m_maxl', c_int),        #        Lines per page
          ('m_marg', c_int),        #        Left margin
@@ -242,7 +272,7 @@ class CCTRL(Structure):            # 0/99:*  PrintControl
       ]
 cctrl = CCTRL()
 
-class CCTRL_0(Structure):          # 0/99:0  AccessInfo
+class CCTRL_0(bStructure):          # 0/99:0  AccessInfo
    _fields_ = [
          ('m_id', c_int),          #        Identifier 0
          ('m_acce', c_int),        #        Number of access
@@ -254,7 +284,7 @@ class CCTRL_0(Structure):          # 0/99:0  AccessInfo
       ]
 cctrl_0 = CCTRL_0()
 
-class CCTRL_1(Structure):          # 0/99:1  AccessTitle
+class CCTRL_1(bStructure):          # 0/99:1  AccessTitle
    _fields_ = [
          ('m_id', c_int),          #        Identifier 1
          ('m_acce', c_int),        #        Number of access
@@ -262,7 +292,7 @@ class CCTRL_1(Structure):          # 0/99:1  AccessTitle
       ]
 cctrl_1 = CCTRL_1()
 
-class CCTRL_VAR(Structure):        # 0/100  Global_CADINP_Variable
+class CCTRL_VAR(bStructure):        # 0/100  Global_CADINP_Variable
    _fields_ = [
          ('m_name', c_int * 4),    #        name of variable
          ('m_ind', c_int),         #        index for arrays
@@ -273,7 +303,7 @@ class CCTRL_VAR(Structure):        # 0/100  Global_CADINP_Variable
       ]
 cctrl_var = CCTRL_VAR()
 
-class CCTRL_VAP(Structure):        # 0/100:???  Private_CADINP_Variable
+class CCTRL_VAP(bStructure):        # 0/100:???  Private_CADINP_Variable
    _fields_ = [
          ('m_id', c_int),          #        Identification = ???
          ('m_ind1', c_int),        #        Lower Index of variable
@@ -283,7 +313,7 @@ class CCTRL_VAP(Structure):        # 0/100:???  Private_CADINP_Variable
       ]
 cctrl_vap = CCTRL_VAP()
 
-class CCTRL_DIM(Structure):        # 0/101  Unit definitions
+class CCTRL_DIM(bStructure):        # 0/101  Unit definitions
    _fields_ = [
          ('m_idim', c_int),        #        number of an implicit unit (>999)
          ('m_unia', c_int),        #        unit for output (0=do not change)
@@ -293,7 +323,7 @@ class CCTRL_DIM(Structure):        # 0/101  Unit definitions
       ]
 cctrl_dim = CCTRL_DIM()
 
-class CMAT(Structure):             # 1/NR:0  MaterialTitle
+class CMAT(bStructure):             # 1/NR:0  MaterialTitle
    _fields_ = [
          ('m_id', c_int),          #        Identification = 0
          ('m_type', c_int),        #        Material type
@@ -302,14 +332,14 @@ class CMAT(Structure):             # 1/NR:0  MaterialTitle
       ]
 cmat = CMAT()
 
-class CMAT_USER(Structure):        # 1/NR:10??  Information on user input
+class CMAT_USER(bStructure):        # 1/NR:10??  Information on user input
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_bit', c_int * 32)     #        User input for 001/NR:1
       ]
 cmat_user = CMAT_USER()
 
-class CMAT_FLUI(Structure):        # 1/NR:1  MaterialConstants
+class CMAT_FLUI(bStructure):        # 1/NR:1  MaterialConstants
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_type', c_int),        #        Material type
@@ -324,7 +354,7 @@ class CMAT_FLUI(Structure):        # 1/NR:1  MaterialConstants
       ]
 cmat_flui = CMAT_FLUI()
 
-class CMAT_CONS(Structure):        # 1/NR:1  MaterialConstants
+class CMAT_CONS(bStructure):        # 1/NR:1  MaterialConstants
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_type', c_int),        #        Material type
@@ -347,7 +377,7 @@ class CMAT_CONS(Structure):        # 1/NR:1  MaterialConstants
       ]
 cmat_cons = CMAT_CONS()
 
-class CMAT_UNDR(Structure):        # 1/NR:14  Undrained soil parameters
+class CMAT_UNDR(bStructure):        # 1/NR:14  Undrained soil parameters
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_type', c_int),        #        Material type
@@ -370,7 +400,7 @@ class CMAT_UNDR(Structure):        # 1/NR:14  Undrained soil parameters
       ]
 cmat_undr = CMAT_UNDR()
 
-class CMAT_FAUL(Structure):        # 1/NR:15  Fault/Shear plane
+class CMAT_FAUL(bStructure):        # 1/NR:15  Fault/Shear plane
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_type', c_int),        #        Material type
@@ -393,7 +423,7 @@ class CMAT_FAUL(Structure):        # 1/NR:15  Fault/Shear plane
       ]
 cmat_faul = CMAT_FAUL()
 
-class CMAT_SWEL(Structure):        # 1/NR:16  Swelling parameters
+class CMAT_SWEL(bStructure):        # 1/NR:16  Swelling parameters
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_type', c_int),        #        Material type
@@ -416,7 +446,7 @@ class CMAT_SWEL(Structure):        # 1/NR:16  Swelling parameters
       ]
 cmat_swel = CMAT_SWEL()
 
-class CMAT_CONC(Structure):        # 1/NR:1  MaterialConcrete
+class CMAT_CONC(bStructure):        # 1/NR:1  MaterialConcrete
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_type', c_int),        #        Material type
@@ -456,7 +486,7 @@ class CMAT_CONC(Structure):        # 1/NR:1  MaterialConcrete
       ]
 cmat_conc = CMAT_CONC()
 
-class CMAT_STEE(Structure):        # 1/NR:1  MaterialSteel
+class CMAT_STEE(bStructure):        # 1/NR:1  MaterialSteel
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_type', c_int),        #        Material type
@@ -495,7 +525,7 @@ class CMAT_STEE(Structure):        # 1/NR:1  MaterialSteel
       ]
 cmat_stee = CMAT_STEE()
 
-class CMAT_TIMB(Structure):        # 1/NR:1  MaterialTimber
+class CMAT_TIMB(bStructure):        # 1/NR:1  MaterialTimber
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_type', c_int),        #        Material type
@@ -535,7 +565,7 @@ class CMAT_TIMB(Structure):        # 1/NR:1  MaterialTimber
       ]
 cmat_timb = CMAT_TIMB()
 
-class CMAT_BRIC(Structure):        # 1/NR:1  MaterialBrickwork
+class CMAT_BRIC(bStructure):        # 1/NR:1  MaterialBrickwork
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_type', c_int),        #        Bric type and strength
@@ -566,7 +596,7 @@ class CMAT_BRIC(Structure):        # 1/NR:1  MaterialBrickwork
       ]
 cmat_bric = CMAT_BRIC()
 
-class CMAT_SERV(Structure):        # 1/NR:2  StressStrainLaw (Servicability)
+class CMAT_SERV(bStructure):        # 1/NR:2  StressStrainLaw (Servicability)
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_temp', c_int),        #        Temperature
@@ -579,7 +609,7 @@ class CMAT_SERV(Structure):        # 1/NR:2  StressStrainLaw (Servicability)
       ]
 cmat_serv = CMAT_SERV()
 
-class CMAT_ULTI(Structure):        # 1/NR:3  StressStrainLaw (Ultimate Limit state)
+class CMAT_ULTI(bStructure):        # 1/NR:3  StressStrainLaw (Ultimate Limit state)
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_temp', c_int),        #        Temperature
@@ -592,7 +622,7 @@ class CMAT_ULTI(Structure):        # 1/NR:3  StressStrainLaw (Ultimate Limit sta
       ]
 cmat_ulti = CMAT_ULTI()
 
-class CMAT_NONL(Structure):        # 1/NR:4  StressStrainLaw (Nonlinear Mean Values)
+class CMAT_NONL(bStructure):        # 1/NR:4  StressStrainLaw (Nonlinear Mean Values)
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_temp', c_int),        #        Temperature
@@ -605,7 +635,7 @@ class CMAT_NONL(Structure):        # 1/NR:4  StressStrainLaw (Nonlinear Mean Val
       ]
 cmat_nonl = CMAT_NONL()
 
-class CMAT_BED(Structure):         # 1/NR:7  MaterialBedding
+class CMAT_BED(bStructure):         # 1/NR:7  MaterialBedding
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_mnr', c_int),         #        Materialnumber of bedding boddy
@@ -622,7 +652,7 @@ class CMAT_BED(Structure):         # 1/NR:7  MaterialBedding
       ]
 cmat_bed = CMAT_BED()
 
-class CMAT_LAY(Structure):         # 1/NR:8  MaterialLayerStructure
+class CMAT_LAY(bStructure):         # 1/NR:8  MaterialLayerbStructure
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_nm', c_int),          #        Number of a material
@@ -631,7 +661,7 @@ class CMAT_LAY(Structure):         # 1/NR:8  MaterialLayerStructure
       ]
 cmat_lay = CMAT_LAY()
 
-class CMAT_HYD(Structure):         # 1/NR:9  MaterialConductivity
+class CMAT_HYD(bStructure):         # 1/NR:9  MaterialConductivity
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_t', c_int),           #        Temperature / pressure
@@ -644,7 +674,7 @@ class CMAT_HYD(Structure):         # 1/NR:9  MaterialConductivity
       ]
 cmat_hyd = CMAT_HYD()
 
-class CMAT_SPE(Structure):         # 1/NR:90  MaterialSpecial
+class CMAT_SPE(bStructure):         # 1/NR:90  MaterialSpecial
    _fields_ = [
          ('m_id', c_int),          #        Identification = 90
          ('m_type', c_int),        #        type of material value
@@ -653,7 +683,7 @@ class CMAT_SPE(Structure):         # 1/NR:90  MaterialSpecial
       ]
 cmat_spe = CMAT_SPE()
 
-class CBORE(Structure):            # 2/NR:0  SoilProfile
+class CBORE(bStructure):            # 2/NR:0  SoilProfile
    _fields_ = [
          ('m_id', c_int),          #        identifier 0 (always the first record)
          ('m_x', c_float),         # [1001] X_ordinate
@@ -670,7 +700,7 @@ class CBORE(Structure):            # 2/NR:0  SoilProfile
       ]
 cbore = CBORE()
 
-class CBORE_LAY(Structure):        # 2/NR:1  Soillayer
+class CBORE_LAY(bStructure):        # 2/NR:1  Soillayer
    _fields_ = [
          ('m_id', c_int),          #        Identifier 1
          ('m_mnr', c_int),         #        Material number
@@ -691,7 +721,7 @@ class CBORE_LAY(Structure):        # 2/NR:1  Soillayer
       ]
 cbore_lay = CBORE_LAY()
 
-class CBORE_TAB(Structure):        # 2/NR:10  SoilTabdefinition
+class CBORE_TAB(bStructure):        # 2/NR:10  SoilTabdefinition
    _fields_ = [
          ('m_id', c_int),          #        Identifier 10
          ('m_opt', c_int),         #        Option
@@ -701,7 +731,7 @@ class CBORE_TAB(Structure):        # 2/NR:10  SoilTabdefinition
       ]
 cbore_tab = CBORE_TAB()
 
-class CBORE_TAD(Structure):        # 2/NR:11  SoilTabvalues
+class CBORE_TAD(bStructure):        # 2/NR:11  SoilTabvalues
    _fields_ = [
          ('m_id', c_int),          #        Identifier 11
          ('m_i_1', c_int),         #        reserved
@@ -711,7 +741,7 @@ class CBORE_TAD(Structure):        # 2/NR:11  SoilTabvalues
       ]
 cbore_tad = CBORE_TAD()
 
-class CBORE_BAX(Structure):        # 2/NR:1001  BoreProfileAxial
+class CBORE_BAX(bStructure):        # 2/NR:1001  BoreProfileAxial
    _fields_ = [
          ('m_id', c_int),          #        identifier 1001
          ('m_z1', c_float),        #        parameter s on start
@@ -729,7 +759,7 @@ class CBORE_BAX(Structure):        # 2/NR:1001  BoreProfileAxial
       ]
 cbore_bax = CBORE_BAX()
 
-class CBORE_BLA(Structure):        # 2/NR:1002  BoreProfileTransverse
+class CBORE_BLA(bStructure):        # 2/NR:1002  BoreProfileTransverse
    _fields_ = [
          ('m_id', c_int),          #        identifier 1002
          ('m_z1', c_float),        #        parameter s on start
@@ -746,11 +776,11 @@ class CBORE_BLA(Structure):        # 2/NR:1002  BoreProfileTransverse
          ('m_p0', c_float),        #        peripher Distribution
          ('m_p1', c_float),
          ('m_p2', c_float),
-         ('m_p3', c_float) 
+         ('m_p3', c_float)
       ]
 cbore_bla = CBORE_BLA()
 
-class CBORE_BAM(Structure):        # 2/NR:1003  BoreProfileMoment
+class CBORE_BAM(bStructure):        # 2/NR:1003  BoreProfileMoment
    _fields_ = [
          ('m_id', c_int),          #        identifier 1003
          ('m_z1', c_float),        #        parameter s on start
@@ -762,7 +792,7 @@ class CBORE_BAM(Structure):        # 2/NR:1003  BoreProfileMoment
       ]
 cbore_bam = CBORE_BAM()
 
-class CBORE_DYA(Structure):        # 2/NR:1011  BoreProfileAxialDynamic
+class CBORE_DYA(bStructure):        # 2/NR:1011  BoreProfileAxialDynamic
    _fields_ = [
          ('m_id', c_int),          #        identifier 1011
          ('m_z1', c_float),        #        parameter s on start
@@ -774,7 +804,7 @@ class CBORE_DYA(Structure):        # 2/NR:1011  BoreProfileAxialDynamic
       ]
 cbore_dya = CBORE_DYA()
 
-class CBORE_DYL(Structure):        # 2/NR:1012  BoreProfileTransverseDynamic
+class CBORE_DYL(bStructure):        # 2/NR:1012  BoreProfileTransverseDynamic
    _fields_ = [
          ('m_id', c_int),          #        identifier 1012
          ('m_z1', c_float),        #        parameter s on start
@@ -788,7 +818,7 @@ class CBORE_DYL(Structure):        # 2/NR:1012  BoreProfileTransverseDynamic
       ]
 cbore_dyl = CBORE_DYL()
 
-class CAXIS(Structure):            # 3/ID:0  Geometric Axis
+class CAXIS(bStructure):            # 3/ID:0  Geometric Axis
    _fields_ = [
          ('m_id0', c_int),         #        identifier 0
          ('m_id1', c_int),         #        subtype of axis
@@ -800,7 +830,7 @@ class CAXIS(Structure):            # 3/ID:0  Geometric Axis
       ]
 caxis = CAXIS()
 
-class CAXIS_REF(Structure):        # 3/ID:-  Reference to another Geometry
+class CAXIS_REF(bStructure):        # 3/ID:-  Reference to another Geometry
    _fields_ = [
          ('m_igm', c_int),         #        negative value of the master geometry 03/abs(IGM)
          ('m_igs', c_int),         #        optional identifier of a secondary axis
@@ -809,7 +839,7 @@ class CAXIS_REF(Structure):        # 3/ID:-  Reference to another Geometry
       ]
 caxis_ref = CAXIS_REF()
 
-class CAXIS_GEO(Structure):        # 3/ID:??  Geometric properties
+class CAXIS_GEO(bStructure):        # 3/ID:??  Geometric properties
    _fields_ = [
          ('m_iln', c_int),         #        Code of geometry
          ('m_gpg', c_float),       # [1001] geometry parameter 1
@@ -829,7 +859,7 @@ class CAXIS_GEO(Structure):        # 3/ID:??  Geometric properties
       ]
 caxis_geo = CAXIS_GEO()
 
-class CAXIS_NKN(Structure):        # 3/ID:90  Knots of a Nurb
+class CAXIS_NKN(bStructure):        # 3/ID:90  Knots of a Nurb
    _fields_ = [
          ('m_iln', c_int),         #        ID=90
          ('m_deg', c_int),         #        Order of Spline
@@ -837,7 +867,7 @@ class CAXIS_NKN(Structure):        # 3/ID:90  Knots of a Nurb
       ]
 caxis_nkn = CAXIS_NKN()
 
-class CSLN_NKN(Structure):         # 39/NR:90  Knots of a Nurb
+class CSLN_NKN(bStructure):         # 39/NR:90  Knots of a Nurb
    _fields_ = [
          ('m_iln', c_int),         #        ID=90
          ('m_deg', c_int),         #        Order of Spline
@@ -845,7 +875,7 @@ class CSLN_NKN(Structure):         # 39/NR:90  Knots of a Nurb
       ]
 csln_nkn = CSLN_NKN()
 
-class CAXIS_CPT(Structure):        # 3/ID:91  Control point of a Nurb
+class CAXIS_CPT(bStructure):        # 3/ID:91  Control point of a Nurb
    _fields_ = [
          ('m_iln', c_int),         #        ID=91
          ('m_w', c_float),         #        Weight
@@ -854,7 +884,7 @@ class CAXIS_CPT(Structure):        # 3/ID:91  Control point of a Nurb
       ]
 caxis_cpt = CAXIS_CPT()
 
-class CSLN_CPT(Structure):         # 39/NR:91  Control point of a Nurb
+class CSLN_CPT(bStructure):         # 39/NR:91  Control point of a Nurb
    _fields_ = [
          ('m_iln', c_int),         #        ID=91
          ('m_w', c_float),         #        Weight
@@ -863,7 +893,7 @@ class CSLN_CPT(Structure):         # 39/NR:91  Control point of a Nurb
       ]
 csln_cpt = CSLN_CPT()
 
-class CAXIS_PT(Structure):         # 3/ID:92  Data point on curve
+class CAXIS_PT(bStructure):         # 3/ID:92  Data point on curve
    _fields_ = [
          ('m_iln', c_int),         #        ID=92
          ('m_s', c_float),         #        Parameter along curve
@@ -872,7 +902,7 @@ class CAXIS_PT(Structure):         # 3/ID:92  Data point on curve
       ]
 caxis_pt = CAXIS_PT()
 
-class CSLN_PT(Structure):          # 39/NR:92  Data point on curve
+class CSLN_PT(bStructure):          # 39/NR:92  Data point on curve
    _fields_ = [
          ('m_iln', c_int),         #        ID=92
          ('m_s', c_float),         #        Parameter along curve
@@ -881,7 +911,7 @@ class CSLN_PT(Structure):          # 39/NR:92  Data point on curve
       ]
 csln_pt = CSLN_PT()
 
-class CAXIS_ARC(Structure):        # 3/ID:93  Circular Arc
+class CAXIS_ARC(bStructure):        # 3/ID:93  Circular Arc
    _fields_ = [
          ('m_iln', c_int),         #        ID=93
          ('m_idf', c_int),         #        Definition selected
@@ -893,7 +923,7 @@ class CAXIS_ARC(Structure):        # 3/ID:93  Circular Arc
       ]
 caxis_arc = CAXIS_ARC()
 
-class CSLN_ARC(Structure):         # 39/NR:93  Circular Arc
+class CSLN_ARC(bStructure):         # 39/NR:93  Circular Arc
    _fields_ = [
          ('m_iln', c_int),         #        ID=93
          ('m_idf', c_int),         #        Definition selected
@@ -905,7 +935,7 @@ class CSLN_ARC(Structure):         # 39/NR:93  Circular Arc
       ]
 csln_arc = CSLN_ARC()
 
-class CAXIS_SPT(Structure):        # 3/ID:97  Station point on a Nurb
+class CAXIS_SPT(bStructure):        # 3/ID:97  Station point on a Nurb
    _fields_ = [
          ('m_iln', c_int),         #        ID=97
          ('m_s', c_float),         #        Station value at data point
@@ -915,7 +945,7 @@ class CAXIS_SPT(Structure):        # 3/ID:97  Station point on a Nurb
       ]
 caxis_spt = CAXIS_SPT()
 
-class CAXIS_VIZ(Structure):        # 3/ID:98  Data points for visualisation
+class CAXIS_VIZ(bStructure):        # 3/ID:98  Data points for visualisation
    _fields_ = [
          ('m_iln', c_int),         #        ID=98
          ('m_color', c_int),       #        hexadecimal RGB-value (e.g. 99AAFF)
@@ -924,7 +954,7 @@ class CAXIS_VIZ(Structure):        # 3/ID:98  Data points for visualisation
       ]
 caxis_viz = CAXIS_VIZ()
 
-class CAXIS_OBB(Structure):        # 3/ID:99  Oriented Boundig Box
+class CAXIS_OBB(bStructure):        # 3/ID:99  Oriented Boundig Box
    _fields_ = [
          ('m_iln', c_int),         #        ID=99
          ('m_s1', c_float),        #        Parameter on Start
@@ -935,7 +965,7 @@ class CAXIS_OBB(Structure):        # 3/ID:99  Oriented Boundig Box
       ]
 caxis_obb = CAXIS_OBB()
 
-class CAXIS_ATB(Structure):        # 3/ID:101  Geometric segments of axis plan view
+class CAXIS_ATB(bStructure):        # 3/ID:101  Geometric segments of axis plan view
    _fields_ = [
          ('m_id0', c_int),         #        ident=101
          ('m_id1', c_int),         #        specification type
@@ -951,7 +981,7 @@ class CAXIS_ATB(Structure):        # 3/ID:101  Geometric segments of axis plan v
       ]
 caxis_atb = CAXIS_ATB()
 
-class CAXIS_VTB(Structure):        # 3/ID:102  Geometric properties for axis heights
+class CAXIS_VTB(bStructure):        # 3/ID:102  Geometric properties for axis heights
    _fields_ = [
          ('m_id0', c_int),         #        ident=102
          ('m_id1', c_int),         #        specification type
@@ -964,7 +994,7 @@ class CAXIS_VTB(Structure):        # 3/ID:102  Geometric properties for axis hei
       ]
 caxis_vtb = CAXIS_VTB()
 
-class CAXIS_ITB(Structure):        # 3/ID:103  Placement at axis position
+class CAXIS_ITB(bStructure):        # 3/ID:103  Placement at axis position
    _fields_ = [
          ('m_id0', c_int),         #        ident=103
          ('m_ids', c_int),         #        Enum of secondary axis
@@ -987,7 +1017,7 @@ class CAXIS_ITB(Structure):        # 3/ID:103  Placement at axis position
       ]
 caxis_itb = CAXIS_ITB()
 
-class CAXIS_ITS(Structure):        # 3/ID:104  Secondary axis definition
+class CAXIS_ITS(bStructure):        # 3/ID:104  Secondary axis definition
    _fields_ = [
          ('m_id0', c_int),         #        Ident=104
          ('m_ids', c_int),         #        Enum of secondary axis (1='A' to 26 ='Z')
@@ -1002,7 +1032,7 @@ class CAXIS_ITS(Structure):        # 3/ID:104  Secondary axis definition
       ]
 caxis_its = CAXIS_ITS()
 
-class CAXIS_PSM(Structure):        # 3/ID:105  Prestress method
+class CAXIS_PSM(bStructure):        # 3/ID:105  Prestress method
    _fields_ = [
          ('m_id0', c_int),         #        ident=105
          ('m_idt', c_int),         #        Identifier of Tendon
@@ -1022,7 +1052,7 @@ class CAXIS_PSM(Structure):        # 3/ID:105  Prestress method
       ]
 caxis_psm = CAXIS_PSM()
 
-class CAXIS_PSP(Structure):        # 3/ID:106  Prestress placements
+class CAXIS_PSP(bStructure):        # 3/ID:106  Prestress placements
    _fields_ = [
          ('m_id0', c_int),         #        ident=106
          ('m_typ', c_int),         #        Type of placement
@@ -1036,7 +1066,7 @@ class CAXIS_PSP(Structure):        # 3/ID:106  Prestress placements
       ]
 caxis_psp = CAXIS_PSP()
 
-class CAXIS_PLC(Structure):        # 3/ID:107  Placement at axis position
+class CAXIS_PLC(bStructure):        # 3/ID:107  Placement at axis position
    _fields_ = [
          ('m_id0', c_int),         #        ident=107
          ('m_ids', c_int),         #        Enum of secondary axis
@@ -1062,7 +1092,7 @@ class CAXIS_PLC(Structure):        # 3/ID:107  Placement at axis position
       ]
 caxis_plc = CAXIS_PLC()
 
-class CAXIS_OPT(Structure):        # 3/ID:10107  Placement options
+class CAXIS_OPT(bStructure):        # 3/ID:10107  Placement options
    _fields_ = [
          ('m_id0', c_int),         #        ident=10107
          ('m_a_filter', c_int),    #        Filter for axis
@@ -1070,7 +1100,7 @@ class CAXIS_OPT(Structure):        # 3/ID:10107  Placement options
       ]
 caxis_opt = CAXIS_OPT()
 
-class CAXIS_PRP(Structure):        # 3/ID:110  General properties of axis
+class CAXIS_PRP(bStructure):        # 3/ID:110  General properties of axis
    _fields_ = [
          ('m_id0', c_int),         #        ident=110
          ('m_name', c_int * 4),    #        Name of this item
@@ -1082,7 +1112,7 @@ class CAXIS_PRP(Structure):        # 3/ID:110  General properties of axis
       ]
 caxis_prp = CAXIS_PRP()
 
-class CGAXD_ATB(Structure):        # 3/ID:121  Geometric segments of axis plan view (double precision)
+class CGAXD_ATB(bStructure):        # 3/ID:121  Geometric segments of axis plan view (double precision)
    _fields_ = [
          ('m_id0', c_int),         #        ident=121
          ('m_id1', c_int),         #        specification type
@@ -1100,7 +1130,7 @@ class CGAXD_ATB(Structure):        # 3/ID:121  Geometric segments of axis plan v
       ]
 cgaxd_atb = CGAXD_ATB()
 
-class CGAXD_VTB(Structure):        # 3/ID:122  Geometric properties for axis heights (double precision)
+class CGAXD_VTB(bStructure):        # 3/ID:122  Geometric properties for axis heights (double precision)
    _fields_ = [
          ('m_id0', c_int),         #        ident=122
          ('m_id1', c_int),         #        specification type
@@ -1114,7 +1144,7 @@ class CGAXD_VTB(Structure):        # 3/ID:122  Geometric properties for axis hei
       ]
 cgaxd_vtb = CGAXD_VTB()
 
-class CGAXD_GEO(Structure):        # 3/ID:18?  Geometric properties
+class CGAXD_GEO(bStructure):        # 3/ID:18?  Geometric properties
    _fields_ = [
          ('m_iln', c_int),         #        Code of geometry
          ('m_id1', c_int),         #        reserved
@@ -1135,7 +1165,7 @@ class CGAXD_GEO(Structure):        # 3/ID:18?  Geometric properties
       ]
 cgaxd_geo = CGAXD_GEO()
 
-class CGAXD_NKN(Structure):        # 3/ID:190  Knots of a Nurb
+class CGAXD_NKN(bStructure):        # 3/ID:190  Knots of a Nurb
    _fields_ = [
          ('m_iln', c_int),         #        ID=190
          ('m_deg', c_int),         #        Order of Spline
@@ -1143,7 +1173,7 @@ class CGAXD_NKN(Structure):        # 3/ID:190  Knots of a Nurb
       ]
 cgaxd_nkn = CGAXD_NKN()
 
-class CGAXD_CPT(Structure):        # 3/ID:191  Control point of a Nurb
+class CGAXD_CPT(bStructure):        # 3/ID:191  Control point of a Nurb
    _fields_ = [
          ('m_iln', c_int),         #        ID=191
          ('m_id1', c_int),         #        reserved
@@ -1153,7 +1183,7 @@ class CGAXD_CPT(Structure):        # 3/ID:191  Control point of a Nurb
       ]
 cgaxd_cpt = CGAXD_CPT()
 
-class CGAXD_PT(Structure):         # 3/ID:192  Data point on curve
+class CGAXD_PT(bStructure):         # 3/ID:192  Data point on curve
    _fields_ = [
          ('m_iln', c_int),         #        ID=192
          ('m_id1', c_int),         #        specification type
@@ -1163,7 +1193,7 @@ class CGAXD_PT(Structure):         # 3/ID:192  Data point on curve
       ]
 cgaxd_pt = CGAXD_PT()
 
-class CGAXD_ARC(Structure):        # 3/ID:193  Circular Arc
+class CGAXD_ARC(bStructure):        # 3/ID:193  Circular Arc
    _fields_ = [
          ('m_iln', c_int),         #        ID=193
          ('m_idf', c_int),         #        Definition selected
@@ -1175,7 +1205,7 @@ class CGAXD_ARC(Structure):        # 3/ID:193  Circular Arc
       ]
 cgaxd_arc = CGAXD_ARC()
 
-class CAXIS_TRL(Structure):        # 3/ID:300  Properties for train loading
+class CAXIS_TRL(bStructure):        # 3/ID:300  Properties for train loading
    _fields_ = [
          ('m_id0', c_int),         #        ident 300
          ('m_nra', c_int),         #        Number of the lane (0:99)
@@ -1202,7 +1232,7 @@ class CAXIS_TRL(Structure):        # 3/ID:300  Properties for train loading
       ]
 caxis_trl = CAXIS_TRL()
 
-class CTEND(Structure):            # 4/ID:0  Prestressing Schemes
+class CTEND(bStructure):            # 4/ID:0  Prestressing Schemes
    _fields_ = [
          ('m_id0', c_int),         #        identifier 0
          ('m_key', c_int),         #        Control bits + Info
@@ -1211,7 +1241,7 @@ class CTEND(Structure):            # 4/ID:0  Prestressing Schemes
       ]
 ctend = CTEND()
 
-class CTEND_1(Structure):          # 4/ID:1  Tendon of Prestressing Schemes
+class CTEND_1(bStructure):          # 4/ID:1  Tendon of Prestressing Schemes
    _fields_ = [
          ('m_id0', c_int),         #        identifier 1
          ('m_mnr', c_int),         #        Material number of Prestressing Steel
@@ -1241,7 +1271,7 @@ class CTEND_1(Structure):          # 4/ID:1  Tendon of Prestressing Schemes
       ]
 ctend_1 = CTEND_1()
 
-class CTEND_2(Structure):          # 4/ID:2  Anchor of Prestressing Schemes
+class CTEND_2(bStructure):          # 4/ID:2  Anchor of Prestressing Schemes
    _fields_ = [
          ('m_id0', c_int),         #        identifier 2
          ('m_id1', c_int),         #        Type of anchor
@@ -1251,7 +1281,7 @@ class CTEND_2(Structure):          # 4/ID:2  Anchor of Prestressing Schemes
       ]
 ctend_2 = CTEND_2()
 
-class CTEND_3(Structure):          # 4/ID:3  Jack of Prestressing Schemes
+class CTEND_3(bStructure):          # 4/ID:3  Jack of Prestressing Schemes
    _fields_ = [
          ('m_id0', c_int),         #        identifier 2
          ('m_id1', c_int),         #        reserved
@@ -1261,7 +1291,7 @@ class CTEND_3(Structure):          # 4/ID:3  Jack of Prestressing Schemes
       ]
 ctend_3 = CTEND_3()
 
-class CAREA(Structure):            # 5/ID:0  Geometric Area
+class CAREA(bStructure):            # 5/ID:0  Geometric Area
    _fields_ = [
          ('m_id0', c_int),         #        identifier 0
          ('m_ng', c_int),          #        Type of surface representation
@@ -1279,14 +1309,14 @@ class CAREA(Structure):            # 5/ID:0  Geometric Area
       ]
 carea = CAREA()
 
-class CAREA_CPT(Structure):        # 5/ID:10  Control points of area
+class CAREA_CPT(bStructure):        # 5/ID:10  Control points of area
    _fields_ = [
          ('m_id', c_int),          #        Identification of control point data = 10
          ('m_xpar', c_float * 9999)  #        spline grid and coefficients
       ]
 carea_cpt = CAREA_CPT()
 
-class CAREA_PTS(Structure):        # 5/ID:11  AreaPointonSurface
+class CAREA_PTS(bStructure):        # 5/ID:11  AreaPointonSurface
    _fields_ = [
          ('m_id', c_int),          #        Identification of surface description = 11
          ('m_it', c_int),          #        Type of point
@@ -1300,7 +1330,7 @@ class CAREA_PTS(Structure):        # 5/ID:11  AreaPointonSurface
       ]
 carea_pts = CAREA_PTS()
 
-class CAREA_CPI(Structure):        # 5/ID:12  COONsPatchInfo
+class CAREA_CPI(bStructure):        # 5/ID:12  COONsPatchInfo
    _fields_ = [
          ('m_id', c_int),          #        Identification of COONs blending edges 12
          ('m_it', c_int),          #        Type of blending
@@ -1316,7 +1346,7 @@ class CAREA_CPI(Structure):        # 5/ID:12  COONsPatchInfo
       ]
 carea_cpi = CAREA_CPI()
 
-class CAREA_NKN(Structure):        # 5/ID:9?  Knots of a Nurb
+class CAREA_NKN(bStructure):        # 5/ID:9?  Knots of a Nurb
    _fields_ = [
          ('m_iln', c_int),         #        ID
          ('m_deg', c_int),         #        Order of Spline
@@ -1324,7 +1354,7 @@ class CAREA_NKN(Structure):        # 5/ID:9?  Knots of a Nurb
       ]
 carea_nkn = CAREA_NKN()
 
-class CGARD_PTS(Structure):        # 5/ID:290  AreaPointonSurface
+class CGARD_PTS(bStructure):        # 5/ID:290  AreaPointonSurface
    _fields_ = [
          ('m_id', c_int),          #        Id = 290
          ('m_it', c_int),          #        Type of point
@@ -1338,7 +1368,7 @@ class CGARD_PTS(Structure):        # 5/ID:290  AreaPointonSurface
       ]
 cgard_pts = CGARD_PTS()
 
-class CGARD_NKU(Structure):        # 5/ID:291  Knots of a Nurb
+class CGARD_NKU(bStructure):        # 5/ID:291  Knots of a Nurb
    _fields_ = [
          ('m_iln', c_int),         #        ID
          ('m_deg', c_int),         #        Order of Spline
@@ -1346,7 +1376,7 @@ class CGARD_NKU(Structure):        # 5/ID:291  Knots of a Nurb
       ]
 cgard_nku = CGARD_NKU()
 
-class CGARD_NKV(Structure):        # 5/ID:292  Knots of a Nurb
+class CGARD_NKV(bStructure):        # 5/ID:292  Knots of a Nurb
    _fields_ = [
          ('m_iln', c_int),         #        ID
          ('m_deg', c_int),         #        Order of Spline
@@ -1354,7 +1384,7 @@ class CGARD_NKV(Structure):        # 5/ID:292  Knots of a Nurb
       ]
 cgard_nkv = CGARD_NKV()
 
-class CCON_0(Structure):           # 8/ID:0  Connection Headder
+class CCON_0(bStructure):           # 8/ID:0  Connection Headder
    _fields_ = [
          ('m_ids', c_int),         #        Identification = 0
          ('m_typ', c_int),         #        Type of connection
@@ -1363,7 +1393,7 @@ class CCON_0(Structure):           # 8/ID:0  Connection Headder
       ]
 ccon_0 = CCON_0()
 
-class CCON_BOL(Structure):         # 8/ID:1  Definition of Bolts
+class CCON_BOL(bStructure):         # 8/ID:1  Definition of Bolts
    _fields_ = [
          ('m_ids', c_int),         #        Identification = 1
          ('m_typ', c_int),         #        Type of hole
@@ -1374,7 +1404,7 @@ class CCON_BOL(Structure):         # 8/ID:1  Definition of Bolts
       ]
 ccon_bol = CCON_BOL()
 
-class CCON_WEL(Structure):         # 8/ID:2  Definition of Weldings
+class CCON_WEL(bStructure):         # 8/ID:2  Definition of Weldings
    _fields_ = [
          ('m_ids', c_int),         #        Identification = 2
          ('m_typ', c_int),         #        Type of weld
@@ -1385,7 +1415,7 @@ class CCON_WEL(Structure):         # 8/ID:2  Definition of Weldings
       ]
 ccon_wel = CCON_WEL()
 
-class CCON_CLE(Structure):         # 8/ID:3  Definition of Cleats (Angle/Latch)
+class CCON_CLE(bStructure):         # 8/ID:3  Definition of Cleats (Angle/Latch)
    _fields_ = [
          ('m_ids', c_int),         #        Identification = 3
          ('m_typ', c_int),         #        Enum of type (angle/latch not really enforced)
@@ -1403,7 +1433,7 @@ class CCON_CLE(Structure):         # 8/ID:3  Definition of Cleats (Angle/Latch)
       ]
 ccon_cle = CCON_CLE()
 
-class CCON_MEM(Structure):         # 8/ID:10  Connected Member data
+class CCON_MEM(bStructure):         # 8/ID:10  Connected Member data
    _fields_ = [
          ('m_ids', c_int),         #        Identification = 10
          ('m_nr', c_int),          #        Enumeration or designation of member
@@ -1428,7 +1458,7 @@ class CCON_MEM(Structure):         # 8/ID:10  Connected Member data
       ]
 ccon_mem = CCON_MEM()
 
-class CCON_END(Structure):         # 8/ID:11  Endplate of Beam
+class CCON_END(bStructure):         # 8/ID:11  Endplate of Beam
    _fields_ = [
          ('m_ids', c_int),         #        Identification = 11
          ('m_typ', c_int),         #        Type of end plate
@@ -1446,7 +1476,7 @@ class CCON_END(Structure):         # 8/ID:11  Endplate of Beam
       ]
 ccon_end = CCON_END()
 
-class CCON_PIN(Structure):         # 8/ID:12  Pinned plate of Beam
+class CCON_PIN(bStructure):         # 8/ID:12  Pinned plate of Beam
    _fields_ = [
          ('m_ids', c_int),         #        Identification = 13
          ('m_mat', c_int),         #        Materialnumber of pin plate
@@ -1462,7 +1492,7 @@ class CCON_PIN(Structure):         # 8/ID:12  Pinned plate of Beam
       ]
 ccon_pin = CCON_PIN()
 
-class CCON_PLT(Structure):         # 8/ID:20  Additional plates in connection
+class CCON_PLT(bStructure):         # 8/ID:20  Additional plates in connection
    _fields_ = [
          ('m_ids', c_int),         #        Identification = 20
          ('m_typ', c_int),         #        Type of plate
@@ -1472,7 +1502,7 @@ class CCON_PLT(Structure):         # 8/ID:20  Additional plates in connection
       ]
 ccon_plt = CCON_PLT()
 
-class CSECT(Structure):            # 9/NR:0  SectionalValues (total section)
+class CSECT(bStructure):            # 9/NR:0  SectionalValues (total section)
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_mno', c_int),         #        Materialnumber of sections
@@ -1494,7 +1524,7 @@ class CSECT(Structure):            # 9/NR:0  SectionalValues (total section)
       ]
 csect = CSECT()
 
-class CSECT_EFF(Structure):        # 9/NR:1  SectionalValues (effective section)
+class CSECT_EFF(bStructure):        # 9/NR:1  SectionalValues (effective section)
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_mno', c_int),         #        Materialnumber of sections
@@ -1516,7 +1546,7 @@ class CSECT_EFF(Structure):        # 9/NR:1  SectionalValues (effective section)
       ]
 csect_eff = CSECT_EFF()
 
-class CSECT_PAR(Structure):        # 9/NR:2  SectionalValues (total part of section)
+class CSECT_PAR(bStructure):        # 9/NR:2  SectionalValues (total part of section)
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_mno', c_int),         #        Materialnumber of sections
@@ -1538,7 +1568,7 @@ class CSECT_PAR(Structure):        # 9/NR:2  SectionalValues (total part of sect
       ]
 csect_par = CSECT_PAR()
 
-class CSECT_PEF(Structure):        # 9/NR:3  SectionalValues (effective part of section)
+class CSECT_PEF(bStructure):        # 9/NR:3  SectionalValues (effective part of section)
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_mno', c_int),         #        Materialnumber of sections
@@ -1560,7 +1590,7 @@ class CSECT_PEF(Structure):        # 9/NR:3  SectionalValues (effective part of 
       ]
 csect_pef = CSECT_PEF()
 
-class CSECT_ADD(Structure):        # 9/NR:4  SectionalValuesShear , Temperature
+class CSECT_ADD(bStructure):        # 9/NR:4  SectionalValuesShear , Temperature
    _fields_ = [
          ('m_id', c_int),
          ('m_stype', c_int),
@@ -1590,7 +1620,7 @@ class CSECT_ADD(Structure):        # 9/NR:4  SectionalValuesShear , Temperature
       ]
 csect_add = CSECT_ADD()
 
-class CSECT_WAR(Structure):        # 9/NR:5  SectionalValuesWarping
+class CSECT_WAR(bStructure):        # 9/NR:5  SectionalValuesWarping
    _fields_ = [
          ('m_id', c_int),          #        Identification = 5
          ('m_i_1', c_int),         #        unused
@@ -1613,7 +1643,7 @@ class CSECT_WAR(Structure):        # 9/NR:5  SectionalValuesWarping
       ]
 csect_war = CSECT_WAR()
 
-class CSECT_PLA(Structure):        # 9/NR:6  SectionalPlasticForces
+class CSECT_PLA(bStructure):        # 9/NR:6  SectionalPlasticForces
    _fields_ = [
          ('m_id', c_int),          #        Identification = 6
          ('m_ibc', c_int),         #        Buckling curve
@@ -1631,7 +1661,7 @@ class CSECT_PLA(Structure):        # 9/NR:6  SectionalPlasticForces
       ]
 csect_pla = CSECT_PLA()
 
-class CSECT_DES(Structure):        # 9/NR:7  SectionalValuesDesign
+class CSECT_DES(bStructure):        # 9/NR:7  SectionalValuesDesign
    _fields_ = [
          ('m_id', c_int),          #        Identification = 7
          ('m_mnr', c_int),         #        used reference material
@@ -1653,7 +1683,7 @@ class CSECT_DES(Structure):        # 9/NR:7  SectionalValuesDesign
       ]
 csect_des = CSECT_DES()
 
-class CSECT_PRE(Structure):        # 9/NR:8  SectionalForcesPrestress
+class CSECT_PRE(bStructure):        # 9/NR:8  SectionalForcesPrestress
    _fields_ = [
          ('m_id', c_int),          #        Identification = 8
          ('m_itp', c_int),         #        subtype of information = 0
@@ -1672,7 +1702,7 @@ class CSECT_PRE(Structure):        # 9/NR:8  SectionalForcesPrestress
       ]
 csect_pre = CSECT_PRE()
 
-class CSECT_GV(Structure):         # 9/NR:8  SectionalGeometricValues
+class CSECT_GV(bStructure):         # 9/NR:8  SectionalGeometricValues
    _fields_ = [
          ('m_id', c_int),          #        Identification = 8
          ('m_itp', c_int),         #        subtype of information = 2
@@ -1697,7 +1727,7 @@ class CSECT_GV(Structure):         # 9/NR:8  SectionalGeometricValues
       ]
 csect_gv = CSECT_GV()
 
-class CSECT_TRA(Structure):        # 9/NR:8  SectionalAppliedTransformation
+class CSECT_TRA(bStructure):        # 9/NR:8  SectionalAppliedTransformation
    _fields_ = [
          ('m_id', c_int),          #        Identification = 8
          ('m_itp', c_int),         #        subtype of information = 3
@@ -1708,7 +1738,7 @@ class CSECT_TRA(Structure):        # 9/NR:8  SectionalAppliedTransformation
       ]
 csect_tra = CSECT_TRA()
 
-class CSECT_LAY(Structure):        # 9/NR:9  SectionalReinforcementLayer  (LAY)
+class CSECT_LAY(bStructure):        # 9/NR:9  SectionalReinforcementLayer  (LAY)
    _fields_ = [
          ('m_id', c_int),          #        Identification = 9
          ('m_mnr', c_int),         #        Materialnumber + 1000*No of concrete \%
@@ -1744,7 +1774,7 @@ class CSECT_LAY(Structure):        # 9/NR:9  SectionalReinforcementLayer  (LAY)
       ]
 csect_lay = CSECT_LAY()
 
-class CSECT_REC(Structure):        # 9/NR:10  SectiontypeRectangular T-Beam (SREC)
+class CSECT_REC(bStructure):        # 9/NR:10  SectiontypeRectangular T-Beam (SREC)
    _fields_ = [
          ('m_id', c_int),          #        Identification = 10
          ('m_iq', c_int),          #        Identification of section
@@ -1780,7 +1810,7 @@ class CSECT_REC(Structure):        # 9/NR:10  SectiontypeRectangular T-Beam (SRE
       ]
 csect_rec = CSECT_REC()
 
-class CSECT_ANN(Structure):        # 9/NR:11  SectiontypeAnnular (SCIT)
+class CSECT_ANN(bStructure):        # 9/NR:11  SectiontypeAnnular (SCIT)
    _fields_ = [
          ('m_id', c_int),          #        Identification = 11
          ('m_ir', c_int),          #        Identification of section
@@ -1801,7 +1831,7 @@ class CSECT_ANN(Structure):        # 9/NR:11  SectiontypeAnnular (SCIT)
       ]
 csect_ann = CSECT_ANN()
 
-class CSECT_TUB(Structure):        # 9/NR:11  SectiontypeTube (TUBE)
+class CSECT_TUB(bStructure):        # 9/NR:11  SectiontypeTube (TUBE)
    _fields_ = [
          ('m_id', c_int),          #        Identification = 11
          ('m_ir', c_int),          #        Identification of section = 2
@@ -1811,7 +1841,7 @@ class CSECT_TUB(Structure):        # 9/NR:11  SectiontypeTube (TUBE)
       ]
 csect_tub = CSECT_TUB()
 
-class CSECT_CAB(Structure):        # 9/NR:11  SectiontypeCable (CABL)
+class CSECT_CAB(bStructure):        # 9/NR:11  SectiontypeCable (CABL)
    _fields_ = [
          ('m_id', c_int),          #        Identification = 11
          ('m_ir', c_int),          #        Identification of section = 3
@@ -1831,7 +1861,7 @@ class CSECT_CAB(Structure):        # 9/NR:11  SectiontypeCable (CABL)
       ]
 csect_cab = CSECT_CAB()
 
-class CSECT_PRO(Structure):        # 9/NR:12  SectiontypeShape (PROF)
+class CSECT_PRO(bStructure):        # 9/NR:12  SectiontypeShape (PROF)
    _fields_ = [
          ('m_id', c_int),          #        Identification = 12
          ('m_mno', c_int),         #        Materialnumber + 1000*imbedded Materialnumber
@@ -1875,7 +1905,7 @@ class CSECT_PRO(Structure):        # 9/NR:12  SectiontypeShape (PROF)
       ]
 csect_pro = CSECT_PRO()
 
-class CSECT_TBA(Structure):        # 9/NR:18  List of construction stages
+class CSECT_TBA(bStructure):        # 9/NR:18  List of construction stages
    _fields_ = [
          ('m_id', c_int),          #        Identification = 18
          ('m_iba', c_int),         #        Headder of construction stages = 0
@@ -1884,7 +1914,7 @@ class CSECT_TBA(Structure):        # 9/NR:18  List of construction stages
       ]
 csect_tba = CSECT_TBA()
 
-class CSECT_IBA(Structure):        # 9/NR:18  ConstructionStage (CS/BA)
+class CSECT_IBA(bStructure):        # 9/NR:18  ConstructionStage (CS/BA)
    _fields_ = [
          ('m_id', c_int),          #        Identification = 18
          ('m_iba', c_int),         #        number of construction stage BIRTH
@@ -1893,7 +1923,7 @@ class CSECT_IBA(Structure):        # 9/NR:18  ConstructionStage (CS/BA)
       ]
 csect_iba = CSECT_IBA()
 
-class CSECT_TXT(Structure):        # 9/NR:19  SectionText
+class CSECT_TXT(bStructure):        # 9/NR:19  SectionText
    _fields_ = [
          ('m_id', c_int),          #        Identification = 19
          ('m_nr', c_int),          #        external construction stage number for CS separator
@@ -1902,7 +1932,7 @@ class CSECT_TXT(Structure):        # 9/NR:19  SectionText
       ]
 csect_txt = CSECT_TXT()
 
-class CSECT_WLS(Structure):        # 9/NR:6?  SectionWorklaw Serviceability Analysis
+class CSECT_WLS(bStructure):        # 9/NR:6?  SectionWorklaw Serviceability Analysis
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_n', c_int),           #        Normal force 0/00
@@ -1911,7 +1941,7 @@ class CSECT_WLS(Structure):        # 9/NR:6?  SectionWorklaw Serviceability Anal
       ]
 csect_wls = CSECT_WLS()
 
-class CSECT_WLU(Structure):        # 9/NR:7?  SectionWorklaw Ultimate Analysis
+class CSECT_WLU(bStructure):        # 9/NR:7?  SectionWorklaw Ultimate Analysis
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_n', c_int),           #        Normal force 0/00
@@ -1920,7 +1950,7 @@ class CSECT_WLU(Structure):        # 9/NR:7?  SectionWorklaw Ultimate Analysis
       ]
 csect_wlu = CSECT_WLU()
 
-class CSECT_CW(Structure):         # 9/NR:80  Hydrodynamic coefficients (WIND/Wave loading)
+class CSECT_CW(bStructure):         # 9/NR:80  Hydrodynamic coefficients (WIND/Wave loading)
    _fields_ = [
          ('m_id', c_int),          #        Identification 80
          ('m_iref', c_int),        #        Reference of coefficients
@@ -1935,7 +1965,7 @@ class CSECT_CW(Structure):         # 9/NR:80  Hydrodynamic coefficients (WIND/Wa
       ]
 csect_cw = CSECT_CW()
 
-class CSECT_WPA(Structure):        # 9/NR:81  SectionWindParameters for Wind loading (WPAR)
+class CSECT_WPA(bStructure):        # 9/NR:81  SectionWindParameters for Wind loading (WPAR)
    _fields_ = [
          ('m_id', c_int),          #        Identification 81
          ('m_iba', c_int),         #        construction stage number
@@ -1953,7 +1983,7 @@ class CSECT_WPA(Structure):        # 9/NR:81  SectionWindParameters for Wind loa
       ]
 csect_wpa = CSECT_WPA()
 
-class CSECT_WDE(Structure):        # 9/NR:82  SectionWindDerivativa for Wind loading (WIND)
+class CSECT_WDE(bStructure):        # 9/NR:82  SectionWindDerivativa for Wind loading (WIND)
    _fields_ = [
          ('m_id', c_int),          #        Identification 82
          ('m_iref', c_int),        #        Type of derivativa
@@ -1962,7 +1992,7 @@ class CSECT_WDE(Structure):        # 9/NR:82  SectionWindDerivativa for Wind loa
       ]
 csect_wde = CSECT_WDE()
 
-class CSECT_USR(Structure):        # 9/NR:90  SectionUserValues (SV/QW)
+class CSECT_USR(bStructure):        # 9/NR:90  SectionUserValues (SV/QW)
    _fields_ = [
          ('m_id', c_int),          #        Identification = 90
          ('m_itp', c_int),         #        type of control value set
@@ -1972,14 +2002,14 @@ class CSECT_USR(Structure):        # 9/NR:90  SectionUserValues (SV/QW)
       ]
 csect_usr = CSECT_USR()
 
-class CSECT_MAT(Structure):        # 9/NR:91  SectionalMaterial list
+class CSECT_MAT(bStructure):        # 9/NR:91  SectionalMaterial list
    _fields_ = [
          ('m_id', c_int),          #        Identification = 91
          ('m_mat', c_int * 31)     #        material numbers
       ]
 csect_mat = CSECT_MAT()
 
-class CSECT_VAD(Structure):        # 9/NR:97  SectionVarDefaults
+class CSECT_VAD(bStructure):        # 9/NR:97  SectionVarDefaults
    _fields_ = [
          ('m_id', c_int),          #        Identification = 97/98
          ('m_ind1', c_int),        #        Lower Index of variable
@@ -1990,7 +2020,7 @@ class CSECT_VAD(Structure):        # 9/NR:97  SectionVarDefaults
       ]
 csect_vad = CSECT_VAD()
 
-class CSECT_VAR(Structure):        # 9/NR:98  SectionVarValues
+class CSECT_VAR(bStructure):        # 9/NR:98  SectionVarValues
    _fields_ = [
          ('m_id', c_int),          #        Identification = 97/98
          ('m_ind1', c_int),        #        Lower Index of variable
@@ -2001,16 +2031,16 @@ class CSECT_VAR(Structure):        # 9/NR:98  SectionVarValues
       ]
 csect_var = CSECT_VAR()
 
-class CSECT_REF(Structure):        # 9/NR:99  SectionReference
+class CSECT_REF(bStructure):        # 9/NR:99  SectionReference
    _fields_ = [
          ('m_id', c_int),          #        Identification 099
-         ('m_im', c_int),          #        Type of reference structure definition (see AQUA.ERR)
+         ('m_im', c_int),          #        Type of reference bStructure definition (see AQUA.ERR)
          ('m_irts', c_int),        #        Subtype of reference definition for the points:
          ('m_ref', c_int * 200)    #        Identifier of references (0 = not defined)
       ]
 csect_ref = CSECT_REF()
 
-class CSECT_SPT(Structure):        # 9/NR:100  SectionStressPoint (SPT/QSP)
+class CSECT_SPT(bStructure):        # 9/NR:100  SectionStressPoint (SPT/QSP)
    _fields_ = [
          ('m_id', c_int),          #        Identification 100/101
          ('m_mno', c_int),         #        Material number
@@ -2041,7 +2071,7 @@ class CSECT_SPT(Structure):        # 9/NR:100  SectionStressPoint (SPT/QSP)
       ]
 csect_spt = CSECT_SPT()
 
-class CSECT_PPT(Structure):        # 9/NR:101  SectionPolygonPoint (POLY/QPOL)
+class CSECT_PPT(bStructure):        # 9/NR:101  SectionPolygonPoint (POLY/QPOL)
    _fields_ = [
          ('m_id', c_int),          #        Identification 100/101
          ('m_mno', c_int),         #        Material number
@@ -2072,7 +2102,7 @@ class CSECT_PPT(Structure):        # 9/NR:101  SectionPolygonPoint (POLY/QPOL)
       ]
 csect_ppt = CSECT_PPT()
 
-class CSECT_CIR(Structure):        # 9/NR:102  SectionCircle (CIRC/KREI)
+class CSECT_CIR(bStructure):        # 9/NR:102  SectionCircle (CIRC/KREI)
    _fields_ = [
          ('m_id', c_int),          #        Identification 102
          ('m_mno', c_int),         #        Material number
@@ -2086,7 +2116,7 @@ class CSECT_CIR(Structure):        # 9/NR:102  SectionCircle (CIRC/KREI)
       ]
 csect_cir = CSECT_CIR()
 
-class CSECT_PAN(Structure):        # 9/NR:103  SectionPanel (PLAT,WALL)
+class CSECT_PAN(bStructure):        # 9/NR:103  SectionPanel (PLAT,WALL)
    _fields_ = [
          ('m_id', c_int),          #        Identification 103/104
          ('m_mno', c_int),         #        Material number
@@ -2115,7 +2145,7 @@ class CSECT_PAN(Structure):        # 9/NR:103  SectionPanel (PLAT,WALL)
       ]
 csect_pan = CSECT_PAN()
 
-class CSECT_WEL(Structure):        # 9/NR:104  SectionWeld  (WELD)
+class CSECT_WEL(bStructure):        # 9/NR:104  SectionWeld  (WELD)
    _fields_ = [
          ('m_id', c_int),          #        Identification 103/104
          ('m_mno', c_int),         #        Material number
@@ -2144,7 +2174,7 @@ class CSECT_WEL(Structure):        # 9/NR:104  SectionWeld  (WELD)
       ]
 csect_wel = CSECT_WEL()
 
-class CSECT_PER(Structure):        # 9/NR:110  SectionPeriphery
+class CSECT_PER(bStructure):        # 9/NR:110  SectionPeriphery
    _fields_ = [
          ('m_id', c_int),          #        Identification 110
          ('m_mno', c_int),         #        Material number
@@ -2158,7 +2188,7 @@ class CSECT_PER(Structure):        # 9/NR:110  SectionPeriphery
       ]
 csect_per = CSECT_PER()
 
-class CSECT_FEM(Structure):        # 9/NR:112  SectionTopology
+class CSECT_FEM(bStructure):        # 9/NR:112  SectionTopology
    _fields_ = [
          ('m_id', c_int),          #        Identification 111
          ('m_mno', c_int),         #        Material number
@@ -2167,7 +2197,7 @@ class CSECT_FEM(Structure):        # 9/NR:112  SectionTopology
       ]
 csect_fem = CSECT_FEM()
 
-class CSECT_NER(Structure):        # 9/NR:190  SectionNonEffectiveRectangle (NEFF)
+class CSECT_NER(bStructure):        # 9/NR:190  SectionNonEffectiveRectangle (NEFF)
    _fields_ = [
          ('m_id', c_int),          #        Identification 190
          ('m_mno', c_int),         #        Material number
@@ -2183,7 +2213,7 @@ class CSECT_NER(Structure):        # 9/NR:190  SectionNonEffectiveRectangle (NEF
       ]
 csect_ner = CSECT_NER()
 
-class CSECT_NEP(Structure):        # 9/NR:191  Partial non effective polygons
+class CSECT_NEP(bStructure):        # 9/NR:191  Partial non effective polygons
    _fields_ = [
          ('m_id', c_int),          #        Identification 191
          ('m_mno', c_int),         #        Materialnumber
@@ -2193,7 +2223,7 @@ class CSECT_NEP(Structure):        # 9/NR:191  Partial non effective polygons
       ]
 csect_nep = CSECT_NEP()
 
-class CSECT_PRF(Structure):        # 9/NR:200  SectionPointReinforcement (RF/BEW)
+class CSECT_PRF(bStructure):        # 9/NR:200  SectionPointReinforcement (RF/BEW)
    _fields_ = [
          ('m_id', c_int),          #        Identification 200
          ('m_mno', c_int),         #        Material number
@@ -2213,7 +2243,7 @@ class CSECT_PRF(Structure):        # 9/NR:200  SectionPointReinforcement (RF/BEW
       ]
 csect_prf = CSECT_PRF()
 
-class CSECT_LRF(Structure):        # 9/NR:201  SectionLineReinforcement (LRF/LBEW)
+class CSECT_LRF(bStructure):        # 9/NR:201  SectionLineReinforcement (LRF/LBEW)
    _fields_ = [
          ('m_id', c_int),          #        Identification 201/211/221 or 321
          ('m_mno', c_int),         #        Material number
@@ -2236,7 +2266,7 @@ class CSECT_LRF(Structure):        # 9/NR:201  SectionLineReinforcement (LRF/LBE
       ]
 csect_lrf = CSECT_LRF()
 
-class CSECT_LRP(Structure):        # 9/NR:211  SectionLineReinforcement in Points
+class CSECT_LRP(bStructure):        # 9/NR:211  SectionLineReinforcement in Points
    _fields_ = [
          ('m_id', c_int),          #        Identification 201/211/221 or 321
          ('m_mno', c_int),         #        Material number
@@ -2259,7 +2289,7 @@ class CSECT_LRP(Structure):        # 9/NR:211  SectionLineReinforcement in Point
       ]
 csect_lrp = CSECT_LRP()
 
-class CSECT_LSL(Structure):        # 9/NR:221  SectionShearLink
+class CSECT_LSL(bStructure):        # 9/NR:221  SectionShearLink
    _fields_ = [
          ('m_id', c_int),          #        Identification 201/211/221 or 321
          ('m_mno', c_int),         #        Material number
@@ -2282,7 +2312,7 @@ class CSECT_LSL(Structure):        # 9/NR:221  SectionShearLink
       ]
 csect_lsl = CSECT_LSL()
 
-class CSECT_CRF(Structure):        # 9/NR:202  SectionCircularReinforcement (CRF/KBEW)
+class CSECT_CRF(bStructure):        # 9/NR:202  SectionCircularReinforcement (CRF/KBEW)
    _fields_ = [
          ('m_id', c_int),          #        Identification 202/212/222
          ('m_mno', c_int),         #        Material number
@@ -2304,7 +2334,7 @@ class CSECT_CRF(Structure):        # 9/NR:202  SectionCircularReinforcement (CRF
       ]
 csect_crf = CSECT_CRF()
 
-class CSECT_CRP(Structure):        # 9/NR:212  SectionCircularReinforcement in Points
+class CSECT_CRP(bStructure):        # 9/NR:212  SectionCircularReinforcement in Points
    _fields_ = [
          ('m_id', c_int),          #        Identification 202/212/222
          ('m_mno', c_int),         #        Material number
@@ -2326,7 +2356,7 @@ class CSECT_CRP(Structure):        # 9/NR:212  SectionCircularReinforcement in P
       ]
 csect_crp = CSECT_CRP()
 
-class CSECT_CSL(Structure):        # 9/NR:222  SectionHelicalShearLink
+class CSECT_CSL(bStructure):        # 9/NR:222  SectionHelicalShearLink
    _fields_ = [
          ('m_id', c_int),          #        Identification 202/212/222
          ('m_mno', c_int),         #        Material number
@@ -2348,7 +2378,7 @@ class CSECT_CSL(Structure):        # 9/NR:222  SectionHelicalShearLink
       ]
 csect_csl = CSECT_CSL()
 
-class CSECT_URF(Structure):        # 9/NR:210  SectionPeriphericReinforcement (CURF,UBEW)
+class CSECT_URF(bStructure):        # 9/NR:210  SectionPeriphericReinforcement (CURF,UBEW)
    _fields_ = [
          ('m_id', c_int),          #        Identification 210/220
          ('m_mno', c_int),         #        Material number
@@ -2366,7 +2396,7 @@ class CSECT_URF(Structure):        # 9/NR:210  SectionPeriphericReinforcement (C
       ]
 csect_urf = CSECT_URF()
 
-class CSECT_USL(Structure):        # 9/NR:220  SectionPeriphericShearLink
+class CSECT_USL(bStructure):        # 9/NR:220  SectionPeriphericShearLink
    _fields_ = [
          ('m_id', c_int),          #        Identification 210/220
          ('m_mno', c_int),         #        Material number
@@ -2384,7 +2414,7 @@ class CSECT_USL(Structure):        # 9/NR:220  SectionPeriphericShearLink
       ]
 csect_usl = CSECT_USL()
 
-class CSECT_CPT(Structure):        # 9/NR:300  SectionCutStressPoint
+class CSECT_CPT(bStructure):        # 9/NR:300  SectionCutStressPoint
    _fields_ = [
          ('m_id', c_int),          #        Identification 300
          ('m_mno', c_int),         #        Material of Reinforc. + 1000*Materialnumber
@@ -2409,7 +2439,7 @@ class CSECT_CPT(Structure):        # 9/NR:300  SectionCutStressPoint
       ]
 csect_cpt = CSECT_CPT()
 
-class CSECT_CUT(Structure):        # 9/NR:301  ShearCut (CUT)
+class CSECT_CUT(bStructure):        # 9/NR:301  ShearCut (CUT)
    _fields_ = [
          ('m_id', c_int),          #        Identification 301
          ('m_mno', c_int),         #        Material of Reinforc. + 1000*Materialnumber
@@ -2444,7 +2474,7 @@ class CSECT_CUT(Structure):        # 9/NR:301  ShearCut (CUT)
       ]
 csect_cut = CSECT_CUT()
 
-class CSECT_CPL(Structure):        # 9/NR:311  Partial polygons of shear cut
+class CSECT_CPL(bStructure):        # 9/NR:311  Partial polygons of shear cut
    _fields_ = [
          ('m_id', c_int),          #        Identification 311
          ('m_mno', c_int),         #        Materialnumber
@@ -2454,7 +2484,7 @@ class CSECT_CPL(Structure):        # 9/NR:311  Partial polygons of shear cut
       ]
 csect_cpl = CSECT_CPL()
 
-class CSECT_APL(Structure):        # 9/NR:313  Partial polygons of AKT crack area
+class CSECT_APL(bStructure):        # 9/NR:313  Partial polygons of AKT crack area
    _fields_ = [
          ('m_id', c_int),          #        Identification 311
          ('m_mno', c_int),         #        Materialnumber
@@ -2464,7 +2494,7 @@ class CSECT_APL(Structure):        # 9/NR:313  Partial polygons of AKT crack are
       ]
 csect_apl = CSECT_APL()
 
-class CSECT_HYD(Structure):        # 9/NR:900  SectionalHydraulics total section
+class CSECT_HYD(bStructure):        # 9/NR:900  SectionalHydraulics total section
    _fields_ = [
          ('m_id', c_int),          #        Identification = 900/903
          ('m_i_1', c_int),
@@ -2481,7 +2511,7 @@ class CSECT_HYD(Structure):        # 9/NR:900  SectionalHydraulics total section
       ]
 csect_hyd = CSECT_HYD()
 
-class CSECT_HYP(Structure):        # 9/NR:903  SectionalHydraulics partial section
+class CSECT_HYP(bStructure):        # 9/NR:903  SectionalHydraulics partial section
    _fields_ = [
          ('m_id', c_int),          #        Identification = 900/903
          ('m_i_1', c_int),
@@ -2498,7 +2528,7 @@ class CSECT_HYP(Structure):        # 9/NR:903  SectionalHydraulics partial secti
       ]
 csect_hyp = CSECT_HYP()
 
-class CSECT_HYA(Structure):        # 9/NR:904  SectionalHydraulicsAddval
+class CSECT_HYA(bStructure):        # 9/NR:904  SectionalHydraulicsAddval
    _fields_ = [
          ('m_id', c_int),          #        identifier 904
          ('m_i_2', c_int),
@@ -2520,7 +2550,7 @@ class CSECT_HYA(Structure):        # 9/NR:904  SectionalHydraulicsAddval
       ]
 csect_hya = CSECT_HYA()
 
-class CSECT_HYS(Structure):        # 9/NR:910  SectionalHydraulicsPolygon
+class CSECT_HYS(bStructure):        # 9/NR:910  SectionalHydraulicsPolygon
    _fields_ = [
          ('m_id', c_int),          #        Identification 910
          ('m_mat', c_int),         #        identifier 0 (material number)
@@ -2535,7 +2565,7 @@ class CSECT_HYS(Structure):        # 9/NR:910  SectionalHydraulicsPolygon
       ]
 csect_hys = CSECT_HYS()
 
-class CSECT_INS(Structure):        # 9/NR:100002  structural database contents
+class CSECT_INS(bStructure):        # 9/NR:100002  structural database contents
    _fields_ = [
          ('m_id', c_int),          #        Identification of record key
          ('m_kwh', c_int),         #        Identification of record key (30/31/32)
@@ -2544,7 +2574,7 @@ class CSECT_INS(Structure):        # 9/NR:100002  structural database contents
       ]
 csect_ins = CSECT_INS()
 
-class CSYST(Structure):            # 10/00  SystemInfo
+class CSYST(bStructure):            # 10/00  SystemInfo
    _fields_ = [
          ('m_iprob', c_int),       #        Type of System
          ('m_iachs', c_int),       #        Orientation of gravity
@@ -2558,7 +2588,7 @@ class CSYST(Structure):            # 10/00  SystemInfo
       ]
 csyst = CSYST()
 
-class CSYST_DES(Structure):        # 10/1:0  SystemDesignCode
+class CSYST_DES(bStructure):        # 10/1:0  SystemDesignCode
    _fields_ = [
          ('m_id', c_int),          #        identifier = 0
          ('m_idc', c_int),         #        Design code enumeration
@@ -2579,7 +2609,7 @@ class CSYST_DES(Structure):        # 10/1:0  SystemDesignCode
       ]
 csyst_des = CSYST_DES()
 
-class CSYST_ACT(Structure):        # 10/1:1  Predefined Actions from INI-file
+class CSYST_ACT(bStructure):        # 10/1:1  Predefined Actions from INI-file
    _fields_ = [
          ('m_id', c_int),          #        identifier = 1
          ('m_action', c_int),      #        ID of the real action = type of action
@@ -2597,7 +2627,7 @@ class CSYST_ACT(Structure):        # 10/1:1  Predefined Actions from INI-file
       ]
 csyst_act = CSYST_ACT()
 
-class CSYST_COM_ACT(Structure):    #        Identifier of action
+class CSYST_COM_ACT(bStructure):    #        Identifier of action
    _fields_ = [
          ('m_id', c_int),
          ('m_faku', c_float),
@@ -2605,7 +2635,7 @@ class CSYST_COM_ACT(Structure):    #        Identifier of action
       ]
 csyst_com_act = CSYST_COM_ACT()
 
-class CSYST_COM(Structure):        # 10/1:2  Possible Combination of actions
+class CSYST_COM(bStructure):        # 10/1:2  Possible Combination of actions
    _fields_ = [
          ('m_id', c_int),          #        identifier = 2
          ('m_lfb', c_int),         #        loadcase number offset
@@ -2618,7 +2648,7 @@ class CSYST_COM(Structure):        # 10/1:2  Possible Combination of actions
       ]
 csyst_com = CSYST_COM()
 
-class CGRP(Structure):             # 11/00  Groups
+class CGRP(bStructure):             # 11/00  Groups
    _fields_ = [
          ('m_ng', c_int),          #        group-number
          ('m_typ', c_int),         #        element code
@@ -2646,7 +2676,7 @@ class CGRP(Structure):             # 11/00  Groups
       ]
 cgrp = CGRP()
 
-class CGRP_LC(Structure):          # 11/LC  Groups of Loadcase
+class CGRP_LC(bStructure):          # 11/LC  Groups of Loadcase
    _fields_ = [
          ('m_ng', c_int),          #        group-number
          ('m_typ', c_int),         #        element code
@@ -2674,7 +2704,7 @@ class CGRP_LC(Structure):          # 11/LC  Groups of Loadcase
       ]
 cgrp_lc = CGRP_LC()
 
-class CLC_CTRL(Structure):         # 12/LC:?  Informations on loadcase LC
+class CLC_CTRL(bStructure):         # 12/LC:?  Informations on loadcase LC
    _fields_ = [
          ('m_kind', c_int),        #        type of loadcase
          ('m_ityp', c_int),        #        action type (14/ID)
@@ -2702,7 +2732,7 @@ class CLC_CTRL(Structure):         # 12/LC:?  Informations on loadcase LC
       ]
 clc_ctrl = CLC_CTRL()
 
-class CLC_EVAL(Structure):         # 12/LC:011  Evaluation request
+class CLC_EVAL(bStructure):         # 12/LC:011  Evaluation request
    _fields_ = [
          ('m_id', c_int),          #        identifier 11
          ('m_lref', c_int),        #        Referenced load case or construction stage
@@ -2713,7 +2743,7 @@ class CLC_EVAL(Structure):         # 12/LC:011  Evaluation request
       ]
 clc_eval = CLC_EVAL()
 
-class CLC_COPY(Structure):         # 12/LC:012  Loads from other loadcases
+class CLC_COPY(bStructure):         # 12/LC:012  Loads from other loadcases
    _fields_ = [
          ('m_id', c_int),          #        identifier 12 / 13
          ('m_lref', c_int),        #        Referenced load case or action ID [chr]
@@ -2727,7 +2757,7 @@ class CLC_COPY(Structure):         # 12/LC:012  Loads from other loadcases
       ]
 clc_copy = CLC_COPY()
 
-class CLC_COPI(Structure):         # 12/LC:013  Loads from other loadcases
+class CLC_COPI(bStructure):         # 12/LC:013  Loads from other loadcases
    _fields_ = [
          ('m_id', c_int),          #        identifier 12 / 13
          ('m_lref', c_int),        #        Referenced load case or action ID [chr]
@@ -2741,7 +2771,7 @@ class CLC_COPI(Structure):         # 12/LC:013  Loads from other loadcases
       ]
 clc_copi = CLC_COPI()
 
-class CLC_MBODY(Structure):        # 12/LC:2?  Rotation of Body
+class CLC_MBODY(bStructure):        # 12/LC:2?  Rotation of Body
    _fields_ = [
          ('m_id', c_int),          #        identifier 20/21
          ('m_nr', c_int),          #        primary or secondary group number of moving elements
@@ -2761,14 +2791,14 @@ class CLC_MBODY(Structure):        # 12/LC:2?  Rotation of Body
       ]
 clc_mbody = CLC_MBODY()
 
-class CLC_LRES_LC(Structure):      #        load case number and factor (dynamic length)
+class CLC_LRES_LC(bStructure):      #        load case number and factor (dynamic length)
    _fields_ = [
          ('m_n', c_int),
          ('m_f', c_float)
       ]
 clc_lres_lc = CLC_LRES_LC()
 
-class CLC_LRES(Structure):         # 12/LC:89  Explicit factors for selected results
+class CLC_LRES(bStructure):         # 12/LC:89  Explicit factors for selected results
    _fields_ = [
          ('m_id', c_int),          #        identifier 89
          ('m_kw', c_int),          #        KW where result has been stored
@@ -2779,7 +2809,7 @@ class CLC_LRES(Structure):         # 12/LC:89  Explicit factors for selected res
       ]
 clc_lres = CLC_LRES()
 
-class CLC_LPOS(Structure):         # 12/LC:90  Position of Load trains
+class CLC_LPOS(bStructure):         # 12/LC:90  Position of Load trains
    _fields_ = [
          ('m_id', c_int),          #        identifier 90
          ('m_case', c_int),        #        number of the case
@@ -2796,7 +2826,7 @@ class CLC_LPOS(Structure):         # 12/LC:90  Position of Load trains
       ]
 clc_lpos = CLC_LPOS()
 
-class CLC_LPO1(Structure):         # 12/LC:91  Individual position of Point load
+class CLC_LPO1(bStructure):         # 12/LC:91  Individual position of Point load
    _fields_ = [
          ('m_id', c_int),          #        identifier 91
          ('m_x', c_float),         # [1001] Position of individual load
@@ -2804,7 +2834,7 @@ class CLC_LPO1(Structure):         # 12/LC:91  Individual position of Point load
       ]
 clc_lpo1 = CLC_LPO1()
 
-class CLC_LPO2(Structure):         # 12/LC:92  Individual position of Block load
+class CLC_LPO2(bStructure):         # 12/LC:92  Individual position of Block load
    _fields_ = [
          ('m_id', c_int),          #        identifier 92
          ('m_xa', c_float),        # [1001] Position of individual load start
@@ -2813,7 +2843,7 @@ class CLC_LPO2(Structure):         # 12/LC:92  Individual position of Block load
       ]
 clc_lpo2 = CLC_LPO2()
 
-class CLC_LPO3(Structure):         # 12/LC:93  Individual residual loadings
+class CLC_LPO3(bStructure):         # 12/LC:93  Individual residual loadings
    _fields_ = [
          ('m_id', c_int),          #        identifier 93
          ('m_xa', c_float),        # [1001] Position of individual load start
@@ -2822,7 +2852,7 @@ class CLC_LPO3(Structure):         # 12/LC:93  Individual residual loadings
       ]
 clc_lpo3 = CLC_LPO3()
 
-class CLC_LPOX(Structure):         # 12/LC:99  Spandefinitions from ELLA
+class CLC_LPOX(bStructure):         # 12/LC:99  Spandefinitions from ELLA
    _fields_ = [
          ('m_id', c_int),          #        identifier 99
          ('m_xa', c_float),        # [1001] Limits of an active area start
@@ -2834,16 +2864,16 @@ class CLC_LPOX(Structure):         # 12/LC:99  Spandefinitions from ELLA
       ]
 clc_lpox = CLC_LPOX()
 
-class CLC_POIN_LPT(Structure):     #        loadpt
+class CLC_POIN_LPT(bStructure):     #        loadpt
    _fields_ = [
          ('m_p', c_float),
-         ('m_x', c_float),         # [1001] 
-         ('m_y', c_float),         # [1001] 
-         ('m_z', c_float)          # [1001] 
+         ('m_x', c_float),         # [1001]
+         ('m_y', c_float),         # [1001]
+         ('m_z', c_float)          # [1001]
       ]
 clc_poin_lpt = CLC_POIN_LPT()
 
-class CLC_POIN(Structure):         # 12/LC:10?  Free point loads
+class CLC_POIN(bStructure):         # 12/LC:10?  Free point loads
    _fields_ = [
          ('m_kref', c_int),        #        Reference type
          ('m_nref', c_int),        #        Reference number
@@ -2856,16 +2886,16 @@ class CLC_POIN(Structure):         # 12/LC:10?  Free point loads
       ]
 clc_poin = CLC_POIN()
 
-class CLC_LINE_LPT(Structure):     #        loadpts
+class CLC_LINE_LPT(bStructure):     #        loadpts
    _fields_ = [
          ('m_p', c_float),
-         ('m_x', c_float),         # [1001] 
-         ('m_y', c_float),         # [1001] 
-         ('m_z', c_float)          # [1001] 
+         ('m_x', c_float),         # [1001]
+         ('m_y', c_float),         # [1001]
+         ('m_z', c_float)          # [1001]
       ]
 clc_line_lpt = CLC_LINE_LPT()
 
-class CLC_LINE(Structure):         # 12/LC:11?  Free line loads
+class CLC_LINE(bStructure):         # 12/LC:11?  Free line loads
    _fields_ = [
          ('m_kref', c_int),        #        Reference type
          ('m_nref', c_int),        #        Reference number
@@ -2878,16 +2908,16 @@ class CLC_LINE(Structure):         # 12/LC:11?  Free line loads
       ]
 clc_line = CLC_LINE()
 
-class CLC_CURV_LPT(Structure):     #        loadpts
+class CLC_CURV_LPT(bStructure):     #        loadpts
    _fields_ = [
          ('m_p', c_float),
-         ('m_x', c_float),         # [1001] 
-         ('m_y', c_float),         # [1001] 
-         ('m_z', c_float)          # [1001] 
+         ('m_x', c_float),         # [1001]
+         ('m_y', c_float),         # [1001]
+         ('m_z', c_float)          # [1001]
       ]
 clc_curv_lpt = CLC_CURV_LPT()
 
-class CLC_CURV(Structure):         # 12/LC:14?  Free spline loads
+class CLC_CURV(bStructure):         # 12/LC:14?  Free spline loads
    _fields_ = [
          ('m_kref', c_int),        #        Reference type
          ('m_nref', c_int),        #        Reference number
@@ -2900,16 +2930,16 @@ class CLC_CURV(Structure):         # 12/LC:14?  Free spline loads
       ]
 clc_curv = CLC_CURV()
 
-class CLC_AREA_LPT(Structure):     #        loadpts
+class CLC_AREA_LPT(bStructure):     #        loadpts
    _fields_ = [
          ('m_p', c_float),
-         ('m_x', c_float),         # [1001] 
-         ('m_y', c_float),         # [1001] 
-         ('m_z', c_float)          # [1001] 
+         ('m_x', c_float),         # [1001]
+         ('m_y', c_float),         # [1001]
+         ('m_z', c_float)          # [1001]
       ]
 clc_area_lpt = CLC_AREA_LPT()
 
-class CLC_AREA(Structure):         # 12/LC:12?  Free area loads
+class CLC_AREA(bStructure):         # 12/LC:12?  Free area loads
    _fields_ = [
          ('m_kref', c_int),        #        Reference type
          ('m_nref', c_int),        #        Reference number
@@ -2922,7 +2952,7 @@ class CLC_AREA(Structure):         # 12/LC:12?  Free area loads
       ]
 clc_area = CLC_AREA()
 
-class CLC_VOLU(Structure):         # 12/LC:13?  Free volume loads
+class CLC_VOLU(bStructure):         # 12/LC:13?  Free volume loads
    _fields_ = [
          ('m_kref', c_int),        #        Reference type
          ('m_nref', c_int),        #        Reference number
@@ -2933,39 +2963,39 @@ class CLC_VOLU(Structure):         # 12/LC:13?  Free volume loads
          ('m_width', c_float),     # [1001] Factor for silo fillings A/U
          ('m_p0', c_float),        #        load value
          ('m_x', c_float),         # [1001] Reference point for load value P0
-         ('m_y', c_float),         # [1001] 
-         ('m_z', c_float),         # [1001] 
+         ('m_y', c_float),         # [1001]
+         ('m_z', c_float),         # [1001]
          ('m_p1', c_float),        #        variant load value second reference point
          ('m_dx1', c_float),       # [1001] Reference point for load value P1
-         ('m_dy1', c_float),       # [1001] 
-         ('m_dz1', c_float),       # [1001] 
+         ('m_dy1', c_float),       # [1001]
+         ('m_dz1', c_float),       # [1001]
          ('m_p2', c_float),        #        variant load value second reference point
          ('m_dx2', c_float),       # [1001] Reference point for load value P2
-         ('m_dy2', c_float),       # [1001] 
-         ('m_dz2', c_float),       # [1001] 
+         ('m_dy2', c_float),       # [1001]
+         ('m_dz2', c_float),       # [1001]
          ('m_p3', c_float),        #        variant load value second reference point
          ('m_dx3', c_float),       # [1001] Reference point for load value P3
-         ('m_dy3', c_float),       # [1001] 
-         ('m_dz3', c_float),       # [1001] 
+         ('m_dy3', c_float),       # [1001]
+         ('m_dz3', c_float),       # [1001]
          ('m_p4', c_float),        #        variant load value second reference point
          ('m_dx4', c_float),       # [1001] Reference point for load value P2
-         ('m_dy4', c_float),       # [1001] 
-         ('m_dz4', c_float),       # [1001] 
+         ('m_dy4', c_float),       # [1001]
+         ('m_dz4', c_float),       # [1001]
          ('m_p5', c_float),        #        variant load value second reference point
          ('m_dx5', c_float),       # [1001] Reference point for load value P3
-         ('m_dy5', c_float),       # [1001] 
-         ('m_dz5', c_float)        # [1001] 
+         ('m_dy5', c_float),       # [1001]
+         ('m_dz5', c_float)        # [1001]
       ]
 clc_volu = CLC_VOLU()
 
-class CGLC_GUID(Structure):        # 12/LC:199  Unique identifier of loading member
+class CGLC_GUID(bStructure):        # 12/LC:199  Unique identifier of loading member
    _fields_ = [
          ('m_id', c_int),          #        identifier 199
          ('m_idbim', c_int * 36)   #        256 Bit GUId Identifier of following element
       ]
 cglc_guid = CGLC_GUID()
 
-class CLC_TRAI(Structure):         # 12/LC:300  Train loading
+class CLC_TRAI(bStructure):         # 12/LC:300  Train loading
    _fields_ = [
          ('m_id', c_int),          #        identifier 300
          ('m_iden', c_int),        #        Type of load train
@@ -3001,7 +3031,7 @@ class CLC_TRAI(Structure):         # 12/LC:300  Train loading
       ]
 clc_trai = CLC_TRAI()
 
-class CLC_TRAL(Structure):         # 12/LC:301  Individual loads of Train loading
+class CLC_TRAL(bStructure):         # 12/LC:301  Individual loads of Train loading
    _fields_ = [
          ('m_id', c_int),          #        identifier 301
          ('m_type', c_int),        #        Type of loading
@@ -3036,7 +3066,7 @@ class CLC_TRAL(Structure):         # 12/LC:301  Individual loads of Train loadin
       ]
 clc_tral = CLC_TRAL()
 
-class CLC_WIND(Structure):         # 12/LC:400  wind loading
+class CLC_WIND(bStructure):         # 12/LC:400  wind loading
    _fields_ = [
          ('m_id', c_int),          #        identifier 400
          ('m_norm', c_int),        #        wind design code
@@ -3048,8 +3078,8 @@ class CLC_WIND(Structure):         # 12/LC:400  wind loading
          ('m_dy', c_float),
          ('m_dz', c_float),
          ('m_xref', c_float),      # [1001] Reference point
-         ('m_yref', c_float),      # [1001] 
-         ('m_zref', c_float),      # [1001] 
+         ('m_yref', c_float),      # [1001]
+         ('m_zref', c_float),      # [1001]
          ('m_dxre', c_float),      #        Reference direction
          ('m_dyre', c_float),
          ('m_dzre', c_float),
@@ -3061,7 +3091,7 @@ class CLC_WIND(Structure):         # 12/LC:400  wind loading
       ]
 clc_wind = CLC_WIND()
 
-class CLC_WTOP(Structure):         # 12/LC:401  Wind environment
+class CLC_WTOP(bStructure):         # 12/LC:401  Wind environment
    _fields_ = [
          ('m_id', c_int),          #        identifier 401
          ('m_typ', c_float),       #        type of environment height
@@ -3078,16 +3108,16 @@ class CLC_WTOP(Structure):         # 12/LC:401  Wind environment
       ]
 clc_wtop = CLC_WTOP()
 
-class CLC_WROU_R(Structure):       #        limits given
+class CLC_WROU_R(bStructure):       #        limits given
    _fields_ = [
-         ('m_d', c_float),         # [1001] 
-         ('m_r', c_float),         # [1001] 
-         ('m_dh', c_float),        # [1001] 
-         ('m_hh', c_float)         # [1001] 
+         ('m_d', c_float),         # [1001]
+         ('m_r', c_float),         # [1001]
+         ('m_dh', c_float),        # [1001]
+         ('m_hh', c_float)         # [1001]
       ]
 clc_wrou_r = CLC_WROU_R()
 
-class CLC_WROU(Structure):         # 12/LC:402  Roughness (wind)
+class CLC_WROU(bStructure):         # 12/LC:402  Roughness (wind)
    _fields_ = [
          ('m_id', c_int),          #        identifier 402
          ('m_i_1', c_float),       #        reserved
@@ -3097,7 +3127,7 @@ class CLC_WROU(Structure):         # 12/LC:402  Roughness (wind)
       ]
 clc_wrou = CLC_WROU()
 
-class CLC_WSPE(Structure):         # 12/LC:410  wind spectrum
+class CLC_WSPE(bStructure):         # 12/LC:410  wind spectrum
    _fields_ = [
          ('m_id', c_int),          #        identifier 410
          ('m_typ', c_int),         #        type of spectra
@@ -3133,17 +3163,17 @@ class CLC_WSPE(Structure):         # 12/LC:410  wind spectrum
       ]
 clc_wspe = CLC_WSPE()
 
-class CLC_WTST(Structure):         # 12/LC:411  wind coherence test requests
+class CLC_WTST(bStructure):         # 12/LC:411  wind coherence test requests
    _fields_ = [
          ('m_id', c_int),          #        identifier 411
          ('m_typ', c_int),         #        type of coherence component
          ('m_lc', c_int),          #        load case of an eigenvalue
          ('m_xref', c_float),      # [1001] Reference point
-         ('m_yref', c_float),      # [1001] 
-         ('m_zref', c_float),      # [1001] 
+         ('m_yref', c_float),      # [1001]
+         ('m_zref', c_float),      # [1001]
          ('m_rx', c_float),        # [1001] Distance or direction of distance
-         ('m_ry', c_float),        # [1001] 
-         ('m_rz', c_float),        # [1001] 
+         ('m_ry', c_float),        # [1001]
+         ('m_rz', c_float),        # [1001]
          ('m_cx', c_float),        #        Davenport/Krenk reference coefficients
          ('m_cy', c_float),
          ('m_cz', c_float),
@@ -3155,17 +3185,17 @@ class CLC_WTST(Structure):         # 12/LC:411  wind coherence test requests
       ]
 clc_wtst = CLC_WTST()
 
-class CLC_WPRC(Structure):         # 12/LC:420  wind profile control values
+class CLC_WPRC(bStructure):         # 12/LC:420  wind profile control values
    _fields_ = [
          ('m_id', c_int),          #        identifier 420
          ('m_id2', c_int),         #        identifier 0
          ('m_ipro', c_float),      #        number of generated profiles
-         ('m_wxmi', c_float),      # [1001] size of structure in wind coordinates
-         ('m_wxma', c_float),      # [1001] 
-         ('m_wymi', c_float),      # [1001] 
-         ('m_wyma', c_float),      # [1001] 
-         ('m_wzmi', c_float),      # [1001] 
-         ('m_wzma', c_float),      # [1001] 
+         ('m_wxmi', c_float),      # [1001] size of bStructure in wind coordinates
+         ('m_wxma', c_float),      # [1001]
+         ('m_wymi', c_float),      # [1001]
+         ('m_wyma', c_float),      # [1001]
+         ('m_wzmi', c_float),      # [1001]
+         ('m_wzma', c_float),      # [1001]
          ('m_alfa', c_float),      #        some angle ...
          ('m_beta', c_float),      #        some angle ...
          ('m_gamm', c_float),      #        some angle ...
@@ -3173,7 +3203,7 @@ class CLC_WPRC(Structure):         # 12/LC:420  wind profile control values
       ]
 clc_wprc = CLC_WPRC()
 
-class CLC_WPRO(Structure):         # 12/LC:420  wind profile distinct values
+class CLC_WPRO(bStructure):         # 12/LC:420  wind profile distinct values
    _fields_ = [
          ('m_id', c_int),          #        identifier 420
          ('m_ist', c_int),         #        source of data
@@ -3191,7 +3221,7 @@ class CLC_WPRO(Structure):         # 12/LC:420  wind profile distinct values
       ]
 clc_wpro = CLC_WPRO()
 
-class CLC_WAVE(Structure):         # 12/LC:500  Wave Loading
+class CLC_WAVE(bStructure):         # 12/LC:500  Wave Loading
    _fields_ = [
          ('m_id', c_int),          #        identifier 500
          ('m_typ', c_int),         #        wave theory bit pattern
@@ -3209,7 +3239,7 @@ class CLC_WAVE(Structure):         # 12/LC:500  Wave Loading
       ]
 clc_wave = CLC_WAVE()
 
-class CLC_HIST(Structure):         # 13/LC:0  TimeHistoryTitle
+class CLC_HIST(bStructure):         # 13/LC:0  TimeHistoryTitle
    _fields_ = [
          ('m_id', c_int),          #        identifier 0
          ('m_idt', c_int),         #        Unit of time resp x-axis
@@ -3221,14 +3251,14 @@ class CLC_HIST(Structure):         # 13/LC:0  TimeHistoryTitle
       ]
 clc_hist = CLC_HIST()
 
-class CLC_DAMP(Structure):         # 13/LC:1  Damping values
+class CLC_DAMP(bStructure):         # 13/LC:1  Damping values
    _fields_ = [
          ('m_id', c_int),          #        identifier 1
          ('m_d', c_float * 7)      #        modal damping values
       ]
 clc_damp = CLC_DAMP()
 
-class CLC_FVAL(Structure):         # 13/LC:?0  Discrete function values
+class CLC_FVAL(bStructure):         # 13/LC:?0  Discrete function values
    _fields_ = [
          ('m_id', c_int),          #        identifier
          ('m_tt', c_float),        #        Time/frequency/modenumber
@@ -3236,7 +3266,7 @@ class CLC_FVAL(Structure):         # 13/LC:?0  Discrete function values
       ]
 clc_fval = CLC_FVAL()
 
-class CLC_FMODC(Structure):        # 13/LC:9?  Explicit modal coordinates
+class CLC_FMODC(bStructure):        # 13/LC:9?  Explicit modal coordinates
    _fields_ = [
          ('m_id', c_int),          #        identifier
          ('m_tt', c_float),        #        Time/frequency/modenumber
@@ -3244,7 +3274,7 @@ class CLC_FMODC(Structure):        # 13/LC:9?  Explicit modal coordinates
       ]
 clc_fmodc = CLC_FMODC()
 
-class CLC_FSIN(Structure):         # 13/LC:11  Harmonic function additive
+class CLC_FSIN(bStructure):         # 13/LC:11  Harmonic function additive
    _fields_ = [
          ('m_id', c_int),          #        identifier
          ('m_t', c_float),         # [  90] Time/frequency
@@ -3262,7 +3292,7 @@ class CLC_FSIN(Structure):         # 13/LC:11  Harmonic function additive
       ]
 clc_fsin = CLC_FSIN()
 
-class CLC_FSINM(Structure):        # 13/LC:21  Harmonic function multiplier
+class CLC_FSINM(bStructure):        # 13/LC:21  Harmonic function multiplier
    _fields_ = [
          ('m_id', c_int),          #        identifier
          ('m_t', c_float),         # [  90] Time/frequency
@@ -3280,7 +3310,7 @@ class CLC_FSINM(Structure):        # 13/LC:21  Harmonic function multiplier
       ]
 clc_fsinm = CLC_FSINM()
 
-class CLC_FSTP(Structure):         # 13/LC:12  Periodic stepping function additive
+class CLC_FSTP(bStructure):         # 13/LC:12  Periodic stepping function additive
    _fields_ = [
          ('m_id', c_int),          #        identifier
          ('m_t', c_float),         # [  90] Time/frequency
@@ -3288,11 +3318,11 @@ class CLC_FSTP(Structure):         # 13/LC:12  Periodic stepping function additi
          ('m_tc', c_float),        # [  90] contact time
          ('m_tmin', c_float),      # [  90] starttime
          ('m_tmax', c_float),      # [  90] stoptime if > starttime
-         ('m_s', c_float)          #        impactfactor (Sailer/Hüttner/Bachmann)
+         ('m_s', c_float)          #        impactfactor (Sailer/Hï¿½ï¿½er/Bachmann)
       ]
 clc_fstp = CLC_FSTP()
 
-class CLC_FSTPM(Structure):        # 13/LC:22  Periodic stepping function multiplier
+class CLC_FSTPM(bStructure):        # 13/LC:22  Periodic stepping function multiplier
    _fields_ = [
          ('m_id', c_int),          #        identifier
          ('m_t', c_float),         # [  90] Time/frequency
@@ -3300,11 +3330,11 @@ class CLC_FSTPM(Structure):        # 13/LC:22  Periodic stepping function multip
          ('m_tc', c_float),        # [  90] contact time
          ('m_tmin', c_float),      # [  90] starttime
          ('m_tmax', c_float),      # [  90] stoptime if > starttime
-         ('m_s', c_float)          #        impactfactor (Sailer/Hüttner/Bachmann)
+         ('m_s', c_float)          #        impactfactor (Sailer/Hï¿½ï¿½er/Bachmann)
       ]
 clc_fstpm = CLC_FSTPM()
 
-class CLC_FINA(Structure):         # 13/LC:13  Aperiodic function additive
+class CLC_FINA(bStructure):         # 13/LC:13  Aperiodic function additive
    _fields_ = [
          ('m_id', c_int),          #        identifier 13
          ('m_t', c_float),         # [  90] Total Time
@@ -3320,7 +3350,7 @@ class CLC_FINA(Structure):         # 13/LC:13  Aperiodic function additive
       ]
 clc_fina = CLC_FINA()
 
-class CLC_FINM(Structure):         # 13/LC:23  Aperiodic function multiplier
+class CLC_FINM(bStructure):         # 13/LC:23  Aperiodic function multiplier
    _fields_ = [
          ('m_id', c_int),          #        identifier 13
          ('m_t', c_float),         # [  90] Total Time
@@ -3336,7 +3366,7 @@ class CLC_FINM(Structure):         # 13/LC:23  Aperiodic function multiplier
       ]
 clc_finm = CLC_FINM()
 
-class CLC_RESW(Structure):         # 13/LC:9??  Response spectra wind
+class CLC_RESW(bStructure):         # 13/LC:9??  Response spectra wind
    _fields_ = [
          ('m_typ', c_int),         #        Type of spectra 900 - 999
          ('m_sint', c_float),      #        Integral of spectra
@@ -3351,7 +3381,7 @@ class CLC_RESW(Structure):         # 13/LC:9??  Response spectra wind
       ]
 clc_resw = CLC_RESW()
 
-class CLC_RESP(Structure):         # 13/LC:???  Response spectra earthquake
+class CLC_RESP(bStructure):         # 13/LC:???  Response spectra earthquake
    _fields_ = [
          ('m_typ', c_int),         #        Type of spectra 100 - 999
          ('m_d', c_float),         #        Damping value eta or behaviour factor q
@@ -3372,7 +3402,7 @@ class CLC_RESP(Structure):         # 13/LC:???  Response spectra earthquake
       ]
 clc_resp = CLC_RESP()
 
-class CLC_FREF(Structure):         # 13/LC:????  Discrete reference function values
+class CLC_FREF(bStructure):         # 13/LC:????  Discrete reference function values
    _fields_ = [
          ('m_id', c_int),          #        line type
          ('m_tt', c_float),        #        Time/frequency
@@ -3380,7 +3410,7 @@ class CLC_FREF(Structure):         # 13/LC:????  Discrete reference function val
       ]
 clc_fref = CLC_FREF()
 
-class CACT_TASK_SCOM(Structure):   #        index,factor and name of items
+class CACT_TASK_SCOM(bStructure):   #        index,factor and name of items
    _fields_ = [
          ('m_ind', c_int),
          ('m_fak', c_float),
@@ -3388,7 +3418,7 @@ class CACT_TASK_SCOM(Structure):   #        index,factor and name of items
       ]
 cact_task_scom = CACT_TASK_SCOM()
 
-class CACT_TASK(Structure):        # 14/0  Superposition task commands
+class CACT_TASK(bStructure):        # 14/0  Superposition task commands
    _fields_ = [
          ('m_ivers', c_int),       #        < 9999 = old data format (ACT_RULE)
          ('m_num', c_int),         #        number of superposition command
@@ -3408,7 +3438,7 @@ class CACT_TASK(Structure):        # 14/0  Superposition task commands
       ]
 cact_task = CACT_TASK()
 
-class CACT_RULE_SCOM(Structure):   #        index,factor and name of items
+class CACT_RULE_SCOM(bStructure):   #        index,factor and name of items
    _fields_ = [
          ('m_ind', c_int),
          ('m_fak', c_float),
@@ -3416,7 +3446,7 @@ class CACT_RULE_SCOM(Structure):   #        index,factor and name of items
       ]
 cact_rule_scom = CACT_RULE_SCOM()
 
-class CACT_RULE(Structure):        # 14/0  Superposition commands (old Version)
+class CACT_RULE(bStructure):        # 14/0  Superposition commands (old Version)
    _fields_ = [
          ('m_num', c_int),         #        number of superposition command
          ('m_act', c_int),         #        number of groups of actions at 14/act
@@ -3432,7 +3462,7 @@ class CACT_RULE(Structure):        # 14/0  Superposition commands (old Version)
       ]
 cact_rule = CACT_RULE()
 
-class CLC_ACT0(Structure):         # 14/NR:0  Group of Actions for SUPP-task
+class CLC_ACT0(bStructure):         # 14/NR:0  Group of Actions for SUPP-task
    _fields_ = [
          ('m_id', c_int),          #        ident = 0  user defined ; < 0 automatic
          ('m_lfb', c_int),         #        load case offset
@@ -3442,7 +3472,7 @@ class CLC_ACT0(Structure):         # 14/NR:0  Group of Actions for SUPP-task
       ]
 clc_act0 = CLC_ACT0()
 
-class CLC_CACT0(Structure):        # 12/LC:80  Group of Actions for SUPP-task
+class CLC_CACT0(bStructure):        # 12/LC:80  Group of Actions for SUPP-task
    _fields_ = [
          ('m_id', c_int),          #        ident = 0  user defined ; < 0 automatic
          ('m_lfb', c_int),         #        load case offset
@@ -3452,7 +3482,7 @@ class CLC_CACT0(Structure):        # 12/LC:80  Group of Actions for SUPP-task
       ]
 clc_cact0 = CLC_CACT0()
 
-class CLC_ACT1(Structure):         # 14/NR:1  Action member
+class CLC_ACT1(bStructure):         # 14/NR:1  Action member
    _fields_ = [
          ('m_id', c_int),          #        ident = 1 / 81
          ('m_action', c_int),      #        ID of the action = type of action
@@ -3469,7 +3499,7 @@ class CLC_ACT1(Structure):         # 14/NR:1  Action member
       ]
 clc_act1 = CLC_ACT1()
 
-class CLC_CACT1(Structure):        # 12/NR:81  current action member
+class CLC_CACT1(bStructure):        # 12/NR:81  current action member
    _fields_ = [
          ('m_id', c_int),          #        ident = 1 / 81
          ('m_action', c_int),      #        ID of the action = type of action
@@ -3486,7 +3516,7 @@ class CLC_CACT1(Structure):        # 12/NR:81  current action member
       ]
 clc_cact1 = CLC_CACT1()
 
-class CLC_ACT_L(Structure):        # 14/NR:2  loadcase of action
+class CLC_ACT_L(bStructure):        # 14/NR:2  loadcase of action
    _fields_ = [
          ('m_id', c_int),          #        ident = 2 / 82
          ('m_lf', c_int),          #        load case number
@@ -3495,7 +3525,7 @@ class CLC_ACT_L(Structure):        # 14/NR:2  loadcase of action
       ]
 clc_act_l = CLC_ACT_L()
 
-class CLC_CACT2(Structure):        # 12/NR:82  current loadcase of action
+class CLC_CACT2(bStructure):        # 12/NR:82  current loadcase of action
    _fields_ = [
          ('m_id', c_int),          #        ident = 2 / 82
          ('m_lf', c_int),          #        load case number
@@ -3504,7 +3534,7 @@ class CLC_CACT2(Structure):        # 12/NR:82  current loadcase of action
       ]
 clc_cact2 = CLC_CACT2()
 
-class CLC_ACT_R(Structure):        # 14/NR:1?  Response Spectra
+class CLC_ACT_R(bStructure):        # 14/NR:1?  Response Spectra
    _fields_ = [
          ('m_id', c_int),          #        Evaluation type of response
          ('m_resp', c_int),        #        load case number of spectra
@@ -3513,7 +3543,7 @@ class CLC_ACT_R(Structure):        # 14/NR:1?  Response Spectra
       ]
 clc_act_r = CLC_ACT_R()
 
-class CLC_ACT(Structure):          # 14/IDT:1  Action defaults
+class CLC_ACT(bStructure):          # 14/IDT:1  Action defaults
    _fields_ = [
          ('m_id', c_int),          #        ident = 1
          ('m_action', c_int),      #        ID of the real action = type of action
@@ -3530,7 +3560,7 @@ class CLC_ACT(Structure):          # 14/IDT:1  Action defaults
       ]
 clc_act = CLC_ACT()
 
-class CCSM_GRP(Structure):         # 15/-1  Construction Stage Group Definitions
+class CCSM_GRP(bStructure):         # 15/-1  Construction Stage Group Definitions
    _fields_ = [
          ('m_grp', c_int),         #        Group number
          ('m_ics', c_int),         #        CS number of first activation
@@ -3541,7 +3571,7 @@ class CCSM_GRP(Structure):         # 15/-1  Construction Stage Group Definitions
       ]
 ccsm_grp = CCSM_GRP()
 
-class CCSM_LC(Structure):          # 15/-2  Construction Stage Loadcase Definitions
+class CCSM_LC(bStructure):          # 15/-2  Construction Stage Loadcase Definitions
    _fields_ = [
          ('m_lc', c_int),          #        Loadcase
          ('m_start', c_int),       #        CS number for first action
@@ -3549,7 +3579,7 @@ class CCSM_LC(Structure):          # 15/-2  Construction Stage Loadcase Definiti
       ]
 ccsm_lc = CCSM_LC()
 
-class CCSM_CS(Structure):          # 15/-3  Construction Stage Table
+class CCSM_CS(bStructure):          # 15/-3  Construction Stage Table
    _fields_ = [
          ('m_cs', c_int),          #        Construction Stage
          ('m_id', c_int),          #        Main action type in this CS
@@ -3562,7 +3592,7 @@ class CCSM_CS(Structure):          # 15/-3  Construction Stage Table
       ]
 ccsm_cs = CCSM_CS()
 
-class CCSM_CREE(Structure):        # 15/-4  creep+shrink values for manual input
+class CCSM_CREE(bStructure):        # 15/-4  creep+shrink values for manual input
    _fields_ = [
          ('m_mno', c_int),         #        Material number
          ('m_grp', c_int),         #        Group number
@@ -3572,7 +3602,7 @@ class CCSM_CREE(Structure):        # 15/-4  creep+shrink values for manual input
       ]
 ccsm_cree = CCSM_CREE()
 
-class CCSG_CS(Structure):          # 15/-10  Construction Stage
+class CCSG_CS(bStructure):          # 15/-10  Construction Stage
    _fields_ = [
          ('m_no', c_int),          #        construction stage number
          ('m_titl', c_int * 32),   #        Designation
@@ -3580,7 +3610,7 @@ class CCSG_CS(Structure):          # 15/-10  Construction Stage
       ]
 ccsg_cs = CCSG_CS()
 
-class CCSG_CGRP(Structure):        # 15/-11  Group specification
+class CCSG_CGRP(bStructure):        # 15/-11  Group specification
    _fields_ = [
          ('m_ics', c_int),         #        corresponding cs number
          ('m_no', c_int),          #        group number
@@ -3597,7 +3627,7 @@ class CCSG_CGRP(Structure):        # 15/-11  Group specification
       ]
 ccsg_cgrp = CCSG_CGRP()
 
-class CCSG_CLAS(Structure):        # 15/-12  Load specification
+class CCSG_CLAS(bStructure):        # 15/-12  Load specification
    _fields_ = [
          ('m_ics', c_int),         #        corresponding cs number
          ('m_no', c_int),          #        number of referenced loadcase
@@ -3606,14 +3636,14 @@ class CCSG_CLAS(Structure):        # 15/-12  Load specification
       ]
 ccsg_clas = CCSG_CLAS()
 
-class CCSG_CSYS(Structure):        # 15/-13  System specification
+class CCSG_CSYS(bStructure):        # 15/-13  System specification
    _fields_ = [
          ('m_ics', c_int),         #        corresponding cs number
          ('m_prob', c_int)         #        problem type
       ]
 ccsg_csys = CCSG_CSYS()
 
-class CCSG_CCRL(Structure):        # 15/-14  Computation control
+class CCSG_CCRL(bStructure):        # 15/-14  Computation control
    _fields_ = [
          ('m_ics', c_int),         #        corresponding cs number
          ('m_opt', c_int),         #        control option
@@ -3630,14 +3660,14 @@ class CCSG_CCRL(Structure):        # 15/-14  Computation control
       ]
 ccsg_ccrl = CCSG_CCRL()
 
-class CCSG_CGW(Structure):         # 15/-15  Change ground water level
+class CCSG_CGW(bStructure):         # 15/-15  Change ground water level
    _fields_ = [
          ('m_ics', c_int),         #        corresponding cs number
          ('m_hw', c_float)         # [  13] new ground water level
       ]
 ccsg_cgw = CCSG_CGW()
 
-class CCSG_ECHO(Structure):        # 15/-16  Echo options
+class CCSG_ECHO(bStructure):        # 15/-16  Echo options
    _fields_ = [
          ('m_ics', c_int),         #        corresponding cs number
          ('m_opt', c_int),         #        echo option
@@ -3645,7 +3675,7 @@ class CCSG_ECHO(Structure):        # 15/-16  Echo options
       ]
 ccsg_echo = CCSG_ECHO()
 
-class CCSM_LC1(Structure):         # 15/LC:1  CSM loadcase parameters Group members
+class CCSM_LC1(bStructure):         # 15/LC:1  CSM loadcase parameters Group members
    _fields_ = [
          ('m_id', c_int),          #        identifier 1
          ('m_grp', c_int),         #        Group number
@@ -3654,7 +3684,7 @@ class CCSM_LC1(Structure):         # 15/LC:1  CSM loadcase parameters Group memb
       ]
 ccsm_lc1 = CCSM_LC1()
 
-class CCSM_LC2(Structure):         # 15/LC:2  CSM loadcase parameters quad-tendon members
+class CCSM_LC2(bStructure):         # 15/LC:2  CSM loadcase parameters quad-tendon members
    _fields_ = [
          ('m_id', c_int),          #        identifier 2
          ('m_grp', c_int),         #        quad-tendon number
@@ -3663,7 +3693,7 @@ class CCSM_LC2(Structure):         # 15/LC:2  CSM loadcase parameters quad-tendo
       ]
 ccsm_lc2 = CCSM_LC2()
 
-class CVIEW(Structure):            # 18/-1  View definitions (Exchange ANIMATOR-WINGRAF)
+class CVIEW(bStructure):            # 18/-1  View definitions (Exchange ANIMATOR-WINGRAF)
    _fields_ = [
          ('m_iachs', c_int),       #        downward direction (compare 10/0)
          ('m_pers', c_int),        #        Perspective
@@ -3679,7 +3709,7 @@ class CVIEW(Structure):            # 18/-1  View definitions (Exchange ANIMATOR-
          ('m_xcam', c_float),      # [1001] X-coordinate of camera point
          ('m_ycam', c_float),      # [1001] Y-coordinate of camera point
          ('m_zcam', c_float),      # [1001] Z-coordinate of camera point
-         ('m_fakv', c_float),      #        Factor of deformed structure
+         ('m_fakv', c_float),      #        Factor of deformed bStructure
          ('m_ssiz', c_float),      #        Size of supports (0.-100.)
          ('m_wmag', c_float),      #        Warping magnification (0.-100.)
          ('m_fovy', c_float),      # [   5] perspective angle of field of view
@@ -3689,21 +3719,21 @@ class CVIEW(Structure):            # 18/-1  View definitions (Exchange ANIMATOR-
       ]
 cview = CVIEW()
 
-class CVIEW_SEL_R(Structure):      #        Range lower and upper limit
+class CVIEW_SEL_R(bStructure):      #        Range lower and upper limit
    _fields_ = [
          ('m_low', c_int),
          ('m_upp', c_int)
       ]
 cview_sel_r = CVIEW_SEL_R()
 
-class CVIEW_SEL(Structure):        # 18/-2  currently selected elements in WINGRAF
+class CVIEW_SEL(bStructure):        # 18/-2  currently selected elements in WINGRAF
    _fields_ = [
          ('m_id', c_int),          #        Identifikator
          ('m_r',  CVIEW_SEL_R * 32)  #        Range lower and upper limit
       ]
 cview_sel = CVIEW_SEL()
 
-class CVIEW_SRE(Structure):        # 18/-3  currently selected results in WINGRAF
+class CVIEW_SRE(bStructure):        # 18/-3  currently selected results in WINGRAF
    _fields_ = [
          ('m_kwh', c_int),         #        Main key of current item
          ('m_kwl', c_int),         #        Secondary key of cuurent item (LF,MAT)
@@ -3711,10 +3741,10 @@ class CVIEW_SRE(Structure):        # 18/-3  currently selected results in WINGRA
       ]
 cview_sre = CVIEW_SRE()
 
-class CMTXT_0(Structure):          # 18/-4:0  Header for membrane manufacturing
+class CMTXT_0(bStructure):          # 18/-4:0  Header for membrane manufacturing
    _fields_ = [
          ('m_id', c_int),          #        identificator = 0
-         ('m_lf', c_int),          #        used load case of a deformed structure Lastfallnummer einer ver
+         ('m_lf', c_int),          #        used load case of a deformed bStructure Lastfallnummer einer ver
          ('m_bits', c_int),        #        Bitpattern of conditions of evaluation
          ('m_nfl', c_int),         #        Number of manufacturing areas
          ('m_nqu', c_int),         #        total number of QUADS within those areas
@@ -3722,7 +3752,7 @@ class CMTXT_0(Structure):          # 18/-4:0  Header for membrane manufacturing
       ]
 cmtxt_0 = CMTXT_0()
 
-class CMTXT_NOD(Structure):        # 18/-4:-  Definition of new nodes
+class CMTXT_NOD(bStructure):        # 18/-4:-  Definition of new nodes
    _fields_ = [
          ('m_no', c_int),          #        Number of new interpolated node
          ('m_quad', c_int),        #        Nummer of QUAD-element containing this node
@@ -3731,7 +3761,7 @@ class CMTXT_NOD(Structure):        # 18/-4:-  Definition of new nodes
       ]
 cmtxt_nod = CMTXT_NOD()
 
-class CMTXT_ELM(Structure):        # 18/-4:+  Definition of manufacturing elements
+class CMTXT_ELM(bStructure):        # 18/-4:+  Definition of manufacturing elements
    _fields_ = [
          ('m_no', c_int),          #        Number of manufacturing area
          ('m_quad', c_int),        #        Number of QUAD-element
@@ -3742,7 +3772,7 @@ class CMTXT_ELM(Structure):        # 18/-4:+  Definition of manufacturing elemen
       ]
 cmtxt_elm = CMTXT_ELM()
 
-class CVIEW_MCO(Structure):        # 18/-5  Colour of material
+class CVIEW_MCO(bStructure):        # 18/-5  Colour of material
    _fields_ = [
          ('m_no', c_int),          #        Number of material / group
          ('m_red', c_float),       #        RGBA: red color
@@ -3752,7 +3782,7 @@ class CVIEW_MCO(Structure):        # 18/-5  Colour of material
       ]
 cview_mco = CVIEW_MCO()
 
-class CVIEW_GCO(Structure):        # 18/-6  Colour of group
+class CVIEW_GCO(bStructure):        # 18/-6  Colour of group
    _fields_ = [
          ('m_no', c_int),          #        Number of material / group
          ('m_red', c_float),       #        RGBA: red color
@@ -3762,7 +3792,7 @@ class CVIEW_GCO(Structure):        # 18/-6  Colour of group
       ]
 cview_gco = CVIEW_GCO()
 
-class CANI_SELE(Structure):        # 18/-101:1  Dialogbox Animator selection request
+class CANI_SELE(bStructure):        # 18/-101:1  Dialogbox Animator selection request
    _fields_ = [
          ('m_sele', c_int),        #        identifier 1 : selection request
          ('m_igrp', c_int),        #        element-group switch
@@ -3773,7 +3803,7 @@ class CANI_SELE(Structure):        # 18/-101:1  Dialogbox Animator selection req
       ]
 cani_sele = CANI_SELE()
 
-class CANI_CTRL(Structure):        # 18/-101:2  Dialogbox Animator drawing controls
+class CANI_CTRL(bStructure):        # 18/-101:2  Dialogbox Animator drawing controls
    _fields_ = [
          ('m_sele', c_int),        #        identifier 2 : drawing controls
          ('m_igrp', c_int),        #        element-group switch as in record 018/-101
@@ -3786,7 +3816,7 @@ class CANI_CTRL(Structure):        # 18/-101:2  Dialogbox Animator drawing contr
       ]
 cani_ctrl = CANI_CTRL()
 
-class CANI_SRES(Structure):        # 18/-103  Selection result from Animator
+class CANI_SRES(bStructure):        # 18/-103  Selection result from Animator
    _fields_ = [
          ('m_id101', c_int),       #        access ID of 18/-101 to check if selection allready done
          ('m_igrp', c_int),        #        element-group switch as defined in 018/-101
@@ -3799,7 +3829,7 @@ class CANI_SRES(Structure):        # 18/-103  Selection result from Animator
       ]
 cani_sres = CANI_SRES()
 
-class CLC_SELF(Structure):         # 18/LCD  Self weight loading of elements from ASE
+class CLC_SELF(bStructure):         # 18/LCD  Self weight loading of elements from ASE
    _fields_ = [
          ('m_kwh', c_int),         #        Type of load element
          ('m_nr', c_int),          #        all other values as in KWH/LC
@@ -3808,7 +3838,7 @@ class CLC_SELF(Structure):         # 18/LCD  Self weight loading of elements fro
       ]
 clc_self = CLC_SELF()
 
-class CGRP_BIL(Structure):         # 19/LC  Bilances of Flow in HYDRA
+class CGRP_BIL(bStructure):         # 19/LC  Bilances of Flow in HYDRA
    _fields_ = [
          ('m_id', c_int),          #        type of result
          ('m_nr', c_int),          #        group number
@@ -3819,7 +3849,7 @@ class CGRP_BIL(Structure):         # 19/LC  Bilances of Flow in HYDRA
       ]
 cgrp_bil = CGRP_BIL()
 
-class CNODE(Structure):            # 20/00  Nodes
+class CNODE(bStructure):            # 20/00  Nodes
    _fields_ = [
          ('m_nr', c_int),          #        node-number
          ('m_inr', c_int),         #        internal node-number
@@ -3829,21 +3859,21 @@ class CNODE(Structure):            # 20/00  Nodes
       ]
 cnode = CNODE()
 
-class CNODE_GRC(Structure):        # 20/11:0  number of Nodegroups
+class CNODE_GRC(bStructure):        # 20/11:0  number of Nodegroups
    _fields_ = [
          ('m_id', c_int),
          ('m_maxgrp', c_int)       #        maximum number of groups per node
       ]
 cnode_grc = CNODE_GRC()
 
-class CNODE_GRP(Structure):        # 20/11:+  Nodegroups
+class CNODE_GRP(bStructure):        # 20/11:+  Nodegroups
    _fields_ = [
          ('m_n', c_int),           #        node-number
          ('m_igrp', c_int * 9999)  #        group-numbers connecting to node
       ]
 cnode_grp = CNODE_GRP()
 
-class CNODE_KIC(Structure):        # 21/00:0  Info on kinematic constraints
+class CNODE_KIC(bStructure):        # 21/00:0  Info on kinematic constraints
    _fields_ = [
          ('m_id', c_int),
          ('m_nlev', c_int),        #        depth of recurent coupling (obsolete)
@@ -3852,7 +3882,7 @@ class CNODE_KIC(Structure):        # 21/00:0  Info on kinematic constraints
       ]
 cnode_kic = CNODE_KIC()
 
-class CNODE_KIN(Structure):        # 21/00:+  Standard kinematic constraint
+class CNODE_KIN(bStructure):        # 21/00:+  Standard kinematic constraint
    _fields_ = [
          ('m_ktl', c_int),         #        type + 100 * depth + 10000*group-number
          ('m_nr', c_int),          #        node-number
@@ -3863,21 +3893,21 @@ class CNODE_KIN(Structure):        # 21/00:+  Standard kinematic constraint
       ]
 cnode_kin = CNODE_KIN()
 
-class CNODE_KIG_ID(Structure):     #        node+degree-number of dependent (0)
+class CNODE_KIG_ID(bStructure):     #        node+degree-number of dependent (0)
    _fields_ = [
          ('m_nr', c_int),
          ('m_nd', c_int)
       ]
 cnode_kig_id = CNODE_KIG_ID()
 
-class CNODE_KIG(Structure):        # 21/00:*99  general constraints (equation list)
+class CNODE_KIG(bStructure):        # 21/00:*99  general constraints (equation list)
    _fields_ = [
          ('m_ktl', c_int),
          ('m_id',  CNODE_KIG_ID * 256)  #        node+degree-number of dependent (0)
       ]
 cnode_kig = CNODE_KIG()
 
-class CNODE_KIF(Structure):        # 21/00:*99  general constraints (factor list)
+class CNODE_KIF(bStructure):        # 21/00:*99  general constraints (factor list)
    _fields_ = [
          ('m_ktl', c_int),         #        99 + 100 * depth
          ('m_id', c_int),          #        identifier 0
@@ -3885,7 +3915,7 @@ class CNODE_KIF(Structure):        # 21/00:*99  general constraints (factor list
       ]
 cnode_kif = CNODE_KIF()
 
-class CNODE_KIH(Structure):        # 21/09  Hydraulic couplings
+class CNODE_KIH(bStructure):        # 21/09  Hydraulic couplings
    _fields_ = [
          ('m_ng', c_int),          #        group-number
          ('m_nr', c_int),          #        node-number
@@ -3893,7 +3923,7 @@ class CNODE_KIH(Structure):        # 21/09  Hydraulic couplings
       ]
 cnode_kih = CNODE_KIH()
 
-class CNODE_KFC(Structure):        # 22/LC:0  Max. Constraining Forces
+class CNODE_KFC(bStructure):        # 22/LC:0  Max. Constraining Forces
    _fields_ = [
          ('m_id', c_int),          #        identifier 0
          ('m_px', c_float),        # [1190] force component X
@@ -3906,7 +3936,7 @@ class CNODE_KFC(Structure):        # 22/LC:0  Max. Constraining Forces
       ]
 cnode_kfc = CNODE_KFC()
 
-class CNODE_KFO(Structure):        # 22/LC:+  Constraining forces
+class CNODE_KFO(bStructure):        # 22/LC:+  Constraining forces
    _fields_ = [
          ('m_nr', c_int),          #        node-number
          ('m_px', c_float),        # [1190] force component X
@@ -3919,7 +3949,7 @@ class CNODE_KFO(Structure):        # 22/LC:+  Constraining forces
       ]
 cnode_kfo = CNODE_KFO()
 
-class CNODE_L(Structure):          # 23/LC:+  Nodal_loads
+class CNODE_L(bStructure):          # 23/LC:+  Nodal_loads
    _fields_ = [
          ('m_nr', c_int),          #        node-number
          ('m_typ', c_int),         #        type of load
@@ -3933,7 +3963,7 @@ class CNODE_L(Structure):          # 23/LC:+  Nodal_loads
       ]
 cnode_l = CNODE_L()
 
-class CNODE_LW(Structure):         # 23/LC:+  prescribed support displacements
+class CNODE_LW(bStructure):         # 23/LC:+  prescribed support displacements
    _fields_ = [
          ('m_nr', c_int),          #        node-number
          ('m_typ', c_int),         #        type of load
@@ -3946,7 +3976,7 @@ class CNODE_LW(Structure):         # 23/LC:+  prescribed support displacements
       ]
 cnode_lw = CNODE_LW()
 
-class CNODE_ACC(Structure):        # 23/LC:*  Base acceleration
+class CNODE_ACC(bStructure):        # 23/LC:*  Base acceleration
    _fields_ = [
          ('m_nr', c_int),          #        node number / influence load case
          ('m_typ', c_int),         #        type of load (=10)
@@ -3963,7 +3993,7 @@ class CNODE_ACC(Structure):        # 23/LC:*  Base acceleration
       ]
 cnode_acc = CNODE_ACC()
 
-class CNODE_LA(Structure):         # 23/LC:+  prescribed nodal accelerations
+class CNODE_LA(bStructure):         # 23/LC:+  prescribed nodal accelerations
    _fields_ = [
          ('m_nr', c_int),          #        node-number
          ('m_typ', c_int),         #        type of load
@@ -3976,7 +4006,7 @@ class CNODE_LA(Structure):         # 23/LC:+  prescribed nodal accelerations
       ]
 cnode_la = CNODE_LA()
 
-class CNODE_ROT(Structure):        # 23/LC:+  Rotation of Body
+class CNODE_ROT(bStructure):        # 23/LC:+  Rotation of Body
    _fields_ = [
          ('m_nr', c_int),          #        influence reference
          ('m_typ', c_int),         #        type of load (=20)
@@ -3989,7 +4019,7 @@ class CNODE_ROT(Structure):        # 23/LC:+  Rotation of Body
       ]
 cnode_rot = CNODE_ROT()
 
-class CN_DISPC(Structure):         # 24/LC:0  Max. Displacements and support forces
+class CN_DISPC(bStructure):         # 24/LC:0  Max. Displacements and support forces
    _fields_ = [
          ('m_id', c_int),
          ('m_ux', c_float),        # [1003] displacement X
@@ -4009,7 +4039,7 @@ class CN_DISPC(Structure):         # 24/LC:0  Max. Displacements and support for
       ]
 cn_dispc = CN_DISPC()
 
-class CN_DISPIC(Structure):        # 26/LC:0  Max. Displacement and forces increments
+class CN_DISPIC(bStructure):        # 26/LC:0  Max. Displacement and forces increments
    _fields_ = [
          ('m_id', c_int),
          ('m_ux', c_float),        # [1003] displacement X
@@ -4029,7 +4059,7 @@ class CN_DISPIC(Structure):        # 26/LC:0  Max. Displacement and forces incre
       ]
 cn_dispic = CN_DISPIC()
 
-class CN_DISPTC(Structure):        # 27/LC:0  Max. Cooordinate offsets
+class CN_DISPTC(bStructure):        # 27/LC:0  Max. Cooordinate offsets
    _fields_ = [
          ('m_id', c_int),
          ('m_ux', c_float),        # [1003] displacement X
@@ -4049,7 +4079,7 @@ class CN_DISPTC(Structure):        # 27/LC:0  Max. Cooordinate offsets
       ]
 cn_disptc = CN_DISPTC()
 
-class CN_DISP(Structure):          # 24/LC:+  Displacements and support forces of nodes
+class CN_DISP(bStructure):          # 24/LC:+  Displacements and support forces of nodes
    _fields_ = [
          ('m_nr', c_int),          #        node-number
          ('m_ux', c_float),        # [1003] displacement
@@ -4069,7 +4099,7 @@ class CN_DISP(Structure):          # 24/LC:+  Displacements and support forces o
       ]
 cn_disp = CN_DISP()
 
-class CN_DISPI(Structure):         # 26/LC:+  Displacement increments and residual forces
+class CN_DISPI(bStructure):         # 26/LC:+  Displacement increments and residual forces
    _fields_ = [
          ('m_nr', c_int),          #        node-number
          ('m_ux', c_float),        # [1003] displacement
@@ -4089,7 +4119,7 @@ class CN_DISPI(Structure):         # 26/LC:+  Displacement increments and residu
       ]
 cn_dispi = CN_DISPI()
 
-class CN_DISPT(Structure):         # 27/LC:+  Cooordinate offsets
+class CN_DISPT(bStructure):         # 27/LC:+  Cooordinate offsets
    _fields_ = [
          ('m_nr', c_int),          #        node-number
          ('m_ux', c_float),        # [1003] displacement
@@ -4109,7 +4139,7 @@ class CN_DISPT(Structure):         # 27/LC:+  Cooordinate offsets
       ]
 cn_dispt = CN_DISPT()
 
-class CN_VELOC(Structure):         # 25/LC:0  Max. velocities and accelerations of nodes
+class CN_VELOC(bStructure):         # 25/LC:0  Max. velocities and accelerations of nodes
    _fields_ = [
          ('m_id', c_int),
          ('m_vx', c_float),        # [1201] velocity X
@@ -4129,7 +4159,7 @@ class CN_VELOC(Structure):         # 25/LC:0  Max. velocities and accelerations 
       ]
 cn_veloc = CN_VELOC()
 
-class CN_VELO(Structure):          # 25/LC:+  velocitys and acceleration of nodes
+class CN_VELO(bStructure):          # 25/LC:+  velocitys and acceleration of nodes
    _fields_ = [
          ('m_nr', c_int),          #        node-number
          ('m_vx', c_float),        # [1201] velocity X
@@ -4149,21 +4179,21 @@ class CN_VELO(Structure):          # 25/LC:+  velocitys and acceleration of node
       ]
 cn_velo = CN_VELO()
 
-class CGLN_MATC(Structure):        # 31/0  Heritage of Structural lines
+class CGLN_MATC(bStructure):        # 31/0  Heritage of Structural lines
    _fields_ = [
          ('m_nr', c_int),          #        original structural line number
          ('m_ids', c_int * 9999)   #        sequence of sub-lines
       ]
 cgln_matc = CGLN_MATC()
 
-class CGAR_MATC(Structure):        # 32/0  Heritage of Structural Areas
+class CGAR_MATC(bStructure):        # 32/0  Heritage of Structural Areas
    _fields_ = [
          ('m_nr', c_int),          #        original structural area number
          ('m_ids', c_int * 9999)   #        list of sub-areas
       ]
 cgar_matc = CGAR_MATC()
 
-class CSPT(Structure):             # 39/NR:0  Structural points
+class CSPT(bStructure):             # 39/NR:0  Structural points
    _fields_ = [
          ('m_id', c_int),          #        identifier 0
          ('m_ids', c_int),         #        optional identifier of point
@@ -4186,7 +4216,7 @@ class CSPT(Structure):             # 39/NR:0  Structural points
       ]
 cspt = CSPT()
 
-class CSLN(Structure):             # 39/NR:100  Structural lines
+class CSLN(bStructure):             # 39/NR:100  Structural lines
    _fields_ = [
          ('m_id', c_int),          #        identifier 100
          ('m_ids', c_int),         #        optional identifier of structural line
@@ -4213,7 +4243,7 @@ class CSLN(Structure):             # 39/NR:100  Structural lines
       ]
 csln = CSLN()
 
-class CSLN_BEAM(Structure):        # 39/NR:101  Properties of beams
+class CSLN_BEAM(bStructure):        # 39/NR:101  Properties of beams
    _fields_ = [
          ('m_id', c_int),          #        ident 101
          ('m_typ', c_int),         #        Element type (see 009/NR:90:4 IBTYP)
@@ -4238,7 +4268,7 @@ class CSLN_BEAM(Structure):        # 39/NR:101  Properties of beams
       ]
 csln_beam = CSLN_BEAM()
 
-class CGLN_BPRO(Structure):        # 31/NR:101  Properties of beams
+class CGLN_BPRO(bStructure):        # 31/NR:101  Properties of beams
    _fields_ = [
          ('m_id', c_int),          #        ident 101
          ('m_typ', c_int),         #        Element type (see 009/NR:90:4 IBTYP)
@@ -4263,7 +4293,7 @@ class CGLN_BPRO(Structure):        # 31/NR:101  Properties of beams
       ]
 cgln_bpro = CGLN_BPRO()
 
-class CSLN_SUPP(Structure):        # 39/NR:102  Support of Structural lines
+class CSLN_SUPP(bStructure):        # 39/NR:102  Support of Structural lines
    _fields_ = [
          ('m_id', c_int),          #        identifier 102
          ('m_ids', c_int),         #        type of reference
@@ -4289,7 +4319,7 @@ class CSLN_SUPP(Structure):        # 39/NR:102  Support of Structural lines
       ]
 csln_supp = CSLN_SUPP()
 
-class CGLN_SUPP(Structure):        # 31/NR:102  Support of Structural lines
+class CGLN_SUPP(bStructure):        # 31/NR:102  Support of Structural lines
    _fields_ = [
          ('m_id', c_int),          #        identifier 102
          ('m_ids', c_int),         #        type of reference
@@ -4315,7 +4345,7 @@ class CGLN_SUPP(Structure):        # 31/NR:102  Support of Structural lines
       ]
 cgln_supp = CGLN_SUPP()
 
-class CSLN_EXYZ(Structure):        # 39/NR:120  Explicit nodes on lines
+class CSLN_EXYZ(bStructure):        # 39/NR:120  Explicit nodes on lines
    _fields_ = [
          ('m_id', c_int),          #        identifier = 120
          ('m_id1', c_int),         #        reserved
@@ -4323,7 +4353,7 @@ class CSLN_EXYZ(Structure):        # 39/NR:120  Explicit nodes on lines
       ]
 csln_exyz = CSLN_EXYZ()
 
-class CGLN_EXYZ(Structure):        # 31/NR:120  Explicit nodes on lines
+class CGLN_EXYZ(bStructure):        # 31/NR:120  Explicit nodes on lines
    _fields_ = [
          ('m_id', c_int),          #        identifier = 120
          ('m_id1', c_int),         #        reserved
@@ -4331,7 +4361,7 @@ class CGLN_EXYZ(Structure):        # 31/NR:120  Explicit nodes on lines
       ]
 cgln_exyz = CGLN_EXYZ()
 
-class CSLN_SCT(Structure):         # 39/NR:130  Beams sections
+class CSLN_SCT(bStructure):         # 39/NR:130  Beams sections
    _fields_ = [
          ('m_id', c_int),          #        identifier = 130
          ('m_reft', c_int),        #        Type of reference
@@ -4341,7 +4371,7 @@ class CSLN_SCT(Structure):         # 39/NR:130  Beams sections
       ]
 csln_sct = CSLN_SCT()
 
-class CGLN_SCT(Structure):         # 31/NR:130  Beams sections
+class CGLN_SCT(bStructure):         # 31/NR:130  Beams sections
    _fields_ = [
          ('m_id', c_int),          #        identifier = 130
          ('m_reft', c_int),        #        Type of reference
@@ -4351,7 +4381,7 @@ class CGLN_SCT(Structure):         # 31/NR:130  Beams sections
       ]
 cgln_sct = CGLN_SCT()
 
-class CSAR(Structure):             # 39/NR:200  Structural area
+class CSAR(bStructure):             # 39/NR:200  Structural area
    _fields_ = [
          ('m_id', c_int),          #        identification of general data = 200
          ('m_ids', c_int),         #        identifier of structural area (0=auto)
@@ -4374,7 +4404,7 @@ class CSAR(Structure):             # 39/NR:200  Structural area
       ]
 csar = CSAR()
 
-class CSAR_INF(Structure):         # 39/NR:210  GeometricAreaInfo
+class CSAR_INF(bStructure):         # 39/NR:210  GeometricAreaInfo
    _fields_ = [
          ('m_id0', c_int),         #        identifier 210
          ('m_ng', c_int),          #        Type of surface representation
@@ -4385,7 +4415,7 @@ class CSAR_INF(Structure):         # 39/NR:210  GeometricAreaInfo
       ]
 csar_inf = CSAR_INF()
 
-class CSAR_PTS(Structure):         # 39/NR:211  AreaPointonSurface
+class CSAR_PTS(bStructure):         # 39/NR:211  AreaPointonSurface
    _fields_ = [
          ('m_id', c_int),          #        Identifier 211
          ('m_it', c_int),          #        Type of point (see 5/ID:11 for more)
@@ -4399,7 +4429,7 @@ class CSAR_PTS(Structure):         # 39/NR:211  AreaPointonSurface
       ]
 csar_pts = CSAR_PTS()
 
-class CSAR_CPI(Structure):         # 39/NR:212  COONsPatchInfo
+class CSAR_CPI(bStructure):         # 39/NR:212  COONsPatchInfo
    _fields_ = [
          ('m_id', c_int),          #        Id = 212
          ('m_it', c_int),          #        Type of blending
@@ -4410,7 +4440,7 @@ class CSAR_CPI(Structure):         # 39/NR:212  COONsPatchInfo
       ]
 csar_cpi = CSAR_CPI()
 
-class CSAR_EXYZ(Structure):        # 39/NR:220  Explicit QUAD nodes on area
+class CSAR_EXYZ(bStructure):        # 39/NR:220  Explicit QUAD nodes on area
    _fields_ = [
          ('m_id', c_int),          #        identifier = 220
          ('m_id1', c_int),         #        reserved
@@ -4418,7 +4448,7 @@ class CSAR_EXYZ(Structure):        # 39/NR:220  Explicit QUAD nodes on area
       ]
 csar_exyz = CSAR_EXYZ()
 
-class CGAR_EXYZ(Structure):        # 32/NR:220  Explicit QUAD nodes on area
+class CGAR_EXYZ(bStructure):        # 32/NR:220  Explicit QUAD nodes on area
    _fields_ = [
          ('m_id', c_int),          #        identifier = 220
          ('m_id1', c_int),         #        reserved
@@ -4426,7 +4456,7 @@ class CGAR_EXYZ(Structure):        # 32/NR:220  Explicit QUAD nodes on area
       ]
 cgar_exyz = CGAR_EXYZ()
 
-class CSAR_SUPP(Structure):        # 39/NR:221  Support and coupling of structural areas
+class CSAR_SUPP(bStructure):        # 39/NR:221  Support and coupling of structural areas
    _fields_ = [
          ('m_id', c_int),          #        identifier 221
          ('m_ids', c_int),         #        type of reference
@@ -4445,7 +4475,7 @@ class CSAR_SUPP(Structure):        # 39/NR:221  Support and coupling of structur
       ]
 csar_supp = CSAR_SUPP()
 
-class CGAR_SUPP(Structure):        # 32/NR:221  Support and coupling of structural areas
+class CGAR_SUPP(bStructure):        # 32/NR:221  Support and coupling of structural areas
    _fields_ = [
          ('m_id', c_int),          #        identifier 221
          ('m_ids', c_int),         #        type of reference
@@ -4464,7 +4494,7 @@ class CGAR_SUPP(Structure):        # 32/NR:221  Support and coupling of structur
       ]
 cgar_supp = CGAR_SUPP()
 
-class CSVO(Structure):             # 39/NR:300  StructuralVolume
+class CSVO(bStructure):             # 39/NR:300  StructuralVolume
    _fields_ = [
          ('m_id', c_int),          #        identification = 300
          ('m_ids', c_int),         #        identifier of structural area (0=auto)
@@ -4480,7 +4510,7 @@ class CSVO(Structure):             # 39/NR:300  StructuralVolume
       ]
 csvo = CSVO()
 
-class CSMB_ATTR(Structure):        # 39/NR:997  Attributes of structural member
+class CSMB_ATTR(bStructure):        # 39/NR:997  Attributes of structural member
    _fields_ = [
          ('m_id', c_int),          #        identifier 997
          ('m_i1', c_int),          #        reserved
@@ -4494,7 +4524,7 @@ class CSMB_ATTR(Structure):        # 39/NR:997  Attributes of structural member
       ]
 csmb_attr = CSMB_ATTR()
 
-class CSPT_ATTR(Structure):        # 30/NR:997  Attributes of structural member
+class CSPT_ATTR(bStructure):        # 30/NR:997  Attributes of structural member
    _fields_ = [
          ('m_id', c_int),          #        identifier 997
          ('m_i1', c_int),          #        reserved
@@ -4508,7 +4538,7 @@ class CSPT_ATTR(Structure):        # 30/NR:997  Attributes of structural member
       ]
 cspt_attr = CSPT_ATTR()
 
-class CSLN_ATTR(Structure):        # 31/NR:997  Attributes of structural member
+class CSLN_ATTR(bStructure):        # 31/NR:997  Attributes of structural member
    _fields_ = [
          ('m_id', c_int),          #        identifier 997
          ('m_i1', c_int),          #        reserved
@@ -4522,7 +4552,7 @@ class CSLN_ATTR(Structure):        # 31/NR:997  Attributes of structural member
       ]
 csln_attr = CSLN_ATTR()
 
-class CSAR_ATTR(Structure):        # 32/NR:997  Attributes of structural member
+class CSAR_ATTR(bStructure):        # 32/NR:997  Attributes of structural member
    _fields_ = [
          ('m_id', c_int),          #        identifier 997
          ('m_i1', c_int),          #        reserved
@@ -4536,35 +4566,35 @@ class CSAR_ATTR(Structure):        # 32/NR:997  Attributes of structural member
       ]
 csar_attr = CSAR_ATTR()
 
-class CSMB_GUID(Structure):        # 39/NR:999  Unique identifier of structural member
+class CSMB_GUID(bStructure):        # 39/NR:999  Unique identifier of structural member
    _fields_ = [
          ('m_id', c_int),          #        identifier 999
          ('m_idbim', c_int * 36)   #        256 Bit GUId Identifier of preceeding element
       ]
 csmb_guid = CSMB_GUID()
 
-class CSPT_GUID(Structure):        # 30/NR:999  Unique identifier of structural member
+class CSPT_GUID(bStructure):        # 30/NR:999  Unique identifier of structural member
    _fields_ = [
          ('m_id', c_int),          #        identifier 999
          ('m_idbim', c_int * 36)   #        256 Bit GUId Identifier of preceeding element
       ]
 cspt_guid = CSPT_GUID()
 
-class CSLN_GUID(Structure):        # 31/NR:999  Unique identifier of structural member
+class CSLN_GUID(bStructure):        # 31/NR:999  Unique identifier of structural member
    _fields_ = [
          ('m_id', c_int),          #        identifier 999
          ('m_idbim', c_int * 36)   #        256 Bit GUId Identifier of preceeding element
       ]
 csln_guid = CSLN_GUID()
 
-class CSAR_GUID(Structure):        # 32/NR:999  Unique identifier of structural member
+class CSAR_GUID(bStructure):        # 32/NR:999  Unique identifier of structural member
    _fields_ = [
          ('m_id', c_int),          #        identifier 999
          ('m_idbim', c_int * 36)   #        256 Bit GUId Identifier of preceeding element
       ]
 csar_guid = CSAR_GUID()
 
-class CGPT(Structure):             # 30/NR:0  Structural points
+class CGPT(bStructure):             # 30/NR:0  Structural points
    _fields_ = [
          ('m_id', c_int),          #        identifier 0 (always the first record)
          ('m_ibc', c_int),         #        Boundary condition
@@ -4579,7 +4609,7 @@ class CGPT(Structure):             # 30/NR:0  Structural points
       ]
 cgpt = CGPT()
 
-class CGPT_COH(Structure):         # 30/NR:1  Dimension of column head
+class CGPT_COH(bStructure):         # 30/NR:1  Dimension of column head
    _fields_ = [
          ('m_id', c_int),          #        identifier 1/2/3
          ('m_ns', c_int),          #        Number of a cross section 9/NR for details
@@ -4590,7 +4620,7 @@ class CGPT_COH(Structure):         # 30/NR:1  Dimension of column head
       ]
 cgpt_coh = CGPT_COH()
 
-class CGPT_HAU(Structure):         # 30/NR:2  Dimension of voute
+class CGPT_HAU(bStructure):         # 30/NR:2  Dimension of voute
    _fields_ = [
          ('m_id', c_int),          #        identifier 1/2/3
          ('m_ns', c_int),          #        Number of a cross section 9/NR for details
@@ -4601,7 +4631,7 @@ class CGPT_HAU(Structure):         # 30/NR:2  Dimension of voute
       ]
 cgpt_hau = CGPT_HAU()
 
-class CGPT_PUN(Structure):         # 30/NR:3  Dimension of punching perimeter
+class CGPT_PUN(bStructure):         # 30/NR:3  Dimension of punching perimeter
    _fields_ = [
          ('m_id', c_int),          #        identifier 1/2/3
          ('m_ns', c_int),          #        Number of a cross section 9/NR for details
@@ -4612,7 +4642,7 @@ class CGPT_PUN(Structure):         # 30/NR:3  Dimension of punching perimeter
       ]
 cgpt_pun = CGPT_PUN()
 
-class CGPT_COL(Structure):         # 30/NR:4  Connecting columns
+class CGPT_COL(bStructure):         # 30/NR:4  Connecting columns
    _fields_ = [
          ('m_id', c_int),          #        identifier 4
          ('m_ns', c_int),          #        Number of a cross section 9/NR for column
@@ -4624,7 +4654,7 @@ class CGPT_COL(Structure):         # 30/NR:4  Connecting columns
       ]
 cgpt_col = CGPT_COL()
 
-class CGPT_FOO(Structure):         # 30/NR:5  Footing instance definition
+class CGPT_FOO(bStructure):         # 30/NR:5  Footing instance definition
    _fields_ = [
          ('m_id', c_int),          #        identifier 5
          ('m_pos', c_int),         #        referenced building position
@@ -4642,7 +4672,7 @@ class CGPT_FOO(Structure):         # 30/NR:5  Footing instance definition
          ('m_ha', c_float),        # [1001] outer Thickness
          ('m_ex', c_float),        # [1001] Eccentricity of column in local x-direction
          ('m_ey', c_float),        # [1001] Eccentricity of column in local y-direction
-         ('m_ez', c_float),        # [1001] Eccentricity of endpoint of column(=structural point) in local 
+         ('m_ez', c_float),        # [1001] Eccentricity of endpoint of column(=structural point) in local
          ('m_clx', c_float),       # [1011] Assumed dimension of column in local x-direction
          ('m_cly', c_float),       # [1011] Assumed dimension of column in local y-direction
          ('m_sxt', c_float),       # [1024] Boundary distance of x-aligned reinforcement on top face
@@ -4667,7 +4697,7 @@ class CGPT_FOO(Structure):         # 30/NR:5  Footing instance definition
       ]
 cgpt_foo = CGPT_FOO()
 
-class CGPT_FRR(Structure):         # 30/NR:1005  Footing required reinforcement
+class CGPT_FRR(bStructure):         # 30/NR:1005  Footing required reinforcement
    _fields_ = [
          ('m_id', c_int),          #        identifier 1005
          ('m_type', c_int),        #        Type of reinforcement
@@ -4682,7 +4712,7 @@ class CGPT_FRR(Structure):         # 30/NR:1005  Footing required reinforcement
       ]
 cgpt_frr = CGPT_FRR()
 
-class CGPT_SLP(Structure):         # 30/NR:1006  Sleeve foundation properties
+class CGPT_SLP(bStructure):         # 30/NR:1006  Sleeve foundation properties
    _fields_ = [
          ('m_id', c_int),          #        identifier 1006
          ('m_ir1', c_int),         #        reserved
@@ -4703,7 +4733,7 @@ class CGPT_SLP(Structure):         # 30/NR:1006  Sleeve foundation properties
       ]
 cgpt_slp = CGPT_SLP()
 
-class CGPT_HPI(Structure):         # 30/NR:6  Halfspace pile
+class CGPT_HPI(bStructure):         # 30/NR:6  Halfspace pile
    _fields_ = [
          ('m_id', c_int),          #        identifier 6
          ('m_nq', c_int),          #        number cross section   =0 if diameter from 030/NR:0
@@ -4715,17 +4745,17 @@ class CGPT_HPI(Structure):         # 30/NR:6  Halfspace pile
       ]
 cgpt_hpi = CGPT_HPI()
 
-class CGPT_CON_M(Structure):       #        connected members
+class CGPT_CON_M(bStructure):       #        connected members
    _fields_ = [
          ('m_nelt', c_int),
          ('m_nrel', c_int),
          ('m_node', c_int),
          ('m_narb', c_int),
-         ('m_x', c_float)          # [1001] 
+         ('m_x', c_float)          # [1001]
       ]
 cgpt_con_m = CGPT_CON_M()
 
-class CGPT_CON(Structure):         # 30/NR:8  Steelconnection reference
+class CGPT_CON(bStructure):         # 30/NR:8  Steelconnection reference
    _fields_ = [
          ('m_id', c_int),          #        identifier 8
          ('m_conid', c_int),       #        connection identifier
@@ -4733,7 +4763,7 @@ class CGPT_CON(Structure):         # 30/NR:8  Steelconnection reference
       ]
 cgpt_con = CGPT_CON()
 
-class CGPT_SPR(Structure):         # 30/NR:10  Elastic Spring support
+class CGPT_SPR(bStructure):         # 30/NR:10  Elastic Spring support
    _fields_ = [
          ('m_id', c_int),          #        identifier 10
          ('m_iri', c_int),         #        direction
@@ -4757,7 +4787,7 @@ class CGPT_SPR(Structure):         # 30/NR:10  Elastic Spring support
       ]
 cgpt_spr = CGPT_SPR()
 
-class CGPT_KIN(Structure):         # 30/NR:11  Kinematic Constraint
+class CGPT_KIN(bStructure):         # 30/NR:11  Kinematic Constraint
    _fields_ = [
          ('m_id', c_int),          #        identifier 11
          ('m_ktl', c_int),         #        type +  10000*group-number
@@ -4771,7 +4801,7 @@ class CGPT_KIN(Structure):         # 30/NR:11  Kinematic Constraint
       ]
 cgpt_kin = CGPT_KIN()
 
-class CGPT_SPC(Structure):         # 30/NR:12  Elastic Spring connection (obsoleted)
+class CGPT_SPC(bStructure):         # 30/NR:12  Elastic Spring connection (obsoleted)
    _fields_ = [
          ('m_id', c_int),          #        identifier 12
          ('m_iri', c_int),         #        direction + 100*sign(group number,direction)
@@ -4790,14 +4820,14 @@ class CGPT_SPC(Structure):         # 30/NR:12  Elastic Spring connection (obsole
       ]
 cgpt_spc = CGPT_SPC()
 
-class CGPT_DADS(Structure):        # 30/NR:998  List of origin ids the structural member has been created from
+class CGPT_DADS(bStructure):        # 30/NR:998  List of origin ids the structural member has been created from
    _fields_ = [
          ('m_id', c_int),          #        ident 998
          ('m_idd', c_int * 63)     #        ids of all anchestors
       ]
 cgpt_dads = CGPT_DADS()
 
-class CGLN(Structure):             # 31/NR:0  Structural lines
+class CGLN(bStructure):             # 31/NR:0  Structural lines
    _fields_ = [
          ('m_id', c_int),          #        identifier 0
          ('m_pt', c_int * 2),      #        Number start & end point
@@ -4813,7 +4843,7 @@ class CGLN(Structure):             # 31/NR:0  Structural lines
       ]
 cgln = CGLN()
 
-class CGLN_REF(Structure):         # 31/NR:-  Reference to another Geometry
+class CGLN_REF(bStructure):         # 31/NR:-  Reference to another Geometry
    _fields_ = [
          ('m_igm', c_int),         #        negative value of the master geometry
          ('m_igs', c_int),         #        optional identifier of a secondary axis
@@ -4822,7 +4852,7 @@ class CGLN_REF(Structure):         # 31/NR:-  Reference to another Geometry
       ]
 cgln_ref = CGLN_REF()
 
-class CGLN_GEO(Structure):         # 31/NR:??  Geometric properties
+class CGLN_GEO(bStructure):         # 31/NR:??  Geometric properties
    _fields_ = [
          ('m_iln', c_int),         #        Code of geometry
          ('m_gpg', c_float),       # [1001] geometry parameter 1
@@ -4841,7 +4871,7 @@ class CGLN_GEO(Structure):         # 31/NR:??  Geometric properties
       ]
 cgln_geo = CGLN_GEO()
 
-class CGLN_BEAM(Structure):        # 31/NR:100  Properties of beams (obsoleted)
+class CGLN_BEAM(bStructure):        # 31/NR:100  Properties of beams (obsoleted)
    _fields_ = [
          ('m_id', c_int),          #        ident 100
          ('m_nog', c_int),         #        Element type
@@ -4865,7 +4895,7 @@ class CGLN_BEAM(Structure):        # 31/NR:100  Properties of beams (obsoleted)
       ]
 cgln_beam = CGLN_BEAM()
 
-class CGLN_ELNR(Structure):        # 31/NR:121  Elements generated on lines
+class CGLN_ELNR(bStructure):        # 31/NR:121  Elements generated on lines
    _fields_ = [
          ('m_id', c_int),          #        identifier = 121
          ('m_etyp', c_int),        #        Type of element {100,150,160,...} for {Beam,Truss,Cable,...}
@@ -4874,14 +4904,14 @@ class CGLN_ELNR(Structure):        # 31/NR:121  Elements generated on lines
       ]
 cgln_elnr = CGLN_ELNR()
 
-class CGLN_DADS(Structure):        # 31/NR:998  Ids of items being an anchestor
+class CGLN_DADS(bStructure):        # 31/NR:998  Ids of items being an anchestor
    _fields_ = [
          ('m_id', c_int),          #        ident 998
          ('m_idd', c_int * 63)     #        ids of all anchestors
       ]
 cgln_dads = CGLN_DADS()
 
-class CGAR(Structure):             # 32/NR:0  Structural area
+class CGAR(bStructure):             # 32/NR:0  Structural area
    _fields_ = [
          ('m_id', c_int),          #        identification of general data (0)
          ('m_nog', c_int),         #        number of group
@@ -4898,13 +4928,13 @@ class CGAR(Structure):             # 32/NR:0  Structural area
       ]
 cgar = CGAR()
 
-class CGAR_REF(Structure):         # 32/NR:-  Reference to another Geometry
+class CGAR_REF(bStructure):         # 32/NR:-  Reference to another Geometry
    _fields_ = [
          ('m_igm', c_int)          #        negative value of the master geometry
       ]
 cgar_ref = CGAR_REF()
 
-class CGAR_BOUN(Structure):        # 32/NR:1  Outer Boundary of Area
+class CGAR_BOUN(bStructure):        # 32/NR:1  Outer Boundary of Area
    _fields_ = [
          ('m_id', c_int),          #        identification
          ('m_ng', c_int),          #        edgeno     (31/NG)
@@ -4920,7 +4950,7 @@ class CGAR_BOUN(Structure):        # 32/NR:1  Outer Boundary of Area
       ]
 cgar_boun = CGAR_BOUN()
 
-class CGAR_HOLE(Structure):        # 32/NR:2  Inner Boundary of Area
+class CGAR_HOLE(bStructure):        # 32/NR:2  Inner Boundary of Area
    _fields_ = [
          ('m_id', c_int),          #        identification
          ('m_ng', c_int),          #        edgeno     (31/NG)
@@ -4936,7 +4966,7 @@ class CGAR_HOLE(Structure):        # 32/NR:2  Inner Boundary of Area
       ]
 cgar_hole = CGAR_HOLE()
 
-class CGAR_CON3(Structure):        # 32/NR:3  Prescribed Edges/Points
+class CGAR_CON3(bStructure):        # 32/NR:3  Prescribed Edges/Points
    _fields_ = [
          ('m_id', c_int),          #        identification
          ('m_ng', c_int),          #        edgenumber (31/NG)
@@ -4948,7 +4978,7 @@ class CGAR_CON3(Structure):        # 32/NR:3  Prescribed Edges/Points
       ]
 cgar_con3 = CGAR_CON3()
 
-class CGAR_CON4(Structure):        # 32/NR:4  Domain-Subdivision-Edges
+class CGAR_CON4(bStructure):        # 32/NR:4  Domain-Subdivision-Edges
    _fields_ = [
          ('m_id', c_int),          #        identification
          ('m_ng', c_int),          #        edgenumber (31/NG)
@@ -4960,7 +4990,7 @@ class CGAR_CON4(Structure):        # 32/NR:4  Domain-Subdivision-Edges
       ]
 cgar_con4 = CGAR_CON4()
 
-class CGAR_MESH(Structure):        # 32/NR:9  Prescribed Mesh size
+class CGAR_MESH(bStructure):        # 32/NR:9  Prescribed Mesh size
    _fields_ = [
          ('m_id', c_int),          #        identification
          ('m_ng', c_int),          #        number of support macro generating mesh
@@ -4975,7 +5005,7 @@ class CGAR_MESH(Structure):        # 32/NR:9  Prescribed Mesh size
       ]
 cgar_mesh = CGAR_MESH()
 
-class CGAR_GEO(Structure):         # 32/NR:10  Geometry of surface
+class CGAR_GEO(bStructure):         # 32/NR:10  Geometry of surface
    _fields_ = [
          ('m_id', c_int),          #        Identification of surface description 10
          ('m_ng', c_int),          #        Type of surface representation
@@ -5001,7 +5031,7 @@ class CGAR_GEO(Structure):         # 32/NR:10  Geometry of surface
       ]
 cgar_geo = CGAR_GEO()
 
-class CGAR_SURF(Structure):        # 32/NR:11  UserPointonSurface
+class CGAR_SURF(bStructure):        # 32/NR:11  UserPointonSurface
    _fields_ = [
          ('m_id', c_int),          #        Identification of user surface description 11
          ('m_it', c_int),          #        Type of point
@@ -5016,7 +5046,7 @@ class CGAR_SURF(Structure):        # 32/NR:11  UserPointonSurface
       ]
 cgar_surf = CGAR_SURF()
 
-class CGAR_COON(Structure):        # 32/NR:12  COONsPatchInfo
+class CGAR_COON(bStructure):        # 32/NR:12  COONsPatchInfo
    _fields_ = [
          ('m_id', c_int),          #        Identification of COONs blending edges 12
          ('m_it', c_int),          #        Type of blending
@@ -5032,7 +5062,7 @@ class CGAR_COON(Structure):        # 32/NR:12  COONsPatchInfo
       ]
 cgar_coon = CGAR_COON()
 
-class CGAR_ELNR(Structure):        # 32/NR:221  Generated elements from area
+class CGAR_ELNR(bStructure):        # 32/NR:221  Generated elements from area
    _fields_ = [
          ('m_id', c_int),          #        identifier = 221
          ('m_etyp', c_int),        #        Type of element {200,...} for {QUAD,...}
@@ -5041,14 +5071,14 @@ class CGAR_ELNR(Structure):        # 32/NR:221  Generated elements from area
       ]
 cgar_elnr = CGAR_ELNR()
 
-class CGAR_DADS(Structure):        # 32/NR:998  Ids of items being an anchestor
+class CGAR_DADS(bStructure):        # 32/NR:998  Ids of items being an anchestor
    _fields_ = [
          ('m_id', c_int),          #        ident 998
          ('m_idd', c_int * 63)     #        ids of all anchestors
       ]
 cgar_dads = CGAR_DADS()
 
-class CGVO(Structure):             # 33/NR:0  StructuralVolume
+class CGVO(bStructure):             # 33/NR:0  StructuralVolume
    _fields_ = [
          ('m_id', c_int),          #        identification of general data (0)
          ('m_nog', c_int),         #        number of group
@@ -5060,7 +5090,7 @@ class CGVO(Structure):             # 33/NR:0  StructuralVolume
       ]
 cgvo = CGVO()
 
-class CGVO_SURF(Structure):        # 33/NR:+  Involved Surfaces
+class CGVO_SURF(bStructure):        # 33/NR:+  Involved Surfaces
    _fields_ = [
          ('m_itp', c_int),         #        identification of definition
          ('m_ng', c_int),          #        surface    (32/NG)
@@ -5084,7 +5114,7 @@ class CGVO_SURF(Structure):        # 33/NR:+  Involved Surfaces
       ]
 cgvo_surf = CGVO_SURF()
 
-class CSLVL_DEF(Structure):        # 34/NR:0  Structural Storey Level Definition
+class CSLVL_DEF(bStructure):        # 34/NR:0  Structural Storey Level Definition
    _fields_ = [
          ('m_id0', c_int),         #        identification of definition data (0)
          ('m_sptm', c_int),        #        ID of SPT to be generated at center of mass
@@ -5103,7 +5133,7 @@ class CSLVL_DEF(Structure):        # 34/NR:0  Structural Storey Level Definition
       ]
 cslvl_def = CSLVL_DEF()
 
-class CDSLN_DEF(Structure):        # 35/ID:0  Design Element Definition
+class CDSLN_DEF(bStructure):        # 35/ID:0  Design Element Definition
    _fields_ = [
          ('m_id0', c_int),         #        identification of definition data (0)
          ('m_dsln', c_int),        #        number of design element
@@ -5115,7 +5145,7 @@ class CDSLN_DEF(Structure):        # 35/ID:0  Design Element Definition
       ]
 cdsln_def = CDSLN_DEF()
 
-class CDGEO_DEF(Structure):        # 35/ID:1  Design Element Geometry
+class CDGEO_DEF(bStructure):        # 35/ID:1  Design Element Geometry
    _fields_ = [
          ('m_id', c_int),          #        identification of data (2)
          ('m_type', c_int),        #        type of geometric definition
@@ -5126,7 +5156,7 @@ class CDGEO_DEF(Structure):        # 35/ID:1  Design Element Geometry
       ]
 cdgeo_def = CDGEO_DEF()
 
-class CDSLC_DEF(Structure):        # 35/ID:2  Design Sections
+class CDSLC_DEF(bStructure):        # 35/ID:2  Design Sections
    _fields_ = [
          ('m_id', c_int),          #        identification of data (1)
          ('m_type', c_int),        #        type of sectioning
@@ -5135,7 +5165,7 @@ class CDSLC_DEF(Structure):        # 35/ID:2  Design Sections
       ]
 cdslc_def = CDSLC_DEF()
 
-class CSGRP(Structure):            # 37/ID:0  Secondary groups
+class CSGRP(bStructure):            # 37/ID:0  Secondary groups
    _fields_ = [
          ('m_id0', c_int),         #        identification of general data (0)
          ('m_typ', c_int),         #        Bit infos of selected element types
@@ -5144,7 +5174,7 @@ class CSGRP(Structure):            # 37/ID:0  Secondary groups
       ]
 csgrp = CSGRP()
 
-class CSGRP_BOX(Structure):        # 37/ID:1  Selective Basic-Volume
+class CSGRP_BOX(bStructure):        # 37/ID:1  Selective Basic-Volume
    _fields_ = [
          ('m_id', c_int),          #        identification of data (1)
          ('m_typ', c_int),         #        type of property volume
@@ -5153,7 +5183,7 @@ class CSGRP_BOX(Structure):        # 37/ID:1  Selective Basic-Volume
       ]
 csgrp_box = CSGRP_BOX()
 
-class CSGRP_POL(Structure):        # 37/ID:2  Selective Polyeder-Volume
+class CSGRP_POL(bStructure):        # 37/ID:2  Selective Polyeder-Volume
    _fields_ = [
          ('m_id', c_int),          #        identification of data (2)
          ('m_typ', c_int),         #        number of vertices
@@ -5164,28 +5194,28 @@ class CSGRP_POL(Structure):        # 37/ID:2  Selective Polyeder-Volume
       ]
 csgrp_pol = CSGRP_POL()
 
-class CSGRP_LIS(Structure):        # 37/ID:0???  Calculated Selective Element List
+class CSGRP_LIS(bStructure):        # 37/ID:0???  Calculated Selective Element List
    _fields_ = [
          ('m_id', c_int),          #        identifier of element to be selected (positive)
          ('m_nr', c_int * 255)     #        element numbers
       ]
 csgrp_lis = CSGRP_LIS()
 
-class CSGRP_ADD(Structure):        # 37/ID:1???  Selecting Element List
+class CSGRP_ADD(bStructure):        # 37/ID:1???  Selecting Element List
    _fields_ = [
          ('m_id', c_int),          #        identifier of element to be selected (positive)
          ('m_nr', c_int * 255)     #        element numbers
       ]
 csgrp_add = CSGRP_ADD()
 
-class CSGRP_SUB(Structure):        # 37/ID:2???  Excluding Element List
+class CSGRP_SUB(bStructure):        # 37/ID:2???  Excluding Element List
    _fields_ = [
          ('m_id', c_int),          #        identifier of element to be selected (positive)
          ('m_nr', c_int * 255)     #        element numbers
       ]
 csgrp_sub = CSGRP_SUB()
 
-class CSGRP_SEL(Structure):        # 37/ID:3???  Property-Values
+class CSGRP_SEL(bStructure):        # 37/ID:3???  Property-Values
    _fields_ = [
          ('m_id', c_int),          #        identifier of element to be modified
          ('m_type', c_int),        #        Option to perform
@@ -5198,11 +5228,11 @@ class CSGRP_SEL(Structure):        # 37/ID:3???  Property-Values
          ('m_trot', c_float),      #        Fractional rotation about
          ('m_tal', c_float * 3),   #        Vector to be aligned as local axis
          ('m_rdat', c_float * 4),  #        reserved for values not in DATA
-         ('m_data', c_int * 64)    #        equivalenced data structure of that
+         ('m_data', c_int * 64)    #        equivalenced data bStructure of that
       ]
 csgrp_sel = CSGRP_SEL()
 
-class CGLAR_0(Structure):          # 38/NR:0  Load distribution areas Header
+class CGLAR_0(bStructure):          # 38/NR:0  Load distribution areas Header
    _fields_ = [
          ('m_id', c_int),          #        Identification 0
          ('m_ngar', c_int),        #        number of an 32/NGAR area definition
@@ -5221,7 +5251,7 @@ class CGLAR_0(Structure):          # 38/NR:0  Load distribution areas Header
       ]
 cglar_0 = CGLAR_0()
 
-class CGLAR_NOD(Structure):        # 38/NR:1  Node of load distribution area
+class CGLAR_NOD(bStructure):        # 38/NR:1  Node of load distribution area
    _fields_ = [
          ('m_id', c_int),          #        Identification 1 (instead of NR)
          ('m_inr', c_int),         #        nodenumber within the region
@@ -5232,7 +5262,7 @@ class CGLAR_NOD(Structure):        # 38/NR:1  Node of load distribution area
       ]
 cglar_nod = CGLAR_NOD()
 
-class CGLAR_QUA(Structure):        # 38/NR:2  QUAD of load distribution area
+class CGLAR_QUA(bStructure):        # 38/NR:2  QUAD of load distribution area
    _fields_ = [
          ('m_id', c_int),          #        Identification 2 (instead of NR)
          ('m_node', c_int * 4),    #        nodenumbers of the quad within region
@@ -5247,7 +5277,7 @@ class CGLAR_QUA(Structure):        # 38/NR:2  QUAD of load distribution area
       ]
 cglar_qua = CGLAR_QUA()
 
-class CGLAR_SEG(Structure):        # 38/NR:3  BEAM segments within area
+class CGLAR_SEG(bStructure):        # 38/NR:3  BEAM segments within area
    _fields_ = [
          ('m_id', c_int),          #        Identification 3
          ('m_nr', c_int),          #        number of loaded beam element
@@ -5256,7 +5286,7 @@ class CGLAR_SEG(Structure):        # 38/NR:3  BEAM segments within area
       ]
 cglar_seg = CGLAR_SEG()
 
-class CGLAR_P(Structure):          # 38/NR:1?  Load distribution areas  Pointloads
+class CGLAR_P(bStructure):          # 38/NR:1?  Load distribution areas  Pointloads
    _fields_ = [
          ('m_id', c_int),          #        Identification 10:13
          ('m_inr', c_int),         #        nodenumber of 038/NR:1 within region
@@ -5265,7 +5295,7 @@ class CGLAR_P(Structure):          # 38/NR:1?  Load distribution areas  Pointloa
       ]
 cglar_p = CGLAR_P()
 
-class CGLAR_L(Structure):          # 38/NR:10?  Load distribution areas  Beamloads
+class CGLAR_L(bStructure):          # 38/NR:10?  Load distribution areas  Beamloads
    _fields_ = [
          ('m_id', c_int),          #        Identification 100:103
          ('m_inr', c_int),         #        nodenumber of 038/NR:1 within region
@@ -5277,7 +5307,7 @@ class CGLAR_L(Structure):          # 38/NR:10?  Load distribution areas  Beamloa
       ]
 cglar_l = CGLAR_L()
 
-class CTENDAXIS(Structure):        # 40/NR:0  Tendon lanes/reference axis data
+class CTENDAXIS(bStructure):        # 40/NR:0  Tendon lanes/reference axis data
    _fields_ = [
          ('m_id0', c_int),         #        identifier 0
          ('m_igsys', c_int),       #        prestress for:
@@ -5289,7 +5319,7 @@ class CTENDAXIS(Structure):        # 40/NR:0  Tendon lanes/reference axis data
       ]
 ctendaxis = CTENDAXIS()
 
-class CTENDAX_1(Structure):        # 40/NR:1  Tendon lane stations
+class CTENDAX_1(bStructure):        # 40/NR:1  Tendon lane stations
    _fields_ = [
          ('m_id0', c_int),         #        identifier 1
          ('m_igbit', c_int),       #        station parameter
@@ -5302,7 +5332,7 @@ class CTENDAX_1(Structure):        # 40/NR:1  Tendon lane stations
       ]
 ctendax_1 = CTENDAX_1()
 
-class CTENDSPLI(Structure):        # 41/NR:0  Tendon splines
+class CTENDSPLI(bStructure):        # 41/NR:0  Tendon splines
    _fields_ = [
          ('m_id0', c_int),         #        identifier 0
          ('m_nrspur', c_int),      #        corresponding lane
@@ -5319,7 +5349,7 @@ class CTENDSPLI(Structure):        # 41/NR:0  Tendon splines
       ]
 ctendspli = CTENDSPLI()
 
-class CTENDSP_I(Structure):        # 41/NR:??  Input points
+class CTENDSP_I(bStructure):        # 41/NR:??  Input points
    _fields_ = [
          ('m_id0', c_int),         #        identifier INTYP see 41/0  (1=ZPUV standard geometry)
          ('m_igbit', c_int),       #        station parameter see 40/1
@@ -5333,7 +5363,7 @@ class CTENDSP_I(Structure):        # 41/NR:??  Input points
       ]
 ctendsp_i = CTENDSP_I()
 
-class CTENDTOPP(Structure):        # 43/NR  Tendon toppoints
+class CTENDTOPP(bStructure):        # 43/NR  Tendon toppoints
    _fields_ = [
          ('m_id0', c_int),         #        identifier:
          ('m_nr', c_int),          #        corresponding lane
@@ -5342,7 +5372,7 @@ class CTENDTOPP(Structure):        # 43/NR  Tendon toppoints
       ]
 ctendtopp = CTENDTOPP()
 
-class CTENDON(Structure):          # 44/NR:0  Tendons
+class CTENDON(bStructure):          # 44/NR:0  Tendons
    _fields_ = [
          ('m_id0', c_int),         #        identifier 0
          ('m_nrspur', c_int),      #        corresponding lane
@@ -5375,7 +5405,7 @@ class CTENDON(Structure):          # 44/NR:0  Tendons
       ]
 ctendon = CTENDON()
 
-class CTENDJACK(Structure):        # 44/NR:1  Tendon jacking data
+class CTENDJACK(bStructure):        # 44/NR:1  Tendon jacking data
    _fields_ = [
          ('m_id0', c_int),         #        identifier 1
          ('m_id1', c_int),         #        reserved (value = 0)
@@ -5393,7 +5423,7 @@ class CTENDJACK(Structure):        # 44/NR:1  Tendon jacking data
       ]
 ctendjack = CTENDJACK()
 
-class CTENDFACT(Structure):        # 44/NR:2  Tendon jacking factors
+class CTENDFACT(bStructure):        # 44/NR:2  Tendon jacking factors
    _fields_ = [
          ('m_id0', c_int),         #        identifier 2
          ('m_igbit', c_int),       #        station parameter see 40/1
@@ -5405,14 +5435,14 @@ class CTENDFACT(Structure):        # 44/NR:2  Tendon jacking factors
       ]
 ctendfact = CTENDFACT()
 
-class CHIST_HED(Structure):        # 80/LC:-10?  TimeHistoryTitle
+class CHIST_HED(bStructure):        # 80/LC:-10?  TimeHistoryTitle
    _fields_ = [
          ('m_rid', c_float),       #        Identifier of history type
          ('m_title',  c_int * 33)  #        Designation
       ]
 chist_hed = CHIST_HED()
 
-class CHIST_PAR(Structure):        # 80/LC:-9??  IterationParameters
+class CHIST_PAR(bStructure):        # 80/LC:-9??  IterationParameters
    _fields_ = [
          ('m_rid', c_float),       #        identifier
          ('m_val', c_float),       #        current value
@@ -5422,28 +5452,28 @@ class CHIST_PAR(Structure):        # 80/LC:-9??  IterationParameters
       ]
 chist_par = CHIST_PAR()
 
-class CHIST_ITEM(Structure):       #        History element
+class CHIST_ITEM(bStructure):       #        History element
    _fields_ = [
          ('m_nr', c_int),
          ('m_typ', c_int)
       ]
 chist_item = CHIST_ITEM()
 
-class CHIST(Structure):            # 80/LC:-  Identification of history elements
+class CHIST(bStructure):            # 80/LC:-  Identification of history elements
    _fields_ = [
          ('m_rid', c_float),       #        Identification -100 < RID < 0.
          ('m_item',  CHIST_ITEM * 32)  #        History element
       ]
 chist = CHIST()
 
-class CHIST_VAL(Structure):        # 80/LC:+  Transient data
+class CHIST_VAL(bStructure):        # 80/LC:+  Transient data
    _fields_ = [
          ('m_tt', c_float),        #        Time/frequency
          ('m_vb', c_float * 32)    #        curve values
       ]
 chist_val = CHIST_VAL()
 
-class CSLVL_DAT(Structure):        # 87/0:+  Structural Storey Level Data
+class CSLVL_DAT(bStructure):        # 87/0:+  Structural Storey Level Data
    _fields_ = [
          ('m_nr', c_int),          #        Storey Level ID (34/NR)
          ('m_nref', c_int * 2),    #        Node numbers of reference nodes on level
@@ -5465,7 +5495,7 @@ class CSLVL_DAT(Structure):        # 87/0:+  Structural Storey Level Data
       ]
 cslvl_dat = CSLVL_DAT()
 
-class CSLVL_RES(Structure):        # 87/LC:+  Structural Storey Level Results
+class CSLVL_RES(bStructure):        # 87/LC:+  Structural Storey Level Results
    _fields_ = [
          ('m_nr', c_int),          #        Storey Level ID (34/NR)
          ('m_nr_mode', c_int),     #        mode number (=0: resultant values, e.g. from CQC sup.)
@@ -5480,21 +5510,21 @@ class CSLVL_RES(Structure):        # 87/LC:+  Structural Storey Level Results
          ('m_uy', c_float),        # [1003] average storey displacement in Y
          ('m_uz', c_float),        # [1003] average storey displacement in Z
          ('m_rz', c_float),        # [1004] average storey rotation in XY-plane
-         ('m_dx', c_float),        # [1003] inter-storey drift in X (=difference between top and bottom of 
+         ('m_dx', c_float),        # [1003] inter-storey drift in X (=difference between top and bottom of
          ('m_dy', c_float),        # [1003] inter-storey drift in Y
          ('m_drz', c_float),       # [1004] inter-storey rotation in XY-plane
          ('m_lsaf', c_float)       # [  98] modal acceleration (only for NR_MODE>0)
       ]
 cslvl_res = CSLVL_RES()
 
-class CBEAM(Structure):            # 100/00:+  Beams
+class CBEAM(bStructure):            # 100/00:+  Beams
    _fields_ = [
          ('m_nr', c_int),          #        beam number
          ('m_node', c_int * 2),    #        node number start/end
          ('m_np', c_int),          #        prop number
          ('m_dl', c_float),        # [1001] beamlength
          ('m_t', c_float * 3 * 3), #        transformation matrix
-         ('m_ex', c_float * 2 * 3),# [1001] 
+         ('m_ex', c_float * 2 * 3),# [1001]
          ('m_nref', c_int),        #        reference axis
          ('m_spar', c_float * 2),  #        distances along a continuous beam or
          ('m_bety', c_float),
@@ -5504,14 +5534,14 @@ class CBEAM(Structure):            # 100/00:+  Beams
       ]
 cbeam = CBEAM()
 
-class CBSLN(Structure):            # 120/00:+  Design elements
+class CBSLN(bStructure):            # 120/00:+  Design elements
    _fields_ = [
          ('m_nr', c_int),          #        beam number
          ('m_node', c_int * 2),    #        node number start/end
          ('m_np', c_int),          #        prop number
          ('m_dl', c_float),        # [1001] beamlength
          ('m_t', c_float * 3 * 3), #        transformation matrix
-         ('m_ex', c_float * 2 * 3),# [1001] 
+         ('m_ex', c_float * 2 * 3),# [1001]
          ('m_nref', c_int),        #        reference axis
          ('m_spar', c_float * 2),  #        distances along a continuous beam or
          ('m_bety', c_float),
@@ -5521,14 +5551,14 @@ class CBSLN(Structure):            # 120/00:+  Design elements
       ]
 cbsln = CBSLN()
 
-class CBSCT(Structure):            # 140/00:+  External sections
+class CBSCT(bStructure):            # 140/00:+  External sections
    _fields_ = [
          ('m_nr', c_int),          #        beam number
          ('m_node', c_int * 2),    #        node number start/end
          ('m_np', c_int),          #        prop number
          ('m_dl', c_float),        # [1001] beamlength
          ('m_t', c_float * 3 * 3), #        transformation matrix
-         ('m_ex', c_float * 2 * 3),# [1001] 
+         ('m_ex', c_float * 2 * 3),# [1001]
          ('m_nref', c_int),        #        reference axis
          ('m_spar', c_float * 2),  #        distances along a continuous beam or
          ('m_bety', c_float),
@@ -5538,7 +5568,7 @@ class CBSCT(Structure):            # 140/00:+  External sections
       ]
 cbsct = CBSCT()
 
-class CBEAM_SCT(Structure):        # 100/00:0  Beams sections
+class CBEAM_SCT(bStructure):        # 100/00:0  Beams sections
    _fields_ = [
          ('m_id', c_int),          #        identifier for sections 0
          ('m_nq', c_int),          #        number cross section
@@ -5548,7 +5578,7 @@ class CBEAM_SCT(Structure):        # 100/00:0  Beams sections
       ]
 cbeam_sct = CBEAM_SCT()
 
-class CBSLN_SCT(Structure):        # 120/00:0  Design element sections
+class CBSLN_SCT(bStructure):        # 120/00:0  Design element sections
    _fields_ = [
          ('m_id', c_int),          #        identifier for sections 0
          ('m_nq', c_int),          #        number cross section
@@ -5571,7 +5601,7 @@ class CBSLN_SCT(Structure):        # 120/00:0  Design element sections
       ]
 cbsln_sct = CBSLN_SCT()
 
-class CBSCT_SCT(Structure):        # 140/00:0  External sections
+class CBSCT_SCT(bStructure):        # 140/00:0  External sections
    _fields_ = [
          ('m_id', c_int),          #        identifier for sections 0
          ('m_nq', c_int),          #        number cross section
@@ -5594,7 +5624,7 @@ class CBSCT_SCT(Structure):        # 140/00:0  External sections
       ]
 cbsct_sct = CBSCT_SCT()
 
-class CBEAM_TRA(Structure):        # 100/01  transformation matrix
+class CBEAM_TRA(bStructure):        # 100/01  transformation matrix
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_dl', c_float),        # [1001] beamlength
@@ -5602,7 +5632,7 @@ class CBEAM_TRA(Structure):        # 100/01  transformation matrix
       ]
 cbeam_tra = CBEAM_TRA()
 
-class CBEAM_TRS(Structure):        # 100/03  Info about dynamic moving beams (TREX)
+class CBEAM_TRS(bStructure):        # 100/03  Info about dynamic moving beams (TREX)
    _fields_ = [
          ('m_lf', c_int),          #        Loadcase number containing the train
          ('m_nr', c_int),          #        Number of Beam
@@ -5613,7 +5643,7 @@ class CBEAM_TRS(Structure):        # 100/03  Info about dynamic moving beams (TR
       ]
 cbeam_trs = CBEAM_TRS()
 
-class CBEAM_TND(Structure):        # 100/05  tendons of beams
+class CBEAM_TND(bStructure):        # 100/05  tendons of beams
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_nrs', c_int),         #        tendon number
@@ -5640,7 +5670,7 @@ class CBEAM_TND(Structure):        # 100/05  tendons of beams
       ]
 cbeam_tnd = CBEAM_TND()
 
-class CBSLN_TND(Structure):        # 120/05  tendons of structural beam lines
+class CBSLN_TND(bStructure):        # 120/05  tendons of structural beam lines
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_nrs', c_int),         #        tendon number
@@ -5667,7 +5697,7 @@ class CBSLN_TND(Structure):        # 120/05  tendons of structural beam lines
       ]
 cbsln_tnd = CBSLN_TND()
 
-class CBSCT_TND(Structure):        # 140/05  tendons of external sections
+class CBSCT_TND(bStructure):        # 140/05  tendons of external sections
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_nrs', c_int),         #        tendon number
@@ -5694,7 +5724,7 @@ class CBSCT_TND(Structure):        # 140/05  tendons of external sections
       ]
 cbsct_tnd = CBSCT_TND()
 
-class CBEAM_SL(Structure):         # 101/LC:*  single beam loads
+class CBEAM_SL(bStructure):         # 101/LC:*  single beam loads
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_typ', c_int),         #        type of load
@@ -5707,7 +5737,7 @@ class CBEAM_SL(Structure):         # 101/LC:*  single beam loads
       ]
 cbeam_sl = CBEAM_SL()
 
-class CBEAM_DL(Structure):         # 101/LC:*  distributed beam loading on reference
+class CBEAM_DL(bStructure):         # 101/LC:*  distributed beam loading on reference
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_typ', c_int),         #        type of load
@@ -5726,7 +5756,7 @@ class CBEAM_DL(Structure):         # 101/LC:*  distributed beam loading on refer
       ]
 cbeam_dl = CBEAM_DL()
 
-class CBEAM_TL(Structure):         # 101/LC:*  distributed beam loading on reference
+class CBEAM_TL(bStructure):         # 101/LC:*  distributed beam loading on reference
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_typ', c_int),         #        type of load
@@ -5745,7 +5775,7 @@ class CBEAM_TL(Structure):         # 101/LC:*  distributed beam loading on refer
       ]
 cbeam_tl = CBEAM_TL()
 
-class CBEAM_CL(Structure):         # 101/LC:*  cubic beamloads
+class CBEAM_CL(bStructure):         # 101/LC:*  cubic beamloads
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_typ', c_int),         #        type of load
@@ -5758,7 +5788,7 @@ class CBEAM_CL(Structure):         # 101/LC:*  cubic beamloads
       ]
 cbeam_cl = CBEAM_CL()
 
-class CBEAM_WL(Structure):         # 101/LC:*  dynamic wind loads
+class CBEAM_WL(bStructure):         # 101/LC:*  dynamic wind loads
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_typ', c_int),         #        type of load
@@ -5780,7 +5810,7 @@ class CBEAM_WL(Structure):         # 101/LC:*  dynamic wind loads
       ]
 cbeam_wl = CBEAM_WL()
 
-class CTRUS_WL(Structure):         # 151/LC:*  dynamic wind loads
+class CTRUS_WL(bStructure):         # 151/LC:*  dynamic wind loads
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_typ', c_int),         #        type of load
@@ -5802,7 +5832,7 @@ class CTRUS_WL(Structure):         # 151/LC:*  dynamic wind loads
       ]
 ctrus_wl = CTRUS_WL()
 
-class CCABL_WL(Structure):         # 161/LC:*  dynamic wind loads
+class CCABL_WL(bStructure):         # 161/LC:*  dynamic wind loads
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_typ', c_int),         #        type of load
@@ -5824,7 +5854,7 @@ class CCABL_WL(Structure):         # 161/LC:*  dynamic wind loads
       ]
 ccabl_wl = CCABL_WL()
 
-class CBEAM_FOC(Structure):        # 102/LC:0  Maximum of Total Beam forces and deformations
+class CBEAM_FOC(bStructure):        # 102/LC:0  Maximum of Total Beam forces and deformations
    _fields_ = [
          ('m_id', c_int),          #        identifier 0
          ('m_x', c_float),         # [1001] max. beam length
@@ -5851,7 +5881,7 @@ class CBEAM_FOC(Structure):        # 102/LC:0  Maximum of Total Beam forces and 
       ]
 cbeam_foc = CBEAM_FOC()
 
-class CBEAM_FTC(Structure):        # 112/LC:0  Maximum of Beam forces without plate components
+class CBEAM_FTC(bStructure):        # 112/LC:0  Maximum of Beam forces without plate components
    _fields_ = [
          ('m_id', c_int),          #        identifier 0
          ('m_x', c_float),         # [1001] max. beam length
@@ -5878,7 +5908,7 @@ class CBEAM_FTC(Structure):        # 112/LC:0  Maximum of Beam forces without pl
       ]
 cbeam_ftc = CBEAM_FTC()
 
-class CBSLN_FTC(Structure):        # 122/LC:0  Maximum of Beam forces without plate components
+class CBSLN_FTC(bStructure):        # 122/LC:0  Maximum of Beam forces without plate components
    _fields_ = [
          ('m_id', c_int),          #        identifier 0
          ('m_x', c_float),         # [1001] max. beam length
@@ -5905,7 +5935,7 @@ class CBSLN_FTC(Structure):        # 122/LC:0  Maximum of Beam forces without pl
       ]
 cbsln_ftc = CBSLN_FTC()
 
-class CBSCT_FOC(Structure):        # 142/LC:0  Maximum of External sections forces
+class CBSCT_FOC(bStructure):        # 142/LC:0  Maximum of External sections forces
    _fields_ = [
          ('m_id', c_int),          #        identifier 0
          ('m_x', c_float),         # [1001] max. beam length
@@ -5932,7 +5962,7 @@ class CBSCT_FOC(Structure):        # 142/LC:0  Maximum of External sections forc
       ]
 cbsct_foc = CBSCT_FOC()
 
-class CBEAM_FOR(Structure):        # 102/LC:+  Total Beam forces and deformations
+class CBEAM_FOR(bStructure):        # 102/LC:+  Total Beam forces and deformations
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_x', c_float),         # [1001] distance from start
@@ -5966,7 +5996,7 @@ class CBEAM_FOR(Structure):        # 102/LC:+  Total Beam forces and deformation
       ]
 cbeam_for = CBEAM_FOR()
 
-class CBEAM_FTR(Structure):        # 112/LC:+  Beam forces without plate components
+class CBEAM_FTR(bStructure):        # 112/LC:+  Beam forces without plate components
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_x', c_float),         # [1001] distance from start
@@ -6000,7 +6030,7 @@ class CBEAM_FTR(Structure):        # 112/LC:+  Beam forces without plate compone
       ]
 cbeam_ftr = CBEAM_FTR()
 
-class CBSLN_FTR(Structure):        # 122/LC:+  Beam forces without plate components
+class CBSLN_FTR(bStructure):        # 122/LC:+  Beam forces without plate components
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_x', c_float),         # [1001] distance from start
@@ -6034,7 +6064,7 @@ class CBSLN_FTR(Structure):        # 122/LC:+  Beam forces without plate compone
       ]
 cbsln_ftr = CBSLN_FTR()
 
-class CBSCT_FOR(Structure):        # 142/LC:+  External sections forces
+class CBSCT_FOR(bStructure):        # 142/LC:+  External sections forces
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_x', c_float),         # [1001] distance from start
@@ -6068,7 +6098,7 @@ class CBSCT_FOR(Structure):        # 142/LC:+  External sections forces
       ]
 cbsct_for = CBSCT_FOR()
 
-class CBEAM_FOX(Structure):        # 102/0  Total External Beam forces
+class CBEAM_FOX(bStructure):        # 102/0  Total External Beam forces
    _fields_ = [
          ('m_nq', c_int),          #        section number
          ('m_nr', c_int),          #        beamnumber
@@ -6084,7 +6114,7 @@ class CBEAM_FOX(Structure):        # 102/0  Total External Beam forces
       ]
 cbeam_fox = CBEAM_FOX()
 
-class CBSCT_FOX(Structure):        # 142/0  Total External Forces for external sections
+class CBSCT_FOX(bStructure):        # 142/0  Total External Forces for external sections
    _fields_ = [
          ('m_nq', c_int),          #        section number
          ('m_nr', c_int),          #        beamnumber
@@ -6100,7 +6130,7 @@ class CBSCT_FOX(Structure):        # 142/0  Total External Forces for external s
       ]
 cbsct_fox = CBSCT_FOX()
 
-class CBEAM_STI(Structure):        # 103/LC  Stiffness of beams
+class CBEAM_STI(bStructure):        # 103/LC  Stiffness of beams
    _fields_ = [
          ('m_nr', c_int),          #        beam number
          ('m_x', c_float),         # [1001] distance from start
@@ -6154,7 +6184,7 @@ class CBEAM_STI(Structure):        # 103/LC  Stiffness of beams
       ]
 cbeam_sti = CBEAM_STI()
 
-class CBSLN_STI(Structure):        # 123/LC  Stiffness of beams
+class CBSLN_STI(bStructure):        # 123/LC  Stiffness of beams
    _fields_ = [
          ('m_nr', c_int),          #        beam number
          ('m_x', c_float),         # [1001] distance from start
@@ -6208,7 +6238,7 @@ class CBSLN_STI(Structure):        # 123/LC  Stiffness of beams
       ]
 cbsln_sti = CBSLN_STI()
 
-class CBSCT_STI(Structure):        # 143/LC  Stiffness of beams
+class CBSCT_STI(bStructure):        # 143/LC  Stiffness of beams
    _fields_ = [
          ('m_nr', c_int),          #        beam number
          ('m_x', c_float),         # [1001] distance from start
@@ -6262,7 +6292,7 @@ class CBSCT_STI(Structure):        # 143/LC  Stiffness of beams
       ]
 cbsct_sti = CBSCT_STI()
 
-class CBEAM_CRC(Structure):        # 104/LC:0  Parameter of creep interval for each material
+class CBEAM_CRC(bStructure):        # 104/LC:0  Parameter of creep interval for each material
    _fields_ = [
          ('m_id', c_int),          #        identifier 0
          ('m_mnr', c_int),         #        materialnumber
@@ -6280,7 +6310,7 @@ class CBEAM_CRC(Structure):        # 104/LC:0  Parameter of creep interval for e
       ]
 cbeam_crc = CBEAM_CRC()
 
-class CBSLN_CRC(Structure):        # 124/LC:0  Parameter of creep interval for each material
+class CBSLN_CRC(bStructure):        # 124/LC:0  Parameter of creep interval for each material
    _fields_ = [
          ('m_id', c_int),          #        identifier 0
          ('m_mnr', c_int),         #        materialnumber
@@ -6298,7 +6328,7 @@ class CBSLN_CRC(Structure):        # 124/LC:0  Parameter of creep interval for e
       ]
 cbsln_crc = CBSLN_CRC()
 
-class CBSCT_CRC(Structure):        # 144/LC:0  Parameter of creep interval for each material
+class CBSCT_CRC(bStructure):        # 144/LC:0  Parameter of creep interval for each material
    _fields_ = [
          ('m_id', c_int),          #        identifier 0
          ('m_mnr', c_int),         #        materialnumber
@@ -6316,7 +6346,7 @@ class CBSCT_CRC(Structure):        # 144/LC:0  Parameter of creep interval for e
       ]
 cbsct_crc = CBSCT_CRC()
 
-class CBEAM_CRF(Structure):        # 104/LC:+  resulting forces of redistribution
+class CBEAM_CRF(bStructure):        # 104/LC:+  resulting forces of redistribution
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_id', c_int),          #        identifier 0
@@ -6336,7 +6366,7 @@ class CBEAM_CRF(Structure):        # 104/LC:+  resulting forces of redistributio
       ]
 cbeam_crf = CBEAM_CRF()
 
-class CBSLN_CRF(Structure):        # 124/LC:+  resulting forces of redistribution
+class CBSLN_CRF(bStructure):        # 124/LC:+  resulting forces of redistribution
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_id', c_int),          #        identifier 0
@@ -6356,7 +6386,7 @@ class CBSLN_CRF(Structure):        # 124/LC:+  resulting forces of redistributio
       ]
 cbsln_crf = CBSLN_CRF()
 
-class CBSCT_CRF(Structure):        # 144/LC:+  resulting forces of redistribution
+class CBSCT_CRF(bStructure):        # 144/LC:+  resulting forces of redistribution
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_id', c_int),          #        identifier 0
@@ -6376,7 +6406,7 @@ class CBSCT_CRF(Structure):        # 144/LC:+  resulting forces of redistributio
       ]
 cbsct_crf = CBSCT_CRF()
 
-class CBEAM_TSN(Structure):        # 104/LC:+  thermal eigen stress per material
+class CBEAM_TSN(bStructure):        # 104/LC:+  thermal eigen stress per material
    _fields_ = [
          ('m_nr', c_int),          #        element number
          ('m_mnrx', c_int),        #        10000+materialnumber
@@ -6385,7 +6415,7 @@ class CBEAM_TSN(Structure):        # 104/LC:+  thermal eigen stress per material
       ]
 cbeam_tsn = CBEAM_TSN()
 
-class CBSLN_TSN(Structure):        # 124/LC:+  thermal eigen stress per material
+class CBSLN_TSN(bStructure):        # 124/LC:+  thermal eigen stress per material
    _fields_ = [
          ('m_nr', c_int),          #        element number
          ('m_mnrx', c_int),        #        10000+materialnumber
@@ -6394,7 +6424,7 @@ class CBSLN_TSN(Structure):        # 124/LC:+  thermal eigen stress per material
       ]
 cbsln_tsn = CBSLN_TSN()
 
-class CBSCT_TSN(Structure):        # 144/LC:+  thermal eigen stress per material
+class CBSCT_TSN(bStructure):        # 144/LC:+  thermal eigen stress per material
    _fields_ = [
          ('m_nr', c_int),          #        element number
          ('m_mnrx', c_int),        #        10000+materialnumber
@@ -6403,7 +6433,7 @@ class CBSCT_TSN(Structure):        # 144/LC:+  thermal eigen stress per material
       ]
 cbsct_tsn = CBSCT_TSN()
 
-class CBEAM_CRP(Structure):        # 104/LC:+  forces on sectional parts per material
+class CBEAM_CRP(bStructure):        # 104/LC:+  forces on sectional parts per material
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_mnr', c_int),         #        materialnumber
@@ -6423,7 +6453,7 @@ class CBEAM_CRP(Structure):        # 104/LC:+  forces on sectional parts per mat
       ]
 cbeam_crp = CBEAM_CRP()
 
-class CBSLN_CRP(Structure):        # 124/LC:+  forces on sectional parts per material
+class CBSLN_CRP(bStructure):        # 124/LC:+  forces on sectional parts per material
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_mnr', c_int),         #        materialnumber
@@ -6443,7 +6473,7 @@ class CBSLN_CRP(Structure):        # 124/LC:+  forces on sectional parts per mat
       ]
 cbsln_crp = CBSLN_CRP()
 
-class CBSCT_CRP(Structure):        # 144/LC:+  forces on sectional parts per material
+class CBSCT_CRP(bStructure):        # 144/LC:+  forces on sectional parts per material
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_mnr', c_int),         #        materialnumber
@@ -6463,7 +6493,7 @@ class CBSCT_CRP(Structure):        # 144/LC:+  forces on sectional parts per mat
       ]
 cbsct_crp = CBSCT_CRP()
 
-class CBEAM_CRT(Structure):        # 104/LC:+  changes of tensional force
+class CBEAM_CRT(bStructure):        # 104/LC:+  changes of tensional force
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_nrs', c_int),         #        neg. tendonnumber
@@ -6475,7 +6505,7 @@ class CBEAM_CRT(Structure):        # 104/LC:+  changes of tensional force
       ]
 cbeam_crt = CBEAM_CRT()
 
-class CBSLN_CRT(Structure):        # 124/LC:+  changes of tensional force
+class CBSLN_CRT(bStructure):        # 124/LC:+  changes of tensional force
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_nrs', c_int),         #        neg. tendonnumber
@@ -6487,7 +6517,7 @@ class CBSLN_CRT(Structure):        # 124/LC:+  changes of tensional force
       ]
 cbsln_crt = CBSLN_CRT()
 
-class CBSCT_CRT(Structure):        # 144/LC:+  changes of tensional force
+class CBSCT_CRT(bStructure):        # 144/LC:+  changes of tensional force
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_nrs', c_int),         #        neg. tendonnumber
@@ -6499,7 +6529,7 @@ class CBSCT_CRT(Structure):        # 144/LC:+  changes of tensional force
       ]
 cbsct_crt = CBSCT_CRT()
 
-class CBEAM_STC(Structure):        # 105/LC:0  Maximum stresses in cross-section of beams
+class CBEAM_STC(bStructure):        # 105/LC:0  Maximum stresses in cross-section of beams
    _fields_ = [
          ('m_nr', c_int),          #        Ident 0
          ('m_mnr', c_int),         #        materialnumber
@@ -6522,7 +6552,7 @@ class CBEAM_STC(Structure):        # 105/LC:0  Maximum stresses in cross-section
       ]
 cbeam_stc = CBEAM_STC()
 
-class CBSLN_STC(Structure):        # 125/LC:0  Maximum stresses in cross-section of beams
+class CBSLN_STC(bStructure):        # 125/LC:0  Maximum stresses in cross-section of beams
    _fields_ = [
          ('m_nr', c_int),          #        Ident 0
          ('m_mnr', c_int),         #        materialnumber
@@ -6545,7 +6575,7 @@ class CBSLN_STC(Structure):        # 125/LC:0  Maximum stresses in cross-section
       ]
 cbsln_stc = CBSLN_STC()
 
-class CBSCT_STC(Structure):        # 145/LC:0  Maximum stresses in cross-section of beams
+class CBSCT_STC(bStructure):        # 145/LC:0  Maximum stresses in cross-section of beams
    _fields_ = [
          ('m_nr', c_int),          #        Ident 0
          ('m_mnr', c_int),         #        materialnumber
@@ -6568,7 +6598,7 @@ class CBSCT_STC(Structure):        # 145/LC:0  Maximum stresses in cross-section
       ]
 cbsct_stc = CBSCT_STC()
 
-class CBEAM_TST(Structure):        # 105/LC:+  thermal eigen stress per material
+class CBEAM_TST(bStructure):        # 105/LC:+  thermal eigen stress per material
    _fields_ = [
          ('m_nr', c_int),          #        element number
          ('m_mnrx', c_int),        #        100000 + material number as in BSCT_STC
@@ -6577,7 +6607,7 @@ class CBEAM_TST(Structure):        # 105/LC:+  thermal eigen stress per material
       ]
 cbeam_tst = CBEAM_TST()
 
-class CBSLN_TST(Structure):        # 125/LC:+  thermal eigen stress per material
+class CBSLN_TST(bStructure):        # 125/LC:+  thermal eigen stress per material
    _fields_ = [
          ('m_nr', c_int),          #        element number
          ('m_mnrx', c_int),        #        100000 + material number as in BSCT_STC
@@ -6586,7 +6616,7 @@ class CBSLN_TST(Structure):        # 125/LC:+  thermal eigen stress per material
       ]
 cbsln_tst = CBSLN_TST()
 
-class CBSCT_TST(Structure):        # 145/LC:+  thermal eigen stress per material
+class CBSCT_TST(bStructure):        # 145/LC:+  thermal eigen stress per material
    _fields_ = [
          ('m_nr', c_int),          #        element number
          ('m_mnrx', c_int),        #        100000 + material number as in BSCT_STC
@@ -6595,7 +6625,7 @@ class CBSCT_TST(Structure):        # 145/LC:+  thermal eigen stress per material
       ]
 cbsct_tst = CBSCT_TST()
 
-class CBEAM_STR(Structure):        # 105/LC:+  Stresses in cross-section of beams
+class CBEAM_STR(bStructure):        # 105/LC:+  Stresses in cross-section of beams
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_mnr', c_int),         #        materialnumber
@@ -6629,7 +6659,7 @@ class CBEAM_STR(Structure):        # 105/LC:+  Stresses in cross-section of beam
       ]
 cbeam_str = CBEAM_STR()
 
-class CBSLN_STR(Structure):        # 125/LC:+  Stresses in cross-section of beams
+class CBSLN_STR(bStructure):        # 125/LC:+  Stresses in cross-section of beams
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_mnr', c_int),         #        materialnumber
@@ -6663,7 +6693,7 @@ class CBSLN_STR(Structure):        # 125/LC:+  Stresses in cross-section of beam
       ]
 cbsln_str = CBSLN_STR()
 
-class CBSCT_STR(Structure):        # 145/LC:+  Stresses in cross-section of beams
+class CBSCT_STR(bStructure):        # 145/LC:+  Stresses in cross-section of beams
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_mnr', c_int),         #        materialnumber
@@ -6697,7 +6727,7 @@ class CBSCT_STR(Structure):        # 145/LC:+  Stresses in cross-section of beam
       ]
 cbsct_str = CBSCT_STR()
 
-class CBEAM_RF0(Structure):        # 106/DC:0  max. values of reinforcement
+class CBEAM_RF0(bStructure):        # 106/DC:0  max. values of reinforcement
    _fields_ = [
          ('m_nr', c_int),          #        identifier 0
          ('m_nvers', c_int),       #        Version number
@@ -6709,7 +6739,7 @@ class CBEAM_RF0(Structure):        # 106/DC:0  max. values of reinforcement
       ]
 cbeam_rf0 = CBEAM_RF0()
 
-class CBSLN_RF0(Structure):        # 126/DC:0  max. values of reinforcement
+class CBSLN_RF0(bStructure):        # 126/DC:0  max. values of reinforcement
    _fields_ = [
          ('m_nr', c_int),          #        identifier 0
          ('m_nvers', c_int),       #        Version number
@@ -6721,7 +6751,7 @@ class CBSLN_RF0(Structure):        # 126/DC:0  max. values of reinforcement
       ]
 cbsln_rf0 = CBSLN_RF0()
 
-class CBSCT_RF0(Structure):        # 146/DC:0  max. values of reinforcement
+class CBSCT_RF0(bStructure):        # 146/DC:0  max. values of reinforcement
    _fields_ = [
          ('m_nr', c_int),          #        identifier 0
          ('m_nvers', c_int),       #        Version number
@@ -6733,7 +6763,7 @@ class CBSCT_RF0(Structure):        # 146/DC:0  max. values of reinforcement
       ]
 cbsct_rf0 = CBSCT_RF0()
 
-class CTRUS_RF0(Structure):        # 156/DC:0  max. values of reinforcement
+class CTRUS_RF0(bStructure):        # 156/DC:0  max. values of reinforcement
    _fields_ = [
          ('m_nr', c_int),          #        identifier 0
          ('m_nvers', c_int),       #        Version number
@@ -6745,7 +6775,7 @@ class CTRUS_RF0(Structure):        # 156/DC:0  max. values of reinforcement
       ]
 ctrus_rf0 = CTRUS_RF0()
 
-class CCABL_RF0(Structure):        # 166/DC:0  max. values of reinforcement
+class CCABL_RF0(bStructure):        # 166/DC:0  max. values of reinforcement
    _fields_ = [
          ('m_nr', c_int),          #        identifier 0
          ('m_nvers', c_int),       #        Version number
@@ -6757,7 +6787,7 @@ class CCABL_RF0(Structure):        # 166/DC:0  max. values of reinforcement
       ]
 ccabl_rf0 = CCABL_RF0()
 
-class CBEAM_RFI(Structure):        # 106/DC:+  info of reinforcement of beam
+class CBEAM_RFI(bStructure):        # 106/DC:+  info of reinforcement of beam
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_nq', c_int),          #        info id = 0
@@ -6767,7 +6797,7 @@ class CBEAM_RFI(Structure):        # 106/DC:+  info of reinforcement of beam
       ]
 cbeam_rfi = CBEAM_RFI()
 
-class CBSLN_RFI(Structure):        # 126/DC:+  info of reinforcement of design element sect.
+class CBSLN_RFI(bStructure):        # 126/DC:+  info of reinforcement of design element sect.
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_nq', c_int),          #        info id = 0
@@ -6777,7 +6807,7 @@ class CBSLN_RFI(Structure):        # 126/DC:+  info of reinforcement of design e
       ]
 cbsln_rfi = CBSLN_RFI()
 
-class CBSCT_RFI(Structure):        # 146/DC:+  info of reinforcement of external section
+class CBSCT_RFI(bStructure):        # 146/DC:+  info of reinforcement of external section
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_nq', c_int),          #        info id = 0
@@ -6787,7 +6817,7 @@ class CBSCT_RFI(Structure):        # 146/DC:+  info of reinforcement of external
       ]
 cbsct_rfi = CBSCT_RFI()
 
-class CTRUS_RFI(Structure):        # 156/DC:+  info of reinforcement of truss
+class CTRUS_RFI(bStructure):        # 156/DC:+  info of reinforcement of truss
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_nq', c_int),          #        info id = 0
@@ -6797,7 +6827,7 @@ class CTRUS_RFI(Structure):        # 156/DC:+  info of reinforcement of truss
       ]
 ctrus_rfi = CTRUS_RFI()
 
-class CCABL_RFI(Structure):        # 166/DC:+  info of reinforcement of cables
+class CCABL_RFI(bStructure):        # 166/DC:+  info of reinforcement of cables
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_nq', c_int),          #        info id = 0
@@ -6807,7 +6837,7 @@ class CCABL_RFI(Structure):        # 166/DC:+  info of reinforcement of cables
       ]
 ccabl_rfi = CCABL_RFI()
 
-class CBEAM_RFC(Structure):        # 106/DC:+  reinforcement of beam
+class CBEAM_RFC(bStructure):        # 106/DC:+  reinforcement of beam
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_nq', c_int),          #        section number
@@ -6821,7 +6851,7 @@ class CBEAM_RFC(Structure):        # 106/DC:+  reinforcement of beam
       ]
 cbeam_rfc = CBEAM_RFC()
 
-class CBSLN_RFC(Structure):        # 126/DC:+  reinforcement of design element section
+class CBSLN_RFC(bStructure):        # 126/DC:+  reinforcement of design element section
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_nq', c_int),          #        section number
@@ -6835,7 +6865,7 @@ class CBSLN_RFC(Structure):        # 126/DC:+  reinforcement of design element s
       ]
 cbsln_rfc = CBSLN_RFC()
 
-class CBSCT_RFC(Structure):        # 146/DC:+  reinforcement of external section
+class CBSCT_RFC(bStructure):        # 146/DC:+  reinforcement of external section
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_nq', c_int),          #        section number
@@ -6849,7 +6879,7 @@ class CBSCT_RFC(Structure):        # 146/DC:+  reinforcement of external section
       ]
 cbsct_rfc = CBSCT_RFC()
 
-class CTRUS_RFC(Structure):        # 156/DC:+  reinforcement of truss
+class CTRUS_RFC(bStructure):        # 156/DC:+  reinforcement of truss
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_nq', c_int),          #        section number
@@ -6863,7 +6893,7 @@ class CTRUS_RFC(Structure):        # 156/DC:+  reinforcement of truss
       ]
 ctrus_rfc = CTRUS_RFC()
 
-class CCABL_RFC(Structure):        # 166/DC:+  reinforcement of cables
+class CCABL_RFC(bStructure):        # 166/DC:+  reinforcement of cables
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_nq', c_int),          #        section number
@@ -6877,7 +6907,7 @@ class CCABL_RFC(Structure):        # 166/DC:+  reinforcement of cables
       ]
 ccabl_rfc = CCABL_RFC()
 
-class CBEAM_DES(Structure):        # 107/LC  Ultimate/Plastic Design results
+class CBEAM_DES(bStructure):        # 107/LC  Ultimate/Plastic Design results
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_x', c_float),         # [1001] distance from start
@@ -6922,7 +6952,7 @@ class CBEAM_DES(Structure):        # 107/LC  Ultimate/Plastic Design results
       ]
 cbeam_des = CBEAM_DES()
 
-class CBSLN_DES(Structure):        # 127/LC  Ultimate/Plastic Design results
+class CBSLN_DES(bStructure):        # 127/LC  Ultimate/Plastic Design results
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_x', c_float),         # [1001] distance from start
@@ -6967,7 +6997,7 @@ class CBSLN_DES(Structure):        # 127/LC  Ultimate/Plastic Design results
       ]
 cbsln_des = CBSLN_DES()
 
-class CBSCT_DES(Structure):        # 147/LC  Ultimate/Plastic Design results
+class CBSCT_DES(bStructure):        # 147/LC  Ultimate/Plastic Design results
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_x', c_float),         # [1001] distance from start
@@ -7012,7 +7042,7 @@ class CBSCT_DES(Structure):        # 147/LC  Ultimate/Plastic Design results
       ]
 cbsct_des = CBSCT_DES()
 
-class CTRUS_DES(Structure):        # 157/LC  Ultimate/Plastic Design results
+class CTRUS_DES(bStructure):        # 157/LC  Ultimate/Plastic Design results
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_x', c_float),         # [1001] distance from start
@@ -7057,7 +7087,7 @@ class CTRUS_DES(Structure):        # 157/LC  Ultimate/Plastic Design results
       ]
 ctrus_des = CTRUS_DES()
 
-class CBEAM_PIF(Structure):        # 108/LC  reducing factors of stiffness
+class CBEAM_PIF(bStructure):        # 108/LC  reducing factors of stiffness
    _fields_ = [
          ('m_nr', c_int),          #        pilenumber
          ('m_redp', c_float),      #        reducing factor of stiffness
@@ -7066,7 +7096,7 @@ class CBEAM_PIF(Structure):        # 108/LC  reducing factors of stiffness
       ]
 cbeam_pif = CBEAM_PIF()
 
-class CBEAM_HR0(Structure):        # 111/LC:0  Maximum of Implicit Hinge Reactions
+class CBEAM_HR0(bStructure):        # 111/LC:0  Maximum of Implicit Hinge Reactions
    _fields_ = [
          ('m_id', c_int),          #        identifier 0
          ('m_typ', c_int),         #        type of hinge
@@ -7077,7 +7107,7 @@ class CBEAM_HR0(Structure):        # 111/LC:0  Maximum of Implicit Hinge Reactio
       ]
 cbeam_hr0 = CBEAM_HR0()
 
-class CBEAM_HRC(Structure):        # 111/LC:+  Implicit Hinge Reactions
+class CBEAM_HRC(bStructure):        # 111/LC:+  Implicit Hinge Reactions
    _fields_ = [
          ('m_nr', c_int),          #        beamnumber
          ('m_typ', c_int),         #        type of hinge
@@ -7088,7 +7118,7 @@ class CBEAM_HRC(Structure):        # 111/LC:+  Implicit Hinge Reactions
       ]
 cbeam_hrc = CBEAM_HRC()
 
-class CBEAM_MP0(Structure):        # 115/LC:0  Extremal values of cross-sectional material point reactions
+class CBEAM_MP0(bStructure):        # 115/LC:0  Extremal values of cross-sectional material point reactions
    _fields_ = [
          ('m_nr', c_int),          #        identifier 0
          ('m_type', c_int),        #        type: reinforcement=1, base material point=0
@@ -7120,7 +7150,7 @@ class CBEAM_MP0(Structure):        # 115/LC:0  Extremal values of cross-sectiona
       ]
 cbeam_mp0 = CBEAM_MP0()
 
-class CBEAM_MPT(Structure):        # 115/LC:+  Cross-sectional material point reactions
+class CBEAM_MPT(bStructure):        # 115/LC:+  Cross-sectional material point reactions
    _fields_ = [
          ('m_nr', c_int),          #        beam number
          ('m_type', c_int),        #        type: reinforcement=1, base material point=0
@@ -7152,7 +7182,7 @@ class CBEAM_MPT(Structure):        # 115/LC:+  Cross-sectional material point re
       ]
 cbeam_mpt = CBEAM_MPT()
 
-class CTRUS(Structure):            # 150/00  trusselements
+class CTRUS(bStructure):            # 150/00  trusselements
    _fields_ = [
          ('m_nr', c_int),          #        truss number
          ('m_node', c_int * 2),    #        nodenumbers
@@ -7167,7 +7197,7 @@ class CTRUS(Structure):            # 150/00  trusselements
       ]
 ctrus = CTRUS()
 
-class CTRUS_LOA(Structure):        # 151/LC  Loads on truss elements
+class CTRUS_LOA(bStructure):        # 151/LC  Loads on truss elements
    _fields_ = [
          ('m_nr', c_int),          #        truss number
          ('m_typ', c_int),         #        type of load
@@ -7176,7 +7206,7 @@ class CTRUS_LOA(Structure):        # 151/LC  Loads on truss elements
       ]
 ctrus_loa = CTRUS_LOA()
 
-class CTRUS_RE0(Structure):        # 152/LC:0  maximum of results of truss elements
+class CTRUS_RE0(bStructure):        # 152/LC:0  maximum of results of truss elements
    _fields_ = [
          ('m_nr', c_int),          #        identifier 0
          ('m_n', c_float),         # [1101] normal force
@@ -7184,7 +7214,7 @@ class CTRUS_RE0(Structure):        # 152/LC:0  maximum of results of truss eleme
       ]
 ctrus_re0 = CTRUS_RE0()
 
-class CTRUS_RES(Structure):        # 152/LC:+  results of truss elements
+class CTRUS_RES(bStructure):        # 152/LC:+  results of truss elements
    _fields_ = [
          ('m_nr', c_int),          #        truss number
          ('m_n', c_float),         # [1101] normal force
@@ -7194,7 +7224,7 @@ class CTRUS_RES(Structure):        # 152/LC:+  results of truss elements
       ]
 ctrus_res = CTRUS_RES()
 
-class CTRUS_ST0(Structure):        # 155/LC:0  checked truss stresses
+class CTRUS_ST0(bStructure):        # 155/LC:0  checked truss stresses
    _fields_ = [
          ('m_nr', c_int),          #        ident 0
          ('m_mat', c_int),         #        Materialnumber
@@ -7203,7 +7233,7 @@ class CTRUS_ST0(Structure):        # 155/LC:0  checked truss stresses
       ]
 ctrus_st0 = CTRUS_ST0()
 
-class CTRUS_STR(Structure):        # 155/LC:+  truss stress (AQB)
+class CTRUS_STR(bStructure):        # 155/LC:+  truss stress (AQB)
    _fields_ = [
          ('m_nr', c_int),          #        trussingnumber
          ('m_mat', c_int),         #        Materialnumber
@@ -7212,7 +7242,7 @@ class CTRUS_STR(Structure):        # 155/LC:+  truss stress (AQB)
       ]
 ctrus_str = CTRUS_STR()
 
-class CCABL(Structure):            # 160/00  cable elements
+class CCABL(bStructure):            # 160/00  cable elements
    _fields_ = [
          ('m_nr', c_int),          #        cable number
          ('m_node', c_int * 2),    #        nodenumbers
@@ -7227,7 +7257,7 @@ class CCABL(Structure):            # 160/00  cable elements
       ]
 ccabl = CCABL()
 
-class CCABL_LOA(Structure):        # 161/LC  loads on cables
+class CCABL_LOA(bStructure):        # 161/LC  loads on cables
    _fields_ = [
          ('m_nr', c_int),          #        cable number
          ('m_typ', c_int),         #        type of load
@@ -7236,7 +7266,7 @@ class CCABL_LOA(Structure):        # 161/LC  loads on cables
       ]
 ccabl_loa = CCABL_LOA()
 
-class CCABL_RE0(Structure):        # 162/LC:0  maximum results of cables
+class CCABL_RE0(bStructure):        # 162/LC:0  maximum results of cables
    _fields_ = [
          ('m_nr', c_int),          #        identifier 0
          ('m_n', c_float),         # [1101] normal force
@@ -7249,7 +7279,7 @@ class CCABL_RE0(Structure):        # 162/LC:0  maximum results of cables
       ]
 ccabl_re0 = CCABL_RE0()
 
-class CCABL_RES(Structure):        # 162/LC:+  results of cables
+class CCABL_RES(bStructure):        # 162/LC:+  results of cables
    _fields_ = [
          ('m_nr', c_int),          #        cablenumber
          ('m_n', c_float),         # [1101] normal force
@@ -7268,7 +7298,7 @@ class CCABL_RES(Structure):        # 162/LC:+  results of cables
       ]
 ccabl_res = CCABL_RES()
 
-class CCABL_SLP(Structure):        # 163/00  slip cables
+class CCABL_SLP(bStructure):        # 163/00  slip cables
    _fields_ = [
          ('m_nrsl', c_int),        #        slip cable number
          ('m_nrg', c_int),         #        group number
@@ -7278,7 +7308,7 @@ class CCABL_SLP(Structure):        # 163/00  slip cables
       ]
 ccabl_slp = CCABL_SLP()
 
-class CCABL_ST0(Structure):        # 165/LC:0  checked cable stresses
+class CCABL_ST0(bStructure):        # 165/LC:0  checked cable stresses
    _fields_ = [
          ('m_nr', c_int),          #        ident 0
          ('m_mat', c_int),         #        Materialnumber
@@ -7286,7 +7316,7 @@ class CCABL_ST0(Structure):        # 165/LC:0  checked cable stresses
       ]
 ccabl_st0 = CCABL_ST0()
 
-class CCABL_STR(Structure):        # 165/LC:+  cable stresses (AQB)
+class CCABL_STR(bStructure):        # 165/LC:+  cable stresses (AQB)
    _fields_ = [
          ('m_nr', c_int),          #        trussingnumber
          ('m_mat', c_int),         #        Materialnumber
@@ -7294,7 +7324,7 @@ class CCABL_STR(Structure):        # 165/LC:+  cable stresses (AQB)
       ]
 ccabl_str = CCABL_STR()
 
-class CSPRI(Structure):            # 170/00  Spring-elements
+class CSPRI(bStructure):            # 170/00  Spring-elements
    _fields_ = [
          ('m_nr', c_int),          #        springnumber
          ('m_node', c_int * 2),    #        start nodenumber
@@ -7323,7 +7353,7 @@ class CSPRI(Structure):            # 170/00  Spring-elements
       ]
 cspri = CSPRI()
 
-class CSPRI_RE0(Structure):        # 170/LC:0  maximum of results of spring-elements
+class CSPRI_RE0(bStructure):        # 170/LC:0  maximum of results of spring-elements
    _fields_ = [
          ('m_id', c_int),          #        identifier
          ('m_p', c_float),         # [1151] maximum spring force
@@ -7341,7 +7371,7 @@ class CSPRI_RE0(Structure):        # 170/LC:0  maximum of results of spring-elem
       ]
 cspri_re0 = CSPRI_RE0()
 
-class CSPRI_RES(Structure):        # 170/LC:+  results of spring-elements
+class CSPRI_RES(bStructure):        # 170/LC:+  results of spring-elements
    _fields_ = [
          ('m_nr', c_int),          #        springnumber
          ('m_p', c_float),         # [1151] spring force
@@ -7363,7 +7393,7 @@ class CSPRI_RES(Structure):        # 170/LC:+  results of spring-elements
       ]
 cspri_res = CSPRI_RES()
 
-class CDAMP(Structure):            # 171/00  Damping elements (DYNA)
+class CDAMP(bStructure):            # 171/00  Damping elements (DYNA)
    _fields_ = [
          ('m_nr', c_int),          #        element number
          ('m_node', c_int * 2),    #        nodenumbers
@@ -7379,7 +7409,7 @@ class CDAMP(Structure):            # 171/00  Damping elements (DYNA)
       ]
 cdamp = CDAMP()
 
-class CMASS(Structure):            # 172/00  Persistent Nodal masses
+class CMASS(bStructure):            # 172/00  Persistent Nodal masses
    _fields_ = [
          ('m_nr', c_int),          #        nodenumber
          ('m_nrg', c_int),         #        pseudoelementnumber IGDIV*Groupnr+IREF
@@ -7389,7 +7419,7 @@ class CMASS(Structure):            # 172/00  Persistent Nodal masses
       ]
 cmass = CMASS()
 
-class CMASS_ADD(Structure):        # 172/01  non persistent additional nodal masses
+class CMASS_ADD(bStructure):        # 172/01  non persistent additional nodal masses
    _fields_ = [
          ('m_nr', c_int),          #        nodenumber
          ('m_nrg', c_int),         #        pseudoelementnumber IGDIV*Groupnr+IREF
@@ -7399,7 +7429,7 @@ class CMASS_ADD(Structure):        # 172/01  non persistent additional nodal mas
       ]
 cmass_add = CMASS_ADD()
 
-class CMASS_EFF(Structure):        # 172/LD:Z+  Effective nodal masses
+class CMASS_EFF(bStructure):        # 172/LD:Z+  Effective nodal masses
    _fields_ = [
          ('m_nr', c_int),          #        identifier
          ('m_mt', c_float * 3),    # [  52] transversal mass mt-x,mt-y,mt-z
@@ -7407,7 +7437,7 @@ class CMASS_EFF(Structure):        # 172/LD:Z+  Effective nodal masses
       ]
 cmass_eff = CMASS_EFF()
 
-class CMASS_EFC(Structure):        # 172/LD:-  Effective consistent masses
+class CMASS_EFC(bStructure):        # 172/LD:-  Effective consistent masses
    _fields_ = [
          ('m_nr', c_int),          #        identifier = negative number of nodes
          ('m_node', c_int * 8),    #        node numbers
@@ -7415,7 +7445,7 @@ class CMASS_EFC(Structure):        # 172/LD:-  Effective consistent masses
       ]
 cmass_efc = CMASS_EFC()
 
-class CSPRI_WL0(Structure):        # 173/NR:0  (nonlinear) Spring material
+class CSPRI_WL0(bStructure):        # 173/NR:0  (nonlinear) Spring material
    _fields_ = [
          ('m_id', c_int),          #        Identification = 0
          ('m_ltyp', c_int),        #        Type of link
@@ -7423,14 +7453,14 @@ class CSPRI_WL0(Structure):        # 173/NR:0  (nonlinear) Spring material
          ('m_icap', c_int),        #        capacities from reference-section SNO
          ('m_ibit2', c_int),       #        reserved
          ('m_ihbit', c_int),       #        Bitpattern of defined degrees of freedom for implicit hinges
-         ('m_rlim', c_float * 2 * 7), # [1105] 
+         ('m_rlim', c_float * 2 * 7), # [1105]
          ('m_alph', c_float),      #        Interpolation exponent My-Mz (PMM, only)
          ('m_par', c_float * 16),  #        further reserved material parameters
          ('m_title',  c_int * 17)  #        Designation
       ]
 cspri_wl0 = CSPRI_WL0()
 
-class CSPRI_WL(Structure):         # 173/NR:+  Worklaw for nonlinear Springs
+class CSPRI_WL(bStructure):         # 173/NR:+  Worklaw for nonlinear Springs
    _fields_ = [
          ('m_id', c_int),          #        Identification
          ('m_ntyp', c_int),        #        Type of law
@@ -7441,7 +7471,7 @@ class CSPRI_WL(Structure):         # 173/NR:+  Worklaw for nonlinear Springs
       ]
 cspri_wl = CSPRI_WL()
 
-class CSPRI_MOV(Structure):        # 174/00  Moving Springs
+class CSPRI_MOV(bStructure):        # 174/00  Moving Springs
    _fields_ = [
          ('m_nr', c_int),          #        spring element number
          ('m_typ', c_int),         #        searching criteria
@@ -7451,7 +7481,7 @@ class CSPRI_MOV(Structure):        # 174/00  Moving Springs
       ]
 cspri_mov = CSPRI_MOV()
 
-class CS_MATRIX(Structure):        # 175/00  General systemmatrices
+class CS_MATRIX(bStructure):        # 175/00  General systemmatrices
    _fields_ = [
          ('m_nr', c_int),          #        element number
          ('m_typ', c_int),         #        element type
@@ -7462,7 +7492,7 @@ class CS_MATRIX(Structure):        # 175/00  General systemmatrices
       ]
 cs_matrix = CS_MATRIX()
 
-class CBOUN(Structure):            # 180/00:+  Boundary elements
+class CBOUN(bStructure):            # 180/00:+  Boundary elements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_nvon', c_int),        #        start nodenumber
@@ -7477,7 +7507,7 @@ class CBOUN(Structure):            # 180/00:+  Boundary elements
       ]
 cboun = CBOUN()
 
-class CBOUN_RES(Structure):        # 180/LC  results of boundary elements
+class CBOUN_RES(bStructure):        # 180/LC  results of boundary elements
    _fields_ = [
          ('m_nr', c_int),          #        element number
          ('m_nk', c_int),          #        nodenumber
@@ -7488,7 +7518,7 @@ class CBOUN_RES(Structure):        # 180/LC  results of boundary elements
       ]
 cboun_res = CBOUN_RES()
 
-class CBOUN_SUM(Structure):        # 181/LC  resultant of boundary results
+class CBOUN_SUM(bStructure):        # 181/LC  resultant of boundary results
    _fields_ = [
          ('m_nr', c_int),          #        element number
          ('m_px', c_float),        # [1151] X-support force
@@ -7501,14 +7531,14 @@ class CBOUN_SUM(Structure):        # 181/LC  resultant of boundary results
       ]
 cboun_sum = CBOUN_SUM()
 
-class CBOUN_LC_LPT(Structure):     #        node number + load value
+class CBOUN_LC_LPT(bStructure):     #        node number + load value
    _fields_ = [
          ('m_n', c_int),
          ('m_p', c_float)
       ]
 cboun_lc_lpt = CBOUN_LC_LPT()
 
-class CBOUN_LC(Structure):         # 183/LC  Info on loading on boundaries
+class CBOUN_LC(bStructure):         # 183/LC  Info on loading on boundaries
    _fields_ = [
          ('m_nr', c_int),          #        element number
          ('m_typ', c_int),         #        type of load
@@ -7516,7 +7546,7 @@ class CBOUN_LC(Structure):         # 183/LC  Info on loading on boundaries
       ]
 cboun_lc = CBOUN_LC()
 
-class CSPRI_SUM(Structure):        # 187/LC  Sum of forces of support springs
+class CSPRI_SUM(bStructure):        # 187/LC  Sum of forces of support springs
    _fields_ = [
          ('m_nr', c_int),          #        group-number
          ('m_px', c_float),        # [1151] nodal support X
@@ -7529,7 +7559,7 @@ class CSPRI_SUM(Structure):        # 187/LC  Sum of forces of support springs
       ]
 cspri_sum = CSPRI_SUM()
 
-class CRSET(Structure):            # 188/00:+  Sets of results
+class CRSET(bStructure):            # 188/00:+  Sets of results
    _fields_ = [
          ('m_id', c_int),          #        number / identifier of result set
          ('m_nit', c_int),         #        number of items in that result set
@@ -7537,11 +7567,11 @@ class CRSET(Structure):            # 188/00:+  Sets of results
       ]
 crset = CRSET()
 
-class CRSET_ITM(Structure):        # 188/00:0  Member of result set
+class CRSET_ITM(bStructure):        # 188/00:0  Member of result set
    _fields_ = [
          ('m_id0', c_int),         #        Identifier = 0
          ('m_id', c_int * 2),      #        Short name of member for headdings
-         ('m_ids', c_int * 2),     #        Selector of main structure
+         ('m_ids', c_int * 2),     #        Selector of main bStructure
          ('m_idm', c_int * 2),     #        Selector of item member
          ('m_dim', c_int),         #        enum of explicitly selected unit
          ('m_kwh', c_int),         #        main id of result data
@@ -7556,14 +7586,14 @@ class CRSET_ITM(Structure):        # 188/00:0  Member of result set
       ]
 crset_itm = CRSET_ITM()
 
-class CRSET_DAT(Structure):        # 188/LC  Result-values for sets of results
+class CRSET_DAT(bStructure):        # 188/LC  Result-values for sets of results
    _fields_ = [
          ('m_id', c_int),          #        identifier of result set
          ('m_val', c_float * 255)  #        result values
       ]
 crset_dat = CRSET_DAT()
 
-class CLINK(Structure):            # 179/00  link elements
+class CLINK(bStructure):            # 179/00  link elements
    _fields_ = [
          ('m_nr', c_int),          #        pipenumber
          ('m_node', c_int * 2),    #        nodenumbers
@@ -7577,7 +7607,7 @@ class CLINK(Structure):            # 179/00  link elements
       ]
 clink = CLINK()
 
-class CPIPE(Structure):            # 190/00  pipes / armatures
+class CPIPE(bStructure):            # 190/00  pipes / armatures
    _fields_ = [
          ('m_nr', c_int),          #        pipenumber
          ('m_node', c_int * 2),    #        nodenumbers
@@ -7591,7 +7621,7 @@ class CPIPE(Structure):            # 190/00  pipes / armatures
       ]
 cpipe = CPIPE()
 
-class CPIPE_RES(Structure):        # 190/LC  results of pipes
+class CPIPE_RES(bStructure):        # 190/LC  results of pipes
    _fields_ = [
          ('m_nr', c_int),          #        pipenumber
          ('m_ha', c_float),        # [1010] start potential
@@ -7609,7 +7639,7 @@ class CPIPE_RES(Structure):        # 190/LC  results of pipes
       ]
 cpipe_res = CPIPE_RES()
 
-class CQUAD(Structure):            # 200/00  QuadElements
+class CQUAD(bStructure):            # 200/00  QuadElements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_node', c_int * 4),    #        nodenumbers
@@ -7628,7 +7658,7 @@ class CQUAD(Structure):            # 200/00  QuadElements
       ]
 cquad = CQUAD()
 
-class CQUAD_NOH(Structure):        # 200/1:0  unified properties of Quad-nodes
+class CQUAD_NOH(bStructure):        # 200/1:0  unified properties of Quad-nodes
    _fields_ = [
          ('m_id1', c_int),
          ('m_id2', c_int),
@@ -7641,7 +7671,7 @@ class CQUAD_NOH(Structure):        # 200/1:0  unified properties of Quad-nodes
       ]
 cquad_noh = CQUAD_NOH()
 
-class CQUAD_NOM(Structure):        # 200/1:-  unified properties of Quad-nodes
+class CQUAD_NOM(bStructure):        # 200/1:-  unified properties of Quad-nodes
    _fields_ = [
          ('m_ngt', c_int),         #        groupselector
          ('m_nr', c_int),          #        nodenumber
@@ -7649,7 +7679,7 @@ class CQUAD_NOM(Structure):        # 200/1:-  unified properties of Quad-nodes
       ]
 cquad_nom = CQUAD_NOM()
 
-class CQUAD_NOD(Structure):        # 200/1:*  properties of Quad-nodes
+class CQUAD_NOD(bStructure):        # 200/1:*  properties of Quad-nodes
    _fields_ = [
          ('m_ng', c_int),          #        groupnumber
          ('m_nr', c_int),          #        nodenumber
@@ -7658,7 +7688,7 @@ class CQUAD_NOD(Structure):        # 200/1:*  properties of Quad-nodes
       ]
 cquad_nod = CQUAD_NOD()
 
-class CQUAD_EDH(Structure):        # 200/2:0  Edges of Quad-elements
+class CQUAD_EDH(bStructure):        # 200/2:0  Edges of Quad-elements
    _fields_ = [
          ('m_id1', c_int),
          ('m_id2', c_int),
@@ -7667,7 +7697,7 @@ class CQUAD_EDH(Structure):        # 200/2:0  Edges of Quad-elements
       ]
 cquad_edh = CQUAD_EDH()
 
-class CQUAD_EDG(Structure):        # 200/2:+  Edges of Quad-elements
+class CQUAD_EDG(bStructure):        # 200/2:+  Edges of Quad-elements
    _fields_ = [
          ('m_ka', c_int),          #        First Node
          ('m_ke', c_int),          #        Last Node
@@ -7677,7 +7707,7 @@ class CQUAD_EDG(Structure):        # 200/2:+  Edges of Quad-elements
       ]
 cquad_edg = CQUAD_EDG()
 
-class CQUAD_TEN(Structure):        # 200/5  tendons of Quad-elements
+class CQUAD_TEN(bStructure):        # 200/5  tendons of Quad-elements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_nrs', c_int),         #        tendon number
@@ -7703,7 +7733,7 @@ class CQUAD_TEN(Structure):        # 200/5  tendons of Quad-elements
       ]
 cquad_ten = CQUAD_TEN()
 
-class CQUAD_RIM(Structure):        # 200/6  Prescribed Reinforcements of Quad-elements
+class CQUAD_RIM(bStructure):        # 200/6  Prescribed Reinforcements of Quad-elements
    _fields_ = [
          ('m_nrg', c_int),         #        group number
          ('m_nr', c_int),          #        selector number
@@ -7751,7 +7781,7 @@ class CQUAD_RIM(Structure):        # 200/6  Prescribed Reinforcements of Quad-el
       ]
 cquad_rim = CQUAD_RIM()
 
-class CQUAD_RID(Structure):        # 200/7:0  Reinforcement Definitions of Quad-elements
+class CQUAD_RID(bStructure):        # 200/7:0  Reinforcement Definitions of Quad-elements
    _fields_ = [
          ('m_id', c_int),          #        identifier (0 = Headder of a definition)
          ('m_nrg', c_int),         #        group number
@@ -7765,7 +7795,7 @@ class CQUAD_RID(Structure):        # 200/7:0  Reinforcement Definitions of Quad-
       ]
 cquad_rid = CQUAD_RID()
 
-class CQUAD_RED(Structure):        # 270/0:0  Evaluated Reinforcement Definitions of Elements
+class CQUAD_RED(bStructure):        # 270/0:0  Evaluated Reinforcement Definitions of Elements
    _fields_ = [
          ('m_id', c_int),          #        identifier (0 = Headder of a definition)
          ('m_nrg', c_int),         #        group number
@@ -7779,7 +7809,7 @@ class CQUAD_RED(Structure):        # 270/0:0  Evaluated Reinforcement Definition
       ]
 cquad_red = CQUAD_RED()
 
-class CQUAD_RIL(Structure):        # 200/7:+  Reinforcement Layers of Quad-elements
+class CQUAD_RIL(bStructure):        # 200/7:+  Reinforcement Layers of Quad-elements
    _fields_ = [
          ('m_id', c_int),          #        reference for this layer
          ('m_dir', c_int),         #        Type of local x-direction
@@ -7796,7 +7826,7 @@ class CQUAD_RIL(Structure):        # 200/7:+  Reinforcement Layers of Quad-eleme
       ]
 cquad_ril = CQUAD_RIL()
 
-class CQUAD_REL(Structure):        # 270/0:+  Evaluated Reinforcement Definitions of Elements
+class CQUAD_REL(bStructure):        # 270/0:+  Evaluated Reinforcement Definitions of Elements
    _fields_ = [
          ('m_id', c_int),          #        reference for this layer
          ('m_dir', c_int),         #        Type of local x-direction
@@ -7813,7 +7843,7 @@ class CQUAD_REL(Structure):        # 270/0:+  Evaluated Reinforcement Definition
       ]
 cquad_rel = CQUAD_REL()
 
-class CQCUT_0(Structure):          # 200/8:0  Header for fabrication areas
+class CQCUT_0(bStructure):          # 200/8:0  Header for fabrication areas
    _fields_ = [
          ('m_nr', c_int),          #        identifier = 0
          ('m_typ', c_int),         #        identifier = 0
@@ -7826,7 +7856,7 @@ class CQCUT_0(Structure):          # 200/8:0  Header for fabrication areas
       ]
 cqcut_0 = CQCUT_0()
 
-class CQCUT_NEW(Structure):        # 200/8:+  New cutting area
+class CQCUT_NEW(bStructure):        # 200/8:+  New cutting area
    _fields_ = [
          ('m_nr', c_int),          #        areanumber
          ('m_typ', c_int),         #        identifier = 0
@@ -7839,7 +7869,7 @@ class CQCUT_NEW(Structure):        # 200/8:+  New cutting area
       ]
 cqcut_new = CQCUT_NEW()
 
-class CQCUT_DIR(Structure):        # 200/8:+  Material direction
+class CQCUT_DIR(bStructure):        # 200/8:+  Material direction
    _fields_ = [
          ('m_nr', c_int),          #        areanumber
          ('m_typ', c_int),         #        Identification
@@ -7850,7 +7880,7 @@ class CQCUT_DIR(Structure):        # 200/8:+  Material direction
       ]
 cqcut_dir = CQCUT_DIR()
 
-class CQCUT_OUT(Structure):        # 200/8:+  Vertex of geometric boundary
+class CQCUT_OUT(bStructure):        # 200/8:+  Vertex of geometric boundary
    _fields_ = [
          ('m_nr', c_int),          #        areanumber
          ('m_typ', c_int),         #        Identification
@@ -7860,7 +7890,7 @@ class CQCUT_OUT(Structure):        # 200/8:+  Vertex of geometric boundary
       ]
 cqcut_out = CQCUT_OUT()
 
-class CQCUT_IN(Structure):         # 200/8:+  Geometry inner lines
+class CQCUT_IN(bStructure):         # 200/8:+  Geometry inner lines
    _fields_ = [
          ('m_nr', c_int),          #        areanumber
          ('m_typ', c_int),         #        Identification
@@ -7872,7 +7902,7 @@ class CQCUT_IN(Structure):         # 200/8:+  Geometry inner lines
       ]
 cqcut_in = CQCUT_IN()
 
-class CQCUT_WAR(Structure):        # 200/8:+  element warp direction
+class CQCUT_WAR(bStructure):        # 200/8:+  element warp direction
    _fields_ = [
          ('m_nr', c_int),          #        areanumber
          ('m_typ', c_int),         #        Identification
@@ -7885,23 +7915,23 @@ class CQCUT_WAR(Structure):        # 200/8:+  element warp direction
       ]
 cqcut_war = CQCUT_WAR()
 
-class CTEXTILE(Structure):         # 200/9  definition of cutting lines
+class CTEXTILE(bStructure):         # 200/9  definition of cutting lines
    _fields_ = [
          ('m_ig', c_int),          #        group selector
          ('m_typ', c_int),         #        type of line
          ('m_xa', c_float),        # [1001] line point A
-         ('m_ya', c_float),        # [1001] 
-         ('m_za', c_float),        # [1001] 
+         ('m_ya', c_float),        # [1001]
+         ('m_za', c_float),        # [1001]
          ('m_xe', c_float),        # [1001] line point E
-         ('m_ye', c_float),        # [1001] 
-         ('m_ze', c_float),        # [1001] 
+         ('m_ye', c_float),        # [1001]
+         ('m_ze', c_float),        # [1001]
          ('m_nx', c_float),        # [1001] projection
-         ('m_ny', c_float),        # [1001] 
-         ('m_nz', c_float)         # [1001] 
+         ('m_ny', c_float),        # [1001]
+         ('m_nz', c_float)         # [1001]
       ]
 ctextile = CTEXTILE()
 
-class CQUAD_P(Structure):          # 200/10  Quad-P-elements
+class CQUAD_P(bStructure):          # 200/10  Quad-P-elements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_node', c_int * 4),    #        nodenumbers
@@ -7917,7 +7947,7 @@ class CQUAD_P(Structure):          # 200/10  Quad-P-elements
       ]
 cquad_p = CQUAD_P()
 
-class CQUAD_LOA(Structure):        # 202/LC  Quad-element loads
+class CQUAD_LOA(bStructure):        # 202/LC  Quad-element loads
    _fields_ = [
          ('m_von', c_int),         #        start elementnumber
          ('m_bis', c_int),         #        end elementnumber
@@ -7929,13 +7959,13 @@ class CQUAD_LOA(Structure):        # 202/LC  Quad-element loads
          ('m_dpdy', c_float),
          ('m_dpdz', c_float),
          ('m_xref', c_float),      # [1001] optional reference point for load value to
-         ('m_yref', c_float),      # [1001] 
-         ('m_zref', c_float),      # [1001] 
+         ('m_yref', c_float),      # [1001]
+         ('m_zref', c_float),      # [1001]
          ('m_tfun', c_float * 16 * 2)  #        optional function of load values across the
       ]
 cquad_loa = CQUAD_LOA()
 
-class CQUAD_LPI(Structure):        # 203/LC:*  internal single loads on Quad-elements
+class CQUAD_LPI(bStructure):        # 203/LC:*  internal single loads on Quad-elements
    _fields_ = [
          ('m_nr', c_int),          #        element number
          ('m_typ', c_int),         #        type of load
@@ -7946,11 +7976,11 @@ class CQUAD_LPI(Structure):        # 203/LC:*  internal single loads on Quad-ele
       ]
 cquad_lpi = CQUAD_LPI()
 
-class CQUAD_LLI(Structure):        # 203/LC:*  internal line loads of Quad-elements
+class CQUAD_LLI(bStructure):        # 203/LC:*  internal line loads of Quad-elements
    _fields_ = [
          ('m_nr', c_int),          #        element number
          ('m_typ', c_int),         #        type of load
-         ('m_prz', c_float),       # [   8] 
+         ('m_prz', c_float),       # [   8]
          ('m_sa', c_float),
          ('m_ta', c_float),
          ('m_pa', c_float),
@@ -7960,7 +7990,7 @@ class CQUAD_LLI(Structure):        # 203/LC:*  internal line loads of Quad-eleme
       ]
 cquad_lli = CQUAD_LLI()
 
-class CQUAD_LAI_LPT(Structure):    #        load points in local coordinates
+class CQUAD_LAI_LPT(bStructure):    #        load points in local coordinates
    _fields_ = [
          ('m_s', c_float),
          ('m_t', c_float),
@@ -7968,23 +7998,23 @@ class CQUAD_LAI_LPT(Structure):    #        load points in local coordinates
       ]
 cquad_lai_lpt = CQUAD_LAI_LPT()
 
-class CQUAD_LAI(Structure):        # 203/LC:*  Free area loads on Quad-elements
+class CQUAD_LAI(bStructure):        # 203/LC:*  Free area loads on Quad-elements
    _fields_ = [
          ('m_nr', c_int),          #        element number
          ('m_typ', c_int),         #        type of load
-         ('m_prz', c_float),       # [   8] 
+         ('m_prz', c_float),       # [   8]
          ('m_lpt',  CQUAD_LAI_LPT * 63)  #        load points in local coordinates
       ]
 cquad_lai = CQUAD_LAI()
 
-class CQUAD_LT(Structure):         # 206/NR  Temperature load profiles for QUADs
+class CQUAD_LT(bStructure):         # 206/NR  Temperature load profiles for QUADs
    _fields_ = [
          ('m_t', c_float),         # [  90] Time value
          ('m_temp', c_float * 20 * 5)  #        Temperature values
       ]
 cquad_lt = CQUAD_LT()
 
-class CQUAD_FOC(Structure):        # 210/LC:0  maximum forces of Quad elements
+class CQUAD_FOC(bStructure):        # 210/LC:0  maximum forces of Quad elements
    _fields_ = [
          ('m_nr', c_int),          #        ident 0 for maximum (first records)
          ('m_mxx', c_float),       # [1114] bending moment
@@ -8000,7 +8030,7 @@ class CQUAD_FOC(Structure):        # 210/LC:0  maximum forces of Quad elements
       ]
 cquad_foc = CQUAD_FOC()
 
-class CQUAD_FOR(Structure):        # 210/LC:+  forces of Quad-elements
+class CQUAD_FOR(bStructure):        # 210/LC:+  forces of Quad-elements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_mxx', c_float),       # [1114] bending moment
@@ -8018,7 +8048,7 @@ class CQUAD_FOR(Structure):        # 210/LC:+  forces of Quad-elements
       ]
 cquad_for = CQUAD_FOR()
 
-class CQUAD_NFC(Structure):        # 211/LC:0  maximum forces in nodes
+class CQUAD_NFC(bStructure):        # 211/LC:0  maximum forces in nodes
    _fields_ = [
          ('m_ng', c_int),          #        ident 0 for maximum (first records)
          ('m_nr', c_int),          #        ident 0 for maximum (first records)
@@ -8036,7 +8066,7 @@ class CQUAD_NFC(Structure):        # 211/LC:0  maximum forces in nodes
       ]
 cquad_nfc = CQUAD_NFC()
 
-class CQUAD_NFO(Structure):        # 211/LC:Z+  Nodal Quad forces
+class CQUAD_NFO(bStructure):        # 211/LC:Z+  Nodal Quad forces
    _fields_ = [
          ('m_ng', c_int),          #        groupselector
          ('m_nr', c_int),          #        nodenumber
@@ -8054,7 +8084,7 @@ class CQUAD_NFO(Structure):        # 211/LC:Z+  Nodal Quad forces
       ]
 cquad_nfo = CQUAD_NFO()
 
-class CQUAD_EFC(Structure):        # 212/LC:0  maximum error estimates for Quad-elements
+class CQUAD_EFC(bStructure):        # 212/LC:0  maximum error estimates for Quad-elements
    _fields_ = [
          ('m_nr', c_int),          #        ident 0 for maximum (first records)
          ('m_mxx', c_float),       # [1114] bending moment
@@ -8069,7 +8099,7 @@ class CQUAD_EFC(Structure):        # 212/LC:0  maximum error estimates for Quad-
       ]
 cquad_efc = CQUAD_EFC()
 
-class CQUAD_EFO(Structure):        # 212/LC:+  error estimates for Quad-elements
+class CQUAD_EFO(bStructure):        # 212/LC:+  error estimates for Quad-elements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_mxx', c_float),       # [1114] bending moment
@@ -8084,7 +8114,7 @@ class CQUAD_EFO(Structure):        # 212/LC:+  error estimates for Quad-elements
       ]
 cquad_efo = CQUAD_EFO()
 
-class CQUAD_BEC(Structure):        # 213/LC:0  bedding stresses and results
+class CQUAD_BEC(bStructure):        # 213/LC:0  bedding stresses and results
    _fields_ = [
          ('m_nr', c_int),          #        ident 0 for maximum (first records)
          ('m_pse', c_float),       # [1155] bedding centre
@@ -8105,7 +8135,7 @@ class CQUAD_BEC(Structure):        # 213/LC:0  bedding stresses and results
       ]
 cquad_bec = CQUAD_BEC()
 
-class CQUAD_BED(Structure):        # 213/LC:+  bedding stresses and results
+class CQUAD_BED(bStructure):        # 213/LC:+  bedding stresses and results
    _fields_ = [
          ('m_nr', c_int),          #        Quadelementnumber
          ('m_pse', c_float),       # [1155] bedding centre
@@ -8126,7 +8156,7 @@ class CQUAD_BED(Structure):        # 213/LC:+  bedding stresses and results
       ]
 cquad_bed = CQUAD_BED()
 
-class CQUAD_RFX(Structure):        # 214/LC  additional information for primary loadcases
+class CQUAD_RFX(bStructure):        # 214/LC  additional information for primary loadcases
    _fields_ = [
          ('m_nr', c_int),          #        Quad-elementnumber
          ('m_eps', c_float * 8 * 5), #        strain
@@ -8134,7 +8164,7 @@ class CQUAD_RFX(Structure):        # 214/LC  additional information for primary 
       ]
 cquad_rfx = CQUAD_RFX()
 
-class CQUAD_RNC(Structure):        # 215/LC:0  nonlinear results of Quad-element
+class CQUAD_RNC(bStructure):        # 215/LC:0  nonlinear results of Quad-element
    _fields_ = [
          ('m_nr', c_int),          #        ident 0 for maximum
          ('m_nmat', c_int),        #        type of material behaviour
@@ -8189,7 +8219,7 @@ class CQUAD_RNC(Structure):        # 215/LC:0  nonlinear results of Quad-element
       ]
 cquad_rnc = CQUAD_RNC()
 
-class CQUAD_RNO(Structure):        # 215/LC:+  nonlinear results of Quad-element
+class CQUAD_RNO(bStructure):        # 215/LC:+  nonlinear results of Quad-element
    _fields_ = [
          ('m_nr', c_int),          #        Quad-elementnumber
          ('m_nmat', c_int),        #        type of material behaviour
@@ -8244,7 +8274,7 @@ class CQUAD_RNO(Structure):        # 215/LC:+  nonlinear results of Quad-element
       ]
 cquad_rno = CQUAD_RNO()
 
-class CQUAD_STC(Structure):        # 220/LC:0  maximum Quad-stress
+class CQUAD_STC(bStructure):        # 220/LC:0  maximum Quad-stress
    _fields_ = [
          ('m_nr', c_int),          #        ident 0 for maximum (first records)
          ('m_sigx', c_float),      # [1092] stress
@@ -8260,7 +8290,7 @@ class CQUAD_STC(Structure):        # 220/LC:0  maximum Quad-stress
       ]
 cquad_stc = CQUAD_STC()
 
-class CQUAD_STP_HTYP(Structure):   #        = state variables for nonlinear material
+class CQUAD_STP_HTYP(bStructure):   #        = state variables for nonlinear material
    _fields_ = [
          ('m_id', c_int),
          ('m_idim', c_int),
@@ -8268,14 +8298,14 @@ class CQUAD_STP_HTYP(Structure):   #        = state variables for nonlinear mate
       ]
 cquad_stp_htyp = CQUAD_STP_HTYP()
 
-class CQUAD_STP(Structure):        # 220/LC:-  Nonlinear QUAD-stress Headder
+class CQUAD_STP(bStructure):        # 220/LC:-  Nonlinear QUAD-stress Headder
    _fields_ = [
          ('m_typ', c_int),         #        enum of nonlinear parameters as in 1/NR:1/???
          ('m_htyp',  CQUAD_STP_HTYP * 15)  #        = state variables for nonlinear material
       ]
 cquad_stp = CQUAD_STP()
 
-class CBRIC_STP_HTYP(Structure):   #        = state variables for nonlinear material
+class CBRIC_STP_HTYP(bStructure):   #        = state variables for nonlinear material
    _fields_ = [
          ('m_id', c_int),
          ('m_idim', c_int),
@@ -8283,23 +8313,23 @@ class CBRIC_STP_HTYP(Structure):   #        = state variables for nonlinear mate
       ]
 cbric_stp_htyp = CBRIC_STP_HTYP()
 
-class CBRIC_STP(Structure):        # 310/LC:-  Nonlinear BRIC-stress Headder
+class CBRIC_STP(bStructure):        # 310/LC:-  Nonlinear BRIC-stress Headder
    _fields_ = [
          ('m_typ', c_int),         #        enum of nonlinear parameters as in 1/NR:1/???
          ('m_htyp',  CBRIC_STP_HTYP * 15)  #        = state variables for nonlinear material
       ]
 cbric_stp = CBRIC_STP()
 
-class CQUAD_STR_SG(Structure):     #        results in GAUSS-points
+class CQUAD_STR_SG(bStructure):     #        results in GAUSS-points
    _fields_ = [
-         ('m_sigx', c_float),      # [1092] 
-         ('m_sigy', c_float),      # [1092] 
-         ('m_tau', c_float),       # [1092] 
-         ('m_sigz', c_float)       # [1092] 
+         ('m_sigx', c_float),      # [1092]
+         ('m_sigy', c_float),      # [1092]
+         ('m_tau', c_float),       # [1092]
+         ('m_sigz', c_float)       # [1092]
       ]
 cquad_str_sg = CQUAD_STR_SG()
 
-class CQUAD_STR(Structure):        # 220/LC  stresses of Quad-element
+class CQUAD_STR(bStructure):        # 220/LC  stresses of Quad-element
    _fields_ = [
          ('m_nr', c_int),          #        Elementnumber
          ('m_sigx', c_float),      # [1092] stress
@@ -8328,7 +8358,7 @@ class CQUAD_STR(Structure):        # 220/LC  stresses of Quad-element
       ]
 cquad_str = CQUAD_STR()
 
-class CQUAD_NSC(Structure):        # 221/LC:0  maximum stresses in nodes
+class CQUAD_NSC(bStructure):        # 221/LC:0  maximum stresses in nodes
    _fields_ = [
          ('m_ng', c_int),          #        ident 0 for maximum (first records)
          ('m_nr', c_int),          #        ident 0 for maximum (first records)
@@ -8340,7 +8370,7 @@ class CQUAD_NSC(Structure):        # 221/LC:0  maximum stresses in nodes
       ]
 cquad_nsc = CQUAD_NSC()
 
-class CQUAD_NST(Structure):        # 221/LC:Z+  stresses in Quad-nodes
+class CQUAD_NST(bStructure):        # 221/LC:Z+  stresses in Quad-nodes
    _fields_ = [
          ('m_ng', c_int),          #        groupnumber
          ('m_nr', c_int),          #        nodenumber
@@ -8352,7 +8382,7 @@ class CQUAD_NST(Structure):        # 221/LC:Z+  stresses in Quad-nodes
       ]
 cquad_nst = CQUAD_NST()
 
-class CQUAD_ESC(Structure):        # 222/LC:0  max. errors in nodes
+class CQUAD_ESC(bStructure):        # 222/LC:0  max. errors in nodes
    _fields_ = [
          ('m_nr', c_int),          #        ident 0 for maximum (first records)
          ('m_sigx', c_float),      # [1092] stress
@@ -8363,7 +8393,7 @@ class CQUAD_ESC(Structure):        # 222/LC:0  max. errors in nodes
       ]
 cquad_esc = CQUAD_ESC()
 
-class CQUAD_EST(Structure):        # 222/LC:+  error estimates of Quad-element stresses
+class CQUAD_EST(bStructure):        # 222/LC:+  error estimates of Quad-element stresses
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_sigx', c_float),      # [1092] stress
@@ -8374,7 +8404,7 @@ class CQUAD_EST(Structure):        # 222/LC:+  error estimates of Quad-element s
       ]
 cquad_est = CQUAD_EST()
 
-class CQUAD_RLC(Structure):        # 225/LC:0  max Quad-Layer-results
+class CQUAD_RLC(bStructure):        # 225/LC:0  max Quad-Layer-results
    _fields_ = [
          ('m_nr', c_int),          #        ident 0 for maximum (first records)
          ('m_mnr', c_int),         #        ident 0 for maximum (first records)
@@ -8401,18 +8431,18 @@ class CQUAD_RLC(Structure):        # 225/LC:0  max Quad-Layer-results
       ]
 cquad_rlc = CQUAD_RLC()
 
-class CQUAD_RLA_SG(Structure):     #        results in GAUSS-points
+class CQUAD_RLA_SG(bStructure):     #        results in GAUSS-points
    _fields_ = [
-         ('m_sigx', c_float),      # [1092] 
-         ('m_sigy', c_float),      # [1092] 
-         ('m_tau', c_float),       # [1092] 
-         ('m_sigz', c_float),      # [1092] 
-         ('m_taux', c_float),      # [1092] 
-         ('m_tauy', c_float)       # [1092] 
+         ('m_sigx', c_float),      # [1092]
+         ('m_sigy', c_float),      # [1092]
+         ('m_tau', c_float),       # [1092]
+         ('m_sigz', c_float),      # [1092]
+         ('m_taux', c_float),      # [1092]
+         ('m_tauy', c_float)       # [1092]
       ]
 cquad_rla_sg = CQUAD_RLA_SG()
 
-class CQUAD_RLA(Structure):        # 225/LC:+  Layer-stresses of Quads
+class CQUAD_RLA(bStructure):        # 225/LC:+  Layer-stresses of Quads
    _fields_ = [
          ('m_nr', c_int),          #        Elementnumber
          ('m_mnr', c_int),         #        Materialnumber MNR>0
@@ -8441,10 +8471,10 @@ class CQUAD_RLA(Structure):        # 225/LC:+  Layer-stresses of Quads
       ]
 cquad_rla = CQUAD_RLA()
 
-class CQUAD_RLB_SG(Structure):     #        results in GAUSS-points
+class CQUAD_RLB_SG(bStructure):     #        results in GAUSS-points
    _fields_ = [
-         ('m_sig1', c_float),      # [1092] 
-         ('m_sig2', c_float),      # [1092] 
+         ('m_sig1', c_float),      # [1092]
+         ('m_sig2', c_float),      # [1092]
          ('m_eps1', c_float),
          ('m_xi1', c_float),
          ('m_xi2', c_float),
@@ -8452,7 +8482,7 @@ class CQUAD_RLB_SG(Structure):     #        results in GAUSS-points
       ]
 cquad_rlb_sg = CQUAD_RLB_SG()
 
-class CQUAD_RLB(Structure):        # 225/LC:+  Layer-reinforcement stresses of Quads MNR=-1
+class CQUAD_RLB(bStructure):        # 225/LC:+  Layer-reinforcement stresses of Quads MNR=-1
    _fields_ = [
          ('m_nr', c_int),          #        Elementnumber
          ('m_mnr', c_int),         #        MNR=-1 identifier for reinforcement data
@@ -8478,7 +8508,7 @@ class CQUAD_RLB(Structure):        # 225/LC:+  Layer-reinforcement stresses of Q
       ]
 cquad_rlb = CQUAD_RLB()
 
-class CQUAD_SEC(Structure):        # 229/LC:0  maximum Quad-sectional stress
+class CQUAD_SEC(bStructure):        # 229/LC:0  maximum Quad-sectional stress
    _fields_ = [
          ('m_nr', c_int),          #        ident 0 for maximum (first records)
          ('m_sigx', c_float),      # [1092] normalstress
@@ -8490,14 +8520,14 @@ class CQUAD_SEC(Structure):        # 229/LC:0  maximum Quad-sectional stress
       ]
 cquad_sec = CQUAD_SEC()
 
-class CQUAD_SEQ(Structure):        # 229/LC:-  location of sectional results in master
+class CQUAD_SEQ(bStructure):        # 229/LC:-  location of sectional results in master
    _fields_ = [
          ('m_nr', c_int),          #        negative beam number
          ('m_x', c_float)          # [1001] section along beam
       ]
 cquad_seq = CQUAD_SEQ()
 
-class CQUAD_SER(Structure):        # 229/LC:+  stresses of sectional Quad-elements
+class CQUAD_SER(bStructure):        # 229/LC:+  stresses of sectional Quad-elements
    _fields_ = [
          ('m_nr', c_int),          #        Elementnumber
          ('m_sigx', c_float),      # [1092] normalstress
@@ -8509,7 +8539,7 @@ class CQUAD_SER(Structure):        # 229/LC:+  stresses of sectional Quad-elemen
       ]
 cquad_ser = CQUAD_SER()
 
-class CQUAD_RT0(Structure):        # 230/LC:0  maximum of tendon stresses
+class CQUAD_RT0(bStructure):        # 230/LC:0  maximum of tendon stresses
    _fields_ = [
          ('m_nr', c_int),          #        identifier 0
          ('m_nrs', c_int),         #        identifier 0
@@ -8533,7 +8563,7 @@ class CQUAD_RT0(Structure):        # 230/LC:0  maximum of tendon stresses
       ]
 cquad_rt0 = CQUAD_RT0()
 
-class CQUAD_RTS(Structure):        # 230/LC  tendon stresses in two integration points
+class CQUAD_RTS(bStructure):        # 230/LC  tendon stresses in two integration points
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_nrs', c_int),         #        tendonnumber
@@ -8557,7 +8587,7 @@ class CQUAD_RTS(Structure):        # 230/LC  tendon stresses in two integration 
       ]
 cquad_rts = CQUAD_RTS()
 
-class CQUAD_DST(Structure):        # 250/DC  design stresses in Quad-elements
+class CQUAD_DST(bStructure):        # 250/DC  design stresses in Quad-elements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_smio', c_float),      # [1092] minimum upside main stress
@@ -8573,7 +8603,7 @@ class CQUAD_DST(Structure):        # 250/DC  design stresses in Quad-elements
       ]
 cquad_dst = CQUAD_DST()
 
-class CQUAD_NDS(Structure):        # 251/DC  design stresses in Quad-nodes
+class CQUAD_NDS(bStructure):        # 251/DC  design stresses in Quad-nodes
    _fields_ = [
          ('m_ng', c_int),          #        groupnumber
          ('m_nr', c_int),          #        nodenumber
@@ -8590,7 +8620,7 @@ class CQUAD_NDS(Structure):        # 251/DC  design stresses in Quad-nodes
       ]
 cquad_nds = CQUAD_NDS()
 
-class CQUAD_RIC(Structure):        # 260/DC:0  maximum reinforcement in Quad-elements
+class CQUAD_RIC(bStructure):        # 260/DC:0  maximum reinforcement in Quad-elements
    _fields_ = [
          ('m_nr', c_int),          #        ident 0
          ('m_aso', c_float),       # [1021] upside reinforcement (outside)
@@ -8635,7 +8665,7 @@ class CQUAD_RIC(Structure):        # 260/DC:0  maximum reinforcement in Quad-ele
       ]
 cquad_ric = CQUAD_RIC()
 
-class CQUAD_REI(Structure):        # 260/DC:+  reinforcement in Quad-elements
+class CQUAD_REI(bStructure):        # 260/DC:+  reinforcement in Quad-elements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_aso', c_float),       # [1021] upside reinforcement (outside)
@@ -8680,7 +8710,7 @@ class CQUAD_REI(Structure):        # 260/DC:+  reinforcement in Quad-elements
       ]
 cquad_rei = CQUAD_REI()
 
-class CQUAD_NRC(Structure):        # 261/DC:0  maximum reinforcement in Quad-nodes
+class CQUAD_NRC(bStructure):        # 261/DC:0  maximum reinforcement in Quad-nodes
    _fields_ = [
          ('m_nr', c_int),          #        ident 0
          ('m_ng', c_int),          #        ident 0
@@ -8723,7 +8753,7 @@ class CQUAD_NRC(Structure):        # 261/DC:0  maximum reinforcement in Quad-nod
       ]
 cquad_nrc = CQUAD_NRC()
 
-class CQUAD_NRI(Structure):        # 261/DC:Z+  reinforcement in Quad-nodes
+class CQUAD_NRI(bStructure):        # 261/DC:Z+  reinforcement in Quad-nodes
    _fields_ = [
          ('m_ng', c_int),          #        groupnumber
          ('m_nr', c_int),          #        nodenumber
@@ -8769,7 +8799,7 @@ class CQUAD_NRI(Structure):        # 261/DC:Z+  reinforcement in Quad-nodes
       ]
 cquad_nri = CQUAD_NRI()
 
-class CQUAD_NRP(Structure):        # 262/DC:+  punching reinforcement in nodes
+class CQUAD_NRP(bStructure):        # 262/DC:+  punching reinforcement in nodes
    _fields_ = [
          ('m_nr', c_int),          #        nodenumber
          ('m_ista', c_int),        #        state of force
@@ -8789,21 +8819,21 @@ class CQUAD_NRP(Structure):        # 262/DC:+  punching reinforcement in nodes
       ]
 cquad_nrp = CQUAD_NRP()
 
-class CQUAD_PUN(Structure):        # 262/DC:0  punching periphery
+class CQUAD_PUN(bStructure):        # 262/DC:0  punching periphery
    _fields_ = [
          ('m_nr', c_int),          #        identifier 0
          ('m_id', c_int),          #        identifier 0
          ('m_typ', c_int),         #        type of line
          ('m_x1', c_float),        # [1001] Coordinates of start point
-         ('m_y1', c_float),        # [1001] 
-         ('m_z1', c_float),        # [1001] 
+         ('m_y1', c_float),        # [1001]
+         ('m_z1', c_float),        # [1001]
          ('m_x2', c_float),        # [1001] Coordinates of end point
-         ('m_y2', c_float),        # [1001] 
-         ('m_z2', c_float)         # [1001] 
+         ('m_y2', c_float),        # [1001]
+         ('m_z2', c_float)         # [1001]
       ]
 cquad_pun = CQUAD_PUN()
 
-class CQUAD_PU1(Structure):        # 262/DC:0  punching parameters
+class CQUAD_PU1(bStructure):        # 262/DC:0  punching parameters
    _fields_ = [
          ('m_nr', c_int),          #        identifier 0
          ('m_id', c_int),          #        identifier 1
@@ -8812,7 +8842,7 @@ class CQUAD_PU1(Structure):        # 262/DC:0  punching parameters
       ]
 cquad_pu1 = CQUAD_PU1()
 
-class CQUAD_RD0(Structure):        # 265/DC:0  maximum of tendon stresses in the design
+class CQUAD_RD0(bStructure):        # 265/DC:0  maximum of tendon stresses in the design
    _fields_ = [
          ('m_nr', c_int),          #        identifier 0
          ('m_nrs', c_int),         #        identifier 0
@@ -8822,7 +8852,7 @@ class CQUAD_RD0(Structure):        # 265/DC:0  maximum of tendon stresses in the
       ]
 cquad_rd0 = CQUAD_RD0()
 
-class CQUAD_RTD(Structure):        # 265/DC  tendon stress in the design
+class CQUAD_RTD(bStructure):        # 265/DC  tendon stress in the design
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_nrs', c_int),         #        tendonnumber
@@ -8832,7 +8862,7 @@ class CQUAD_RTD(Structure):        # 265/DC  tendon stress in the design
       ]
 cquad_rtd = CQUAD_RTD()
 
-class CQUAD_REE(Structure):        # 270/DC:0  maximum design values in Quad-elements
+class CQUAD_REE(bStructure):        # 270/DC:0  maximum design values in Quad-elements
    _fields_ = [
          ('m_ng', c_int),          #        ident 0
          ('m_nr', c_int),          #        ident 0
@@ -8861,7 +8891,7 @@ class CQUAD_REE(Structure):        # 270/DC:0  maximum design values in Quad-ele
       ]
 cquad_ree = CQUAD_REE()
 
-class CQUAD_RNE(Structure):        # 271/DC:0  maximum design values in Nodes of Quad-elements
+class CQUAD_RNE(bStructure):        # 271/DC:0  maximum design values in Nodes of Quad-elements
    _fields_ = [
          ('m_ng', c_int),          #        ident 0
          ('m_nr', c_int),          #        ident 0
@@ -8890,7 +8920,7 @@ class CQUAD_RNE(Structure):        # 271/DC:0  maximum design values in Nodes of
       ]
 cquad_rne = CQUAD_RNE()
 
-class CQUAD_REM(Structure):        # 270/DC:0  maximum reinforcement results in Quad-elements
+class CQUAD_REM(bStructure):        # 270/DC:0  maximum reinforcement results in Quad-elements
    _fields_ = [
          ('m_ng', c_int),          #        ident 0
          ('m_nr', c_int),          #        ident 0
@@ -8906,7 +8936,7 @@ class CQUAD_REM(Structure):        # 270/DC:0  maximum reinforcement results in 
       ]
 cquad_rem = CQUAD_REM()
 
-class CQUAD_REA(Structure):        # 270/DC:z+  General Concrete Design Results
+class CQUAD_REA(bStructure):        # 270/DC:z+  General Concrete Design Results
    _fields_ = [
          ('m_ng', c_int),          #        group number (for nodal results)
          ('m_nr', c_int),          #        element number
@@ -8932,7 +8962,7 @@ class CQUAD_REA(Structure):        # 270/DC:z+  General Concrete Design Results
       ]
 cquad_rea = CQUAD_REA()
 
-class CQUAD_RER(Structure):        # 270/DC:z+  Reinforcement Layer Design Results
+class CQUAD_RER(bStructure):        # 270/DC:z+  Reinforcement Layer Design Results
    _fields_ = [
          ('m_ng', c_int),          #        group number (for nodal results)
          ('m_nr', c_int),          #        element number
@@ -8948,7 +8978,7 @@ class CQUAD_RER(Structure):        # 270/DC:z+  Reinforcement Layer Design Resul
       ]
 cquad_rer = CQUAD_RER()
 
-class CQUAD_CFD(Structure):        # 290/LC  Fluid flow results in Quad-elements
+class CQUAD_CFD(bStructure):        # 290/LC  Fluid flow results in Quad-elements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_vx', c_float),        # [1212] velocity
@@ -8969,7 +8999,7 @@ class CQUAD_CFD(Structure):        # 290/LC  Fluid flow results in Quad-elements
       ]
 cquad_cfd = CQUAD_CFD()
 
-class CQUAD_TM(Structure):         # 291/LC:0  Maximum of Temperature Results in Quads
+class CQUAD_TM(bStructure):         # 291/LC:0  Maximum of Temperature Results in Quads
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_qx', c_float),        # [1218] heat flux
@@ -8983,7 +9013,7 @@ class CQUAD_TM(Structure):         # 291/LC:0  Maximum of Temperature Results in
       ]
 cquad_tm = CQUAD_TM()
 
-class CQUAD_TMP(Structure):        # 291/LC  Temperature Results in Quad-elements
+class CQUAD_TMP(bStructure):        # 291/LC  Temperature Results in Quad-elements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_qx', c_float),        # [1218] heat flux
@@ -8997,7 +9027,7 @@ class CQUAD_TMP(Structure):        # 291/LC  Temperature Results in Quad-element
       ]
 cquad_tmp = CQUAD_TMP()
 
-class CBRIC(Structure):            # 300/00  Bric-elements
+class CBRIC(bStructure):            # 300/00  Bric-elements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_node', c_int * 8),    #        nodenumbers
@@ -9007,7 +9037,7 @@ class CBRIC(Structure):            # 300/00  Bric-elements
       ]
 cbric = CBRIC()
 
-class CBRIC_SU(Structure):         # 300/02:0  Surfaces and Neighbours of Bric-elements
+class CBRIC_SU(bStructure):         # 300/02:0  Surfaces and Neighbours of Bric-elements
    _fields_ = [
          ('m_n0', c_int * 4),
          ('m_nsur', c_int),
@@ -9015,7 +9045,7 @@ class CBRIC_SU(Structure):         # 300/02:0  Surfaces and Neighbours of Bric-e
       ]
 cbric_su = CBRIC_SU()
 
-class CBRIC_SUR(Structure):        # 300/02:+  Surfaces and Neighbours of Bric-elements
+class CBRIC_SUR(bStructure):        # 300/02:+  Surfaces and Neighbours of Bric-elements
    _fields_ = [
          ('m_node', c_int * 4),
          ('m_ijmp', c_int),
@@ -9024,7 +9054,7 @@ class CBRIC_SUR(Structure):        # 300/02:+  Surfaces and Neighbours of Bric-e
       ]
 cbric_sur = CBRIC_SUR()
 
-class CBRIC_RIM(Structure):        # 300/6  Prescribed Reinforcements of Bric-elements
+class CBRIC_RIM(bStructure):        # 300/6  Prescribed Reinforcements of Bric-elements
    _fields_ = [
          ('m_nrg', c_int),         #        group number
          ('m_nr', c_int),          #        selector number
@@ -9044,7 +9074,7 @@ class CBRIC_RIM(Structure):        # 300/6  Prescribed Reinforcements of Bric-el
       ]
 cbric_rim = CBRIC_RIM()
 
-class CBRIC_P(Structure):          # 300/10  Bric-P-Elements
+class CBRIC_P(bStructure):          # 300/10  Bric-P-Elements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_node', c_int * 8),    #        nodenumbers
@@ -9054,7 +9084,7 @@ class CBRIC_P(Structure):          # 300/10  Bric-P-Elements
       ]
 cbric_p = CBRIC_P()
 
-class CBRIC_LOA(Structure):        # 302/LC  loads of Bric-elements
+class CBRIC_LOA(bStructure):        # 302/LC  loads of Bric-elements
    _fields_ = [
          ('m_von', c_int),         #        start elementnumber
          ('m_bis', c_int),         #        end elementnumber
@@ -9066,12 +9096,12 @@ class CBRIC_LOA(Structure):        # 302/LC  loads of Bric-elements
          ('m_dpdy', c_float),
          ('m_dpdz', c_float),
          ('m_xref', c_float),      # [1001] optional reference point for load value
-         ('m_yref', c_float),      # [1001] 
-         ('m_zref', c_float)       # [1001] 
+         ('m_yref', c_float),      # [1001]
+         ('m_zref', c_float)       # [1001]
       ]
 cbric_loa = CBRIC_LOA()
 
-class CBRIC_STC(Structure):        # 310/LC:0  maximum stress in BRICs
+class CBRIC_STC(bStructure):        # 310/LC:0  maximum stress in BRICs
    _fields_ = [
          ('m_nr', c_int),          #        ident 0 for maximum (first records)
          ('m_sigx', c_float),      # [1092] stress
@@ -9085,18 +9115,18 @@ class CBRIC_STC(Structure):        # 310/LC:0  maximum stress in BRICs
       ]
 cbric_stc = CBRIC_STC()
 
-class CBRIC_STR_SG(Structure):     #        results in GAUSS-points
+class CBRIC_STR_SG(bStructure):     #        results in GAUSS-points
    _fields_ = [
-         ('m_sigx', c_float),      # [1092] 
-         ('m_sigy', c_float),      # [1092] 
-         ('m_sigz', c_float),      # [1092] 
-         ('m_tvxy', c_float),      # [1092] 
-         ('m_tvxz', c_float),      # [1092] 
-         ('m_tvyz', c_float)       # [1092] 
+         ('m_sigx', c_float),      # [1092]
+         ('m_sigy', c_float),      # [1092]
+         ('m_sigz', c_float),      # [1092]
+         ('m_tvxy', c_float),      # [1092]
+         ('m_tvxz', c_float),      # [1092]
+         ('m_tvyz', c_float)       # [1092]
       ]
 cbric_str_sg = CBRIC_STR_SG()
 
-class CBRIC_STR(Structure):        # 310/LC:+  3D-stresses in Bric-elements
+class CBRIC_STR(bStructure):        # 310/LC:+  3D-stresses in Bric-elements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_sigx', c_float),      # [1092] stress
@@ -9124,7 +9154,7 @@ class CBRIC_STR(Structure):        # 310/LC:+  3D-stresses in Bric-elements
       ]
 cbric_str = CBRIC_STR()
 
-class CBRIC_NSC(Structure):        # 311/LC:0  maximum nodal 3D stress
+class CBRIC_NSC(bStructure):        # 311/LC:0  maximum nodal 3D stress
    _fields_ = [
          ('m_ng', c_int),          #        ident 0 for maximum (first records)
          ('m_nr', c_int),          #        ident 0 for maximum (first records)
@@ -9137,7 +9167,7 @@ class CBRIC_NSC(Structure):        # 311/LC:0  maximum nodal 3D stress
       ]
 cbric_nsc = CBRIC_NSC()
 
-class CBRIC_NST(Structure):        # 311/LC:+  3D-stresses in Bric-nodes
+class CBRIC_NST(bStructure):        # 311/LC:+  3D-stresses in Bric-nodes
    _fields_ = [
          ('m_ng', c_int),          #        groupnumber
          ('m_nr', c_int),          #        nodenumber
@@ -9151,7 +9181,7 @@ class CBRIC_NST(Structure):        # 311/LC:+  3D-stresses in Bric-nodes
       ]
 cbric_nst = CBRIC_NST()
 
-class CBRIC_ESC(Structure):        # 312/LC:0  max. errors of Bric-stresses
+class CBRIC_ESC(bStructure):        # 312/LC:0  max. errors of Bric-stresses
    _fields_ = [
          ('m_nr', c_int),          #        ident 0 for maximum (first records)
          ('m_sigx', c_float),      # [1092] stress
@@ -9163,7 +9193,7 @@ class CBRIC_ESC(Structure):        # 312/LC:0  max. errors of Bric-stresses
       ]
 cbric_esc = CBRIC_ESC()
 
-class CBRIC_EST(Structure):        # 312/LC:+  3D-error estimates in Bric-Elements
+class CBRIC_EST(bStructure):        # 312/LC:+  3D-error estimates in Bric-Elements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_sigx', c_float),      # [1092] stress
@@ -9175,7 +9205,7 @@ class CBRIC_EST(Structure):        # 312/LC:+  3D-error estimates in Bric-Elemen
       ]
 cbric_est = CBRIC_EST()
 
-class CBRIC_REI(Structure):        # 360/DC:+  reinforcement in Bric-elements
+class CBRIC_REI(bStructure):        # 360/DC:+  reinforcement in Bric-elements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_as', c_float * 3),    # [1022] reinforcement 1-3
@@ -9188,7 +9218,7 @@ class CBRIC_REI(Structure):        # 360/DC:+  reinforcement in Bric-elements
       ]
 cbric_rei = CBRIC_REI()
 
-class CBRIC_NRI(Structure):        # 361/DC:+  reinforcement in Bric-nodes
+class CBRIC_NRI(bStructure):        # 361/DC:+  reinforcement in Bric-nodes
    _fields_ = [
          ('m_ng', c_int),          #        groupnumber
          ('m_nr', c_int),          #        nodenumber
@@ -9202,7 +9232,7 @@ class CBRIC_NRI(Structure):        # 361/DC:+  reinforcement in Bric-nodes
       ]
 cbric_nri = CBRIC_NRI()
 
-class CBRIC_CFD(Structure):        # 390/LC  Fluid flow results in BRIC-elements
+class CBRIC_CFD(bStructure):        # 390/LC  Fluid flow results in BRIC-elements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_vx', c_float),        # [1212] velocity
@@ -9224,7 +9254,7 @@ class CBRIC_CFD(Structure):        # 390/LC  Fluid flow results in BRIC-elements
       ]
 cbric_cfd = CBRIC_CFD()
 
-class CBRIC_TM(Structure):         # 391/LC:0  Maximum Temperature Results in BRICs
+class CBRIC_TM(bStructure):         # 391/LC:0  Maximum Temperature Results in BRICs
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_qx', c_float),        # [1218] heat flux
@@ -9237,7 +9267,7 @@ class CBRIC_TM(Structure):         # 391/LC:0  Maximum Temperature Results in BR
       ]
 cbric_tm = CBRIC_TM()
 
-class CBRIC_TMP(Structure):        # 391/LC  Temperature Results in BRIC-elements
+class CBRIC_TMP(bStructure):        # 391/LC  Temperature Results in BRIC-elements
    _fields_ = [
          ('m_nr', c_int),          #        elementnumber
          ('m_qx', c_float),        # [1218] heat flux
@@ -9250,7 +9280,7 @@ class CBRIC_TMP(Structure):        # 391/LC  Temperature Results in BRIC-element
       ]
 cbric_tmp = CBRIC_TMP()
 
-class CHASE_PIH(Structure):        # 404/NR:0  HASE-Piles in Half-space
+class CHASE_PIH(bStructure):        # 404/NR:0  HASE-Piles in Half-space
    _fields_ = [
          ('m_id', c_int),          #        Identification 0
          ('m_npile', c_int),       #        Number of piles
@@ -9259,7 +9289,7 @@ class CHASE_PIH(Structure):        # 404/NR:0  HASE-Piles in Half-space
       ]
 chase_pih = CHASE_PIH()
 
-class CHASE_PIL(Structure):        # 404/NR:+  HASE-Piles in Half-space
+class CHASE_PIL(bStructure):        # 404/NR:+  HASE-Piles in Half-space
    _fields_ = [
          ('m_enr', c_int),         #        External node number
          ('m_x', c_float),         # [1001] Pile X-coordinate
@@ -9280,7 +9310,7 @@ class CHASE_PIL(Structure):        # 404/NR:+  HASE-Piles in Half-space
       ]
 chase_pil = CHASE_PIL()
 
-class CSEG_DEF(Structure):         # 900/00  Segmentdefinition
+class CSEG_DEF(bStructure):         # 900/00  Segmentdefinition
    _fields_ = [
          ('m_id', c_int),          #        Identification of segment
          ('m_typ', c_int),         #        Type of segment
@@ -9294,7 +9324,7 @@ class CSEG_DEF(Structure):         # 900/00  Segmentdefinition
       ]
 cseg_def = CSEG_DEF()
 
-class CIL_CTRL0(Structure):        # -1/NS:0  Headder of a location
+class CIL_CTRL0(bStructure):        # -1/NS:0  Headder of a location
    _fields_ = [
          ('m_id', c_int),          #        ID=0
          ('m_kwerg', c_int),       #        KWH for results to be saved
@@ -9305,7 +9335,7 @@ class CIL_CTRL0(Structure):        # -1/NS:0  Headder of a location
       ]
 cil_ctrl0 = CIL_CTRL0()
 
-class CIL_CTRL1(Structure):        # -1/NS:?  Headder of a result
+class CIL_CTRL1(bStructure):        # -1/NS:?  Headder of a result
    _fields_ = [
          ('m_idi', c_int),         #        Type of result
          ('m_ierg', c_int),        #        index of this item + 1000*IMUNIT
@@ -9316,7 +9346,7 @@ class CIL_CTRL1(Structure):        # -1/NS:?  Headder of a result
       ]
 cil_ctrl1 = CIL_CTRL1()
 
-class CIL_DATA0(Structure):        # -1/NS:1????  Influence values (V23, obsoleted)
+class CIL_DATA0(bStructure):        # -1/NS:1????  Influence values (V23, obsoleted)
    _fields_ = [
          ('m_idi', c_int),         #        Type of derivatives defined
          ('m_x', c_float),         # [1001] abszissae along lane
@@ -9331,7 +9361,7 @@ class CIL_DATA0(Structure):        # -1/NS:1????  Influence values (V23, obsolet
       ]
 cil_data0 = CIL_DATA0()
 
-class CIL_DATA(Structure):         # -1/NS:1??????  Influence values
+class CIL_DATA(bStructure):         # -1/NS:1??????  Influence values
    _fields_ = [
          ('m_idi', c_int),         #        Type of derivatives defined
          ('m_x', c_float),         # [1001] abszissae along lane
@@ -9353,7 +9383,7 @@ class CIL_DATA(Structure):         # -1/NS:1??????  Influence values
 cil_data = CIL_DATA()
 
 #+============================================================================
-#| Company:   SOFiSTiK AG 
+#| Company:   SOFiSTiK AG
 #|      sofistik_daten.py
 #|      end of automatically generated header
 #+============================================================================

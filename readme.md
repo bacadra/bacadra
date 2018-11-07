@@ -69,4 +69,4 @@ p.dbase.connect()
 p.dbase.close()
 ~~~
 
-While database is creating, the full table relative schema is creating.
+While database is creating, the full table relative ssodb is creating.
