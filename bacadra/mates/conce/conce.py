@@ -1,21 +1,14 @@
-from .  import mdata
-from .. import umate
-
+from .  import pbase
 from ...cunit import cunit
 
 class conce:
     #$$ def --init--
     def __init__(self, core):
         self.core = core
+
+        from ..umate import umate
         self._umate = umate.umate(core=core)
 
-    #$$ def --enter--
-    def __enter__(self):
-        return self
-
-    #$$ def --exit--
-    def __exit__(self, type, value, traceback):
-        pass
 
     #$$ def add
     def add(self,
@@ -27,7 +20,7 @@ class conce:
     f_ck=None, f_ck_cube=None, f_cm=None, f_ctm=None, f_ctk_005=None, f_ctk_095=None, E_cm=None, ε_c1=None, ε_cu1=None, ε_c2=None, ε_cu2=None, n_c=None, ε_c3=None, ε_cu3=None, γ_M=None):
 
         if cclass:
-            cdata = mdata.mdata().get(cclass)
+            cdata = pbase.pbase().get(cclass)
             if not f_ck     : f_ck      = cdata['f_ck']
             if not f_ck_cube: f_ck_cube = cdata['f_ck_cube']
             if not f_cm     : f_cm      = cdata['f_cm']

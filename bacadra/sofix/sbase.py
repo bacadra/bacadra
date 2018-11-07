@@ -2,7 +2,7 @@
 # import ctypes
 # from ctypes import c_int
 #
-# from . import ssodb
+# from . import rdbse
 
 import os
 import platform
@@ -11,7 +11,7 @@ import copy
 
 from ctypes import c_int
 
-from . import ssodb
+from . import rdbse
 from . import verrs
 
 
@@ -231,29 +231,29 @@ class sbase:
             if preset == 'nodes':
                 if not kwh : kwh  = 20
                 if not kwl : kwl  = 0
-                if not data: data = ssodb.cnode
+                if not data: data = rdbse.cnode
             elif preset == 'sect':
                 if not kwh : kwh  = 9
                 if not kwl : kwl  = 0
-                if not data: data = ssodb.csect
+                if not data: data = rdbse.csect
             elif preset == 'beams':
                 if not kwh : kwh  = 100
                 if not kwl : kwl  = 0
-                if not data: data = ssodb.cbeam
+                if not data: data = rdbse.cbeam
             elif preset == 'nodes_results':
                 if not kwh : kwh  = 24
                 # kwl: here kwl mind loadcase number, so user must input it
-                if not data: data = ssodb.cn_dispc
+                if not data: data = rdbse.cn_dispc
             elif preset == 'beam_forces':
                 if not kwh : kwh  = 102
-                if not data: data = ssodb.cbeam_foc
+                if not data: data = rdbse.cbeam_foc
             elif preset == 'sto':
                 if not kwh : kwh  = 0
                 if not kwl : kwl  = 100
-                if not data: data = ssodb.cctrl_var
+                if not data: data = rdbse.cctrl_var
 
             elif type(data) == str:
-                exec(f'data = ssodb.{data}')
+                exec(f'data = rdbse.{data}')
             else:
                 raise ValueError('Unknow preset settings')
 

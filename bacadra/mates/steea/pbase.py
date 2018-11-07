@@ -1,7 +1,7 @@
 import math
 from ...cunit.system.ce import MPa,mm,GPa
 
-class mdata:
+class pbase:
     def __init__(self):
         pass
 

@@ -1,15 +1,9 @@
-from .linex import linex
+from ..tools.rootx import rootx
 
 #$ class index
-class index:
+class index(rootx):
     #$$ --init--
     def __init__(self, core):
+        from .linex import linex
+
         self.linex  = linex.linex(core=core)
-
-    #$$ def --enter--
-    def __enter__(self):
-        return self
-
-    #$$ def --exit--
-    def __exit__(self, type, value, traceback):
-        pass

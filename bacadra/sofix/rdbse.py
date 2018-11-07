@@ -1,3 +1,7 @@
+'''
+***** (R)elational (d)ata(b)ase (s)chem(e) ****
+'''
+
 from ctypes import *
 
 class bStructure(Structure):

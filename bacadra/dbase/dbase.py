@@ -2,7 +2,7 @@
 ------------------------------------------------------------------------------
 bacadra-dbase
 ==============================================================================
-Database tools set, including table ssodb and parse functions.
+Database tools set, including table rdbse and parse functions.
 
 ------------------------------------------------------------------------------
 Copyright (C) 2018 bacadra <bacadra@gmail.com>
@@ -15,7 +15,7 @@ Team members who develop this file:
 import sqlite3
 
 from . import verrs
-from . import ssodb
+from . import rdbse
 from . import parse
 
 
@@ -196,10 +196,10 @@ class dbase:
     #$$ def create-system
     def create_system(self):
         '''
-        Call to ssodb class in ssodb.py file.
+        Call to rdbse class in rdbse.py file.
         '''
         self._check_connection()
-        self.exes(ssodb.ssodb.code)
+        self.exes(rdbse.rdbse.code)
 
     #$$ def parse
     @staticmethod

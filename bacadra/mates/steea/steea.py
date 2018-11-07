@@ -1,23 +1,14 @@
-import pandas as pd
-
-from .  import mdata
-from .. import umate
-
+from .  import pbase
 from ...cunit import cunit
 
 class steea:
     #$$ def --init--
     def __init__(self, core):
         self.core = core
+
+        from ..umate import umate
         self._umate = umate.umate(core=core)
 
-    #$$ def --enter--
-    def __enter__(self):
-        return self
-
-    #$$ def --exit--
-    def __exit__(self, type, value, traceback):
-        pass
 
     #$$ def add
     def add(self,
@@ -29,7 +20,7 @@ class steea:
     f_yk=None, f_uk =None, E_a=None, ε_yk=None, ε_uk=None, γ_M0=None, γ_M1=None, γ_M2=None, γ_M3=None, γ_M4=None, γ_M5=None, γ_M6=None):
 
         if cclass:
-            cdata = mdata.mdata().get(cclass)
+            cdata = pbase.pbase().get(cclass)
             if not f_yk     : f_yk      = cdata['f_yk']
             if not f_uk     : f_uk      = cdata['f_uk']
             if not E_a      : E_a       = cdata['E_a']
@@ -83,19 +74,3 @@ class steea:
             data  = data,
         )
 
-
-    def echo(self):
-        from tabulate import tabulate
-        df = pd.read_sql_query(
-            "SELECT [id],[cclass],[f_yk],[E_a] FROM [013:mates:steea]",
-            self.core.dbase.cb)
-
-        df.to_html('test.html')
-        print(tabulate(df.values,df.columns, tablefmt="pipe"))
-        from tabulate import tabulate
-        print(tabulate(df, tablefmt="markdown", headers="keys"))
-
-        # df.to_csv("test.md", tablefmt="markdown", headers="keys")
-        return df
-        # data = self.core.dbase.get('SELECT * FROM [013:mates:steea]')
-        # return data

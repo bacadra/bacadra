@@ -1,5 +1,5 @@
 
-class soils:
+class soile:
     #$$ def --init--
     def __init__(self, core):
         self.core = core

@@ -1,5 +1,5 @@
 #$ class index
-class root_index:
+class rootx:
     #$$ --init--
     def __init__(self):
         pass

@@ -11,7 +11,7 @@ from . import cjkwrap
 #$ class rstme
 class rstme:
     #$$ def --init--
-    def __init__(self, core, path=None):
+    def __init__(self, core=None, path=None):
         self.core = core
 
         # active mode
@@ -22,7 +22,7 @@ class rstme:
 
         # path to created file
         if path is None:
-            if self.core.dbase._connection:
+            if self.core:
                 path = os.path.splitext(self.core.dbase.path)[0] + '.brst'
             else:
                 self.path = path

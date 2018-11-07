@@ -1,6 +1,9 @@
+# single instance packages
 from .cunit import cunit
-from .pinky.texme.texme import texme
-from .pinky.rstme.rstme import rstme
+from . import pinky
 from . import sofix
+from . import tools
+
+# project
 from .project import project
 

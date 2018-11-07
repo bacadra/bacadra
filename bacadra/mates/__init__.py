@@ -1,21 +1,15 @@
-from .umate import umate
-from .conce import conce
-from .steea import steea
-from .soils import soils
+from ..tools.rootx import rootx
 
 #$ class index
-class index:
+class index(rootx):
     #$$ --init--
     def __init__(self, core):
+        from .umate import umate
+        from .conce import conce
+        from .steea import steea
+        from .soile import soile
+
         self.umate = umate.umate(core=core)
         self.conce = conce.conce(core=core)
         self.steea = steea.steea(core=core)
-        self.soils = soils.soils(core=core)
-
-    #$$ def --enter--
-    def __enter__(self):
-        return self
-
-    #$$ def --exit--
-    def __exit__(self, type, value, traceback):
-        pass
+        self.soile = soile.soile(core=core)

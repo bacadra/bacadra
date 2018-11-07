@@ -82,7 +82,7 @@ frinkelpi:
 import sys
 import unicodedata
 
-import cjkwrap
+from . import cjkwrap
 def textwrapper(txt, width):
     return cjkwrap.wrap(txt, width)
 

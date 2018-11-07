@@ -60,7 +60,7 @@ p = bcdr.project()
 
 ## `dbase` class
 
-The main goal of `dbase` class is provide interface to work with SQLite relational database. We can create local database (extension `.bcdr` recommended) or create it in memory (`.path = :memory:`).
+The main goal of `dbase` class is provide interface to work with SQLite relational database. We can create local database (extension `.bcdr` recommended) or create it in memory (`.path = ":memory:"`).
 
 ~~~
 p.dbase.path = 'main.bcdr'
@@ -69,4 +69,4 @@ p.dbase.connect()
 p.dbase.close()
 ~~~
 
-While database is creating, the full table relative ssodb is creating.
+While database is creating, the full table relative rdbse is creating.
