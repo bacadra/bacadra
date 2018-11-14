@@ -49,7 +49,7 @@ regme_textstyle5 = regex.compile(r'\\(?:mm|tm)'+bm)
 
 
 
-class RegME:
+class regme:
     #$$ def --init--
     def __init__(self, text='', dict={}):
         self.text = text
@@ -58,8 +58,7 @@ class RegME:
 
 
     #$$ def math_inline
-    def math_inline(self,
-        RegMEFunctions):
+    def math_inline(self, RegMEFunctions):
         '''Detect math in string.'''
         a = [self.text.find('$')]
         i = 0

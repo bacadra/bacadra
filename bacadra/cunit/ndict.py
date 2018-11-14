@@ -51,18 +51,54 @@ class ndict:
 #$$ ________ def str2dict __________________________________________________ #
 
     @staticmethod
-    def str2dict(txt):
+    def str2dict(txt, othe=None):
         cdict = {}
+        txt = txt.replace('**','^').replace('*',' ')
         txt = txt.split(' ')
         for val in txt:
-            n = val.find('**')
+            if val == '':
+                continue
+            n = val.find('^')
             if n == -1:
                 txt1 = [val, '1']
             else:
-                txt1 = val.split('**')
-            cdict.update({txt1[0]:txt1[1]})
-        for key,value in cdict.items():
-            cdict[key] = eval(value)
+                txt1 = val.split('^')
+
+            # here is convert if user want to present unit of multiple same val
+            # first find and save position of last slash
+            # this way - slash is protected symbol in package!!!
+            lvl = txt1[0].rfind('/')
+
+            # if othe object is defined and if base key (without slash) is defined then go to procedure
+            if othe and txt1[0][lvl+1:] in othe.base:
+
+                # here is clue, if slash unit is not defined, then define it
+                if not txt1[0] in othe.base:
+
+                    # first get base-non-slash unit
+                    inherit_unit = othe.base[txt1[0][lvl+1:]]
+
+                    # if base-non-slash unit is base unit, then create pattern to call exacly base unit
+                    if inherit_unit is None:
+                        othe.add(
+                            name=txt1[0],
+                            value=1,
+                            units={txt1[0][lvl+1:]:1},
+                        )
+                        inherit_unit = (1, None)
+
+                    # if unit is not base unit, then copy definition of non-slash cunit
+                    else:
+                        othe.add(
+                            name=txt1[0],
+                            value=inherit_unit[0],
+                            units=inherit_unit[1],
+                        )
+
+            if txt1[0] in cdict:
+                cdict[txt1[0]] += eval(txt1[1])
+            else:
+                cdict.update({txt1[0]:eval(txt1[1])})
         return cdict
 
 

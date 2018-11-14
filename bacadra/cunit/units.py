@@ -170,14 +170,37 @@ class cunit(object, metaclass=cunitmeta):
 
         # check overwrite flag
         if (not overwrite) and (name in cunit.base):
+
+            # if flag if False and name alredy exists, then raise error
             verrs.f3CunitSystemError(cunit._system, name)
 
         # extend base dict
         cunit.base.update({name:(value, units)})
 
-
         # retur cunit object
         return cunit(name)
+
+
+#$$ ________ def rem _______________________________________________________ #
+
+    @staticmethod
+    def rem(name, silent=True):
+        '''
+        Delete unit from current system. If silent is True, then no error occur if name not occur in self.base too.
+        '''
+
+        # first check if name is exists in self.base
+        if name in cunit.base:
+
+            # the fastest method of delete key is del statment
+            del cunit.base[name]
+
+        # if not exists, then check silent flag
+        elif not silent:
+
+            # if silent if False, then raise error
+            raise ValueError('name not in base')
+
 
 #$$ ________ def primary ___________________________________________________ #
 
@@ -235,9 +258,9 @@ class cunit(object, metaclass=cunitmeta):
         return cunit(cval, cdict)
 
 
-#$$ ________ def convert / iconvert ________________________________________ #
+#$$ ________ def convert ___________________________________________________ #
 
-    def convert(self, units, fcover=False, inplace=False):
+    def convert(self, units, fcover=False, post=True, inplace=False):
         '''
         Convert unit to other one. Convert is not in-place method!. If fcover flags is True, then units must cover in all current _units. New units can be input as dict, as string or as cunit. Be aware! if you have units "MPa" it is high risk that is defined by base value, so the convert will not work then!
         '''
@@ -245,7 +268,7 @@ class cunit(object, metaclass=cunitmeta):
         # check type of new units
         # if is typed as string then convert string to dict
         if type(units) == str:
-            units = ndict.str2dict(units)
+            units = ndict.str2dict(txt=units, othe=self)
         # if it is type as cunit then get _units from them
         elif type(units) == cunit:
             units = units._units
@@ -265,6 +288,7 @@ class cunit(object, metaclass=cunitmeta):
                 # raise error
                 verrs.f1CunitCoverError(val)
 
+        # check inplace flag
         if inplace:
             self._value = val._value
             self._units = ndict.dsum(units, val._units)
@@ -273,16 +297,6 @@ class cunit(object, metaclass=cunitmeta):
         else:
             # if anythink is ok then return NEW cunit
             return cunit(val._value, ndict.dsum(units, val._units))
-
-
-
-    def iconvert(self, units, fcover=False):
-        '''
-        Convert object in-place. All other behaviours are inherit from convert method.
-        '''
-
-        # return convert method with inplcase=True flags
-        return self.convert(units, fcover, inplace=True)
 
 
 
@@ -327,24 +341,29 @@ class cunit(object, metaclass=cunitmeta):
 
 #$$ ________ def edit ______________________________________________________ #
 
-    def edit(self, units=None, acc=None, style=None):
+    def edit(self, units=None, acc=None, style=None, fcover=False, post=True):
         '''
         Change self in-place like acc, style or units.
         '''
-        if acc:   self.acc  = acc
-        if style:  self.style = style
-        if units: self.iconvert(units)
+        if units: self.convert(
+            units=units, fcover=fcover, inplace=True)
+        if acc  : self.acc   = acc
+        if style: self.style = style
         return self
-
+    e = edit
 
 #$$ ________ def show ______________________________________________________ #
 
-    def show(self, units=None, acc=None, style=None):
+    def show(self, units=None, acc=None, style=None, fcover=False, post=True):
         '''
         Change self only to print, like acc, style or units.
         '''
-        return self.copy().edit(acc=acc, units=units, style=style)
-
+        if units: othe = self.convert(
+            units=units, fcover=fcover, inplace=False)
+        if acc  : othe.acc   = acc
+        if style: othe.style = style
+        return othe
+    s = show
 
 #$$ ________ magic behaviour _______________________________________________ #
 #$$$ ____________ def --add-- / --radd-- / --iadd-- / --pos-- ______________ #
@@ -758,7 +777,8 @@ class cunit(object, metaclass=cunitmeta):
             # significant numbers
             if acc[1]:
                 # TODO: verify how numbers are rounded, ceil, floor or what?
-                value = round(value, -int(math.floor(math.log10(abs(value)))) + (acc[1]-1))
+                if value != 0:
+                    value = round(value, -int(math.floor(math.log10(abs(value)))) + (acc[1]-1))
 
             if int(value) == value:
                 value = int(value)
@@ -797,6 +817,8 @@ class cunit(object, metaclass=cunitmeta):
 
         # loop over units row in dictonary
         for u_str, u_val in self._units.items():
+
+            u_str = u_str[u_str.rfind('/')+1:]
 
             # if-block depend on power
             # if power is zero, then pass
@@ -841,6 +863,8 @@ class cunit(object, metaclass=cunitmeta):
         # loop over units row in dictonary
         for u_str, u_val in self._units.items():
 
+            u_str = u_str[u_str.rfind('/')+1:]
+
             # if-block depend on power
             # if power is zero, then pass
             if   u_val==0 : pass
@@ -883,6 +907,8 @@ class cunit(object, metaclass=cunitmeta):
 
         # loop over units row in dictonary
         for u_str, u_val in self._units.items():
+
+            u_str = u_str[u_str.rfind('/')+1:]
 
             # if-block depend on power
             # if power is zero, then pass
@@ -1214,8 +1240,8 @@ class cunit(object, metaclass=cunitmeta):
 
 #$$ ________ @property convert _______________________________________________ #
 
-    for key,val in base.items():
-        command = ("@property\n"
-                   "def  _" + str(key) + "(self):\n"
-                   "   return self.convert({'" + str(key) + "':1})")
-        exec(command)
+    # for key,val in base.items():
+    #     command = ("@property\n"
+    #                "def  _" + str(key) + "(self):\n"
+    #                "   return self.convert({'" + str(key) + "':1})")
+    #     exec(command)

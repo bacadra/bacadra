@@ -12,6 +12,7 @@ class setts:
             '_lcase_ldef'   : None,
             '_mates_ldef'   : None,
             '_usec1_ldef'   : None,
+            'scope'         : {},
             'nodes_fix'     : None,
             'system_space'  : None,
             'node_tol'      : 0.01*cunit('m'),

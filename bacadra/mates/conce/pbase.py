@@ -1,23 +1,40 @@
 import math
+
+from . import verrs
+
 from ...cunit.system.ce import MPa
 
-class mdata:
-    def __init__(self):
-        pass
 
-    def get(self, name):
+class pbase:
+    def __init__(self):
+        self.cdata = None
+
+    @classmethod
+    def set(self, grade, **kwargs):
         '''
         User input name pattern, eg. C30, then method return valide dict with parametrs.
         '''
 
         # if name start with C then return en-1992 concrete params.
-        if name[0] == 'C':
-            f_ck = eval(name[1:])*MPa
-            return self._en_1992_C(f_ck=f_ck)
+        if grade.lower() == 'c':
+            self.cdata = self._en_1992_C(**kwargs)
+
+        else:
+            verrs.f1_BCDR_mates_conce_Error(grade)
+
+
+    @classmethod
+    def get(self, var, name):
+        if var is None:
+            if name in self.cdata:
+                return self.cdata[name]
+        else:
+            return var
 
 
 #$$ ________ en 1992 _______________________________________________________ #
 
+    @classmethod
     def _en_1992_C(self, f_ck=None, f_ck_cube=None):
         '''
         Return standard concrete (Cnn/nn) parameters according to EN 1992.
@@ -32,6 +49,15 @@ class mdata:
         # elif user input only f_ck_cube
         elif f_ck_cube and not f_ck:
             f_ck = f_ck_cube / 1.25
+
+
+        # print error if value of compressive strength is over max value
+        if f_ck > 90*MPa:
+            pass
+
+        if f_ck_cube > 105*MPa:
+            pass
+
 
         # medium compressive strength
         f_cm = f_ck + 8*MPa

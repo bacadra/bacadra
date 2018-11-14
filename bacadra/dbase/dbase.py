@@ -38,6 +38,17 @@ class dbase:
         self._connection = False      # flag (True|False) of database connection
                                       # init state is False of course
 
+        self._scope = {}
+
+    @property
+    def scope(self):
+        return self._scope
+
+    @scope.setter
+    def scope(self, value):
+        [self._scope.pop(key) for key in self._scope.keys()]
+        self._scope.update(value)
+
     #$$ def --enter--
     def __enter__(self):
         return self
@@ -54,7 +65,13 @@ class dbase:
         '''
 
         # if user use path, then create local copy of db; otherwise :memory:
-        if path:     self.path = path
+        if path:
+            # if user defined other extension than bcdr, then add it to name
+            if path[-5] is not '.bcdr':
+                path = path + '.bcdr'
+            # save name in object atribute
+            self.path = path
+
 
         # first check if connection is established
         if not self._connection:

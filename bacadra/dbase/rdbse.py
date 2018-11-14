@@ -158,7 +158,7 @@ class rdbse:
     code += '   NOT NULL REFERENCES [011:mates:umate] ([id]),'
 
     # klasa betonu
-    code += '[cclass] TEXT,'
+    code += '[grade] TEXT,'
 
     # Characteristic compressive cylinder strength of concrete at 28 days
     code += '[f_ck] REAL,'
@@ -255,7 +255,7 @@ class rdbse:
     code += '   NOT NULL REFERENCES [011:mates:umate] ([id]),'
 
     # klasa stali
-    code += '[cclass] TEXT,'
+    code += '[grade] TEXT,'
 
     # max thickness
     code += '[max_t] REAL,'

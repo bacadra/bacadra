@@ -17,7 +17,7 @@ class rstme:
         # active mode
         self.active = True
 
-        # automaticly call to echo method after all built method
+        # automaticly call to msg method after all built method
         self.display = False
 
         # path to created file
@@ -34,50 +34,49 @@ class rstme:
         self.width = 80
 
         # last one used command, its helpful to stylish file
-        self._last_type = None
+        self.__last_type = None
 
-    #$$ def --enter--
-    def __enter__(self):
-        return self
-
-    #$$ def --exit--
-    def __exit__(self, type, value, traceback):
-        pass
 
     #$$ def -add
-    def _add(self, name, code, inherit=False):
+    def add(self, code, name=None, inherit=False):
         if self.active:
             if inherit is True:
                 return code
             elif inherit is False:
                 self.buffer += [code + '\n\n']
             elif inherit == 'print':
-                self.echo(name, code)
+                self.msg(name, code)
+
+
+    #$$ def msg
+    def msg(self, module=None, code=None):
+        print(f'[pinky.rstme.{module}]\n{code}')
+
 
     #$$ def clear-buffer
     def clear_buffer(self):
         self.buffer = []
 
+
     def clear_file(self):
         open(self.path, 'w').close()
+
 
     #$$ def save
     def save(self, mode='a'):
         with open(self.path, mode, encoding='utf-8') as f:
             f.writelines(self.buffer)
 
+
     #$$ def push
     def push(self, mode='a'):
         self.save(mode=mode)
         self.clear_buffer()
 
-    #$$ def echo
-    def echo(self, module=None, code=None):
-        print(f'[pinky.rstme.{module}]\n{code}')
 
+    #$$ generate methods
 
-
-    #$$ def text
+    #$$$ def text
     def text(self, text, strip=True, wrap=True, inherit=False):
         '''
         '''
@@ -103,9 +102,11 @@ class rstme:
             code = text
 
         self._last_TeXM = 'x'
-        return self._add('text', code, inherit)
+        return self.add('text', code, inherit)
     x = text
 
+
+    #$$$ def head
     def head(self, lvl, text, inherit=False):
         '''
         # with overline, for parts
@@ -140,9 +141,11 @@ class rstme:
         )
 
         self._last_TeXM = 'h'
-        return self._add('head', code, inherit)
+        return self.add('head', code, inherit)
     h = head
 
+
+    #$$$ def math
     def math(self, equation, mode='p', center=False, inherit=False):
         if mode == 'p':
             code = sp.pretty(parse_expr(equation, evaluate=False), use_unicode=False)
@@ -161,11 +164,11 @@ class rstme:
             code = '\n'.join(code_div)
 
         self._last_TeXM = 'm'
-        return self._add('math', code, inherit)
+        return self.add('math', code, inherit)
     m = math
 
 
-    #$$ def add
+    #$$$ def add
     def table(self, data, header=None, width=None, halign=None, valign=None, dtype=None, wrap=True, caption=None, precision=None, border=None, inherit=False):
         table = texttable.Texttable()
         table.wrap = wrap
@@ -188,10 +191,11 @@ class rstme:
             code = '#t Tab. ' + caption + '\n' + code
 
         self._last_TeXM = 't'
-        return self._add('table', code, inherit)
+        return self.add('table', code, inherit)
     t = table
 
-    #$$ def code
+
+    #$$$ def code
     def code(self, code, language = None, inherit = None):
         pass
 

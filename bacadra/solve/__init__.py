@@ -4,4 +4,5 @@ from ..tools.rootx import rootx
 class index(rootx):
     #$$ --init--
     def __init__(self, core):
-        pass
+        from . import genea
+        self.genea = genea.genea(core=core)
