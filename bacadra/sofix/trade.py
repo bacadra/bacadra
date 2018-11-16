@@ -1,4 +1,6 @@
 import os
+import subprocess
+
 from . import sbase
 from ..cunit import cunit
 
@@ -9,14 +11,15 @@ class trade:
     sbase = sbase()
 
     #$$ def --init--
-    def __init__(self, project='sofi', dat='i_main.dat', cdb='p_main.cdb', active=True):
-        self._xdata_sto = []
-        self._xdata_del = []
-        self._xdata_def = []
-        self.active=active
-        self.project = project
-        self.cdb = cdb
-        self.dat = dat
+    def __init__(self, cdb='c_main.cdb', name='x_main.dat', active=True):
+        self.active    = active
+        self.cdb       = cdb
+        self.name      = name
+
+        self._data_sto = []
+        self._data_del = []
+        self._data_def = []
+
 
     #$$ def sto
     def sto(self, name, val, comment=None):
@@ -27,9 +30,9 @@ class trade:
         if type(val) == cunit:
             val = val.drop()
         elif type(val) == list:
-            val = str(val)[1:-1].replace(' ','')
-        self._xdata_del.append('del#{0}'.format(name))
-        self._xdata_sto.append('sto#{0} {1}{2}'.format(name, val, comment))
+            val = str(val)[1:-1].replace(', ',' $$\n')
+        self._data_del.append('del#{0}'.format(name))
+        self._data_sto.append('sto#{0} {1}{2}'.format(name, val, comment))
         return val
 
     #$$ def defb
@@ -38,7 +41,7 @@ class trade:
             comment = '$$ ' + comment + '\n'
         else:
             comment = ''
-        self._xdata_def.append('''#define {0}\n{2}{1}\n#enddef'''.format(name, val, comment))
+        self._data_def.append('''#define {0}\n{2}{1}\n#enddef'''.format(name, val, comment))
         return val
 
     #$$ def defi
@@ -47,23 +50,28 @@ class trade:
             comment = '$$ ' + comment + '\n'
         else:
             comment = ''
-        self._xdata_def.append('''#define {0}={1}'''.format(name, val))
+        self._data_def.append('''#define {0}={1}'''.format(name, val))
         return val
 
     #$$ def push
     def push(self):
-        pathd = os.path.join(self.project, self.dat)
-        temp  = os.path.join(self.project, os.path.splitext(self.dat)[0])
+
+        temp  = os.path.join(
+            os.path.dirname(self.cdb),
+            os.path.splitext(self.name)[0]
+        )
+
+        pathd = temp + '.dat' # main file
         path0 = temp + '.$d0' # plik define
         path1 = temp + '.$d1' # plik sto
         path2 = temp + '.$d2' # plik del
 
-        data0 = '\n'.join(self._xdata_def)
-        data1 = '\n'.join(self._xdata_sto)
-        data2 = '\n'.join(self._xdata_del)
+        data0 = '\n'.join(self._data_def)
+        data1 = '\n'.join(self._data_sto)
+        data2 = '\n'.join(self._data_del)
 
-        if not os.path.exists(self.project):
-            os.makedirs(self.project)
+        if not os.path.exists(os.path.dirname(self.cdb)):
+            os.makedirs(os.path.dirname(self.cdb))
 
         with open(path0, 'w') as f: f.write(data0)
         with open(path1, 'w') as f: f.write(data1)
@@ -71,7 +79,7 @@ class trade:
 
         temp = '''
 $ --------- set defines ----------------------------------------------------- $
-{data0}
+#include "{data0}"
 
 $ --------------------------------------------------------------------------- $
 +prog template
@@ -79,25 +87,28 @@ head bcdr:pinky
 dbg#2 $ debugging mode turn on
 
 $ --------- delete variables ------------------------------------------------ $
-{data2}
+#include "{data2}"
 
 $ --------- set variables --------------------------------------------------- $
-{data1}
+#include "{data1}"
 
 $ --------------------------------------------------------------------------- $
 end
 '''[1:-1].format(**{
-            'data0':data0,
-            'data1':data1,
-            'data2':data2})
+            'data0':os.path.splitext(self.name)[0]+'.$d0',
+            'data1':os.path.splitext(self.name)[0]+'.$d1',
+            'data2':os.path.splitext(self.name)[0]+'.$d2'})
         with open(pathd, 'w') as f: f.write(temp)
 
     #$$ def make
     def make(self):
         self.push()
         code = 'cmd /c pushd "{p0}" & "{p1}" -cdb:"{p2}" "{p3}"'.format(**{
-            'p0': os.path.abspath(self.project),
-            'p1': os.path.join(sofi_env, sofi_sps).replace('/', '\\'),
-            'p2': self.cdb,
-            'p3': self.dat})
+            'p0': os.path.abspath(os.path.dirname(self.cdb)),
+            'p1': os.path.join(
+                self.sbase._sofi_env,
+                self.sbase._sofi_run,
+            ).replace('/', '\\'),
+            'p2': os.path.basename(self.cdb),
+            'p3': self.name})
         subprocess.run(code)

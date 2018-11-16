@@ -59,6 +59,7 @@ class sbase:
         else:
             self._sofi_run = path
         os.path.exists(os.path.join(self._sofi_env, self._sofi_run))
+        return self._sofi_run
 
     @classmethod
     def sofi_urs(self, path=None):
@@ -71,6 +72,7 @@ class sbase:
         else:
             self._sofi_urs  = path
         os.path.exists(os.path.join(self._sofi_env, self._sofi_urs))
+        return self._sofi_urs
 
     @classmethod
     def sofi_dll(self, ver_edu=True):
