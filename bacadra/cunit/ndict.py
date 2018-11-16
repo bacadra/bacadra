@@ -1,4 +1,4 @@
-
+from . import units
 
 #$ ____ class ndict ________________________________________________________ #
 
@@ -99,6 +99,7 @@ class ndict:
                 cdict[txt1[0]] += eval(txt1[1])
             else:
                 cdict.update({txt1[0]:eval(txt1[1])})
+
         return cdict
 
 

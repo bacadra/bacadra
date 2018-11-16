@@ -18,24 +18,27 @@ class project(rootx):
             mdata = self.mdata
             pinky = self.pinky
 
-        from . import mates as mates
+        from . import mates
         self.mates = mates.index(core=core)
 
-        from . import usect as usect
+        from . import usect
         self.usec1 = usect.index(core=core).usec1
         self.usec2 = usect.index(core=core).usec2
         self.usec3 = usect.index(core=core).usec3
 
-        from . import geomx as geomx
+        from . import geomx
         self.geomf = geomx.index(core=core).geomf
         self.geoms = geomx.index(core=core).geoms
         self.geome = geomx.index(core=core).geome
 
-        from . import loads as loads
+        from . import loads
         self.loads = loads.index(core=core)
 
-        from . import mosas as mosas
+        from . import mosas
         self.mosas = mosas.index(core=core)
 
-        from . import solve as solve
+        from . import solve
         self.solve = solve.index(core=core)
+
+        from . import rrfbs
+        self.rrfbs = rrfbs.index(core=core)

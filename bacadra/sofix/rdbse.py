@@ -1,5 +1,5 @@
 '''
-***** (R)elational (d)ata(b)ase (s)chem(e) ****
+***** (R)elational (d)ata(b)ase (s)chem(e) *****
 '''
 
 from ctypes import *

@@ -22,6 +22,24 @@ class cunitmeta(type):
         cls.base = eval('cls.base_'+value)
         cls._system = value
 
+#$ class cunit_range
+class crange:
+    def __init__(self, unit=1, val1=None, val2=None, val3=None):
+        if type(val1) is cunit: val1 = int(val1.d(unit))
+        if type(val2) is cunit: val2 = int(val2.d(unit))
+        if type(val3) is cunit: val3 = int(val3.d(unit))
+
+        if val1 is not None and val2 is not None and val3 is not None:
+            data = range(val1, val2, val3)
+        elif val1 is not None and val2 is not None:
+            data = range(val1, val2)
+        elif val1 is not None:
+            data = range(val1)
+
+        self.value = [cunit(val, unit) for val in data]
+
+    def __iter__(self):
+        return (x for x in self.value)
 
 
 #$ ____ class cunit ________________________________________________________ #
@@ -79,6 +97,7 @@ class cunit(object, metaclass=cunitmeta):
         'm'   : (None                                       ),
         'C'   : (None                                       ),
         's'   : (None                                       ),
+        '%'   : (0.01,          {}                          ),
         'rad' : (1,             {}                          ),
         'mrad': (0.001,         {}                          ),
         'deg' : (math.pi/180,   {}                          ),
@@ -246,7 +265,7 @@ class cunit(object, metaclass=cunitmeta):
             if base_value:
 
                 # multiply value by unit value
-                cval *= base_value[0]
+                cval *= base_value[0] ** val
 
                 # delete key from dictonary
                 cdict.pop(key, None)
@@ -297,12 +316,12 @@ class cunit(object, metaclass=cunitmeta):
         else:
             # if anythink is ok then return NEW cunit
             return cunit(val._value, ndict.dsum(units, val._units))
-
+    c = convert
 
 
 #$$ ________ def drop ______________________________________________________ #
 
-    def drop(self, units=None, fcover=False, system=None):
+    def drop(self, units=None, fcover=True, system=None):
         '''
         Drop unit and return value alone. If dropped pattern unit is not explicit defined, then drop as system base. Is system is not explicited defined then use current system.
         '''
@@ -327,7 +346,7 @@ class cunit(object, metaclass=cunitmeta):
                 verrs.f1CunitCoverError(str(val._units))
 
         return val._value
-
+    d = drop
 
 
 #$$ ________ def copy ______________________________________________________ #
@@ -358,12 +377,25 @@ class cunit(object, metaclass=cunitmeta):
         '''
         Change self only to print, like acc, style or units.
         '''
-        if units: othe = self.convert(
-            units=units, fcover=fcover, inplace=False)
+        othe = self.copy()
+        if units: othe.convert(
+            units=units, fcover=fcover, inplace=True)
         if acc  : othe.acc   = acc
         if style: othe.style = style
         return othe
     s = show
+
+#$$ ________ def unit ______________________________________________________ #
+
+    def unit(self):
+        return cunit(1, self._units)
+
+#$$ ________ def range _____________________________________________________ #
+
+    @staticmethod
+    def range(unit={}, val1=None, val2=None, val3=None):
+        return crange(unit=unit, val1=val1, val2=val2, val3=val3)
+    crange = crange
 
 #$$ ________ magic behaviour _______________________________________________ #
 #$$$ ____________ def --add-- / --radd-- / --iadd-- / --pos-- ______________ #
@@ -1245,3 +1277,5 @@ class cunit(object, metaclass=cunitmeta):
     #                "def  _" + str(key) + "(self):\n"
     #                "   return self.convert({'" + str(key) + "':1})")
     #     exec(command)
+
+

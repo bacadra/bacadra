@@ -52,3 +52,6 @@ def sqrt(x, n=2):
         return cunit(x._value**(1/n), ndict.vmul(x._units, 1/n))
     else:
         return 1/math.atan(x)
+
+def exp(x):
+    return math.exp(x)
