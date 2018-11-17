@@ -1,3 +1,15 @@
+'''
+------------------------------------------------------------------------------
+BCDR += ***** unit tests of (cunit) module *****
+==============================================================================
+
+------------------------------------------------------------------------------
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Team members developing this package:
+    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+------------------------------------------------------------------------------
+'''
+
 import unittest
 import bacadra as bcdr
 from bacadra.cunit.ce    import *

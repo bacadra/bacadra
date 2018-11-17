@@ -1,3 +1,15 @@
+'''
+------------------------------------------------------------------------------
+BCDR += ***** (v)arious (err)ors *****
+==============================================================================
+
+------------------------------------------------------------------------------
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Team members developing this package:
+    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+------------------------------------------------------------------------------
+'''
+
 class BCDR_mates_conce_Error(Exception):
     pass
 

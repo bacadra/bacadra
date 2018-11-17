@@ -1,3 +1,15 @@
+'''
+------------------------------------------------------------------------------
+BCDR += ***** bacadra FEM (project) *****
+==============================================================================
+
+------------------------------------------------------------------------------
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Team members developing this package:
+    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+------------------------------------------------------------------------------
+'''
+
 from .tools.rootx import rootx
 
 class project(rootx):
@@ -17,6 +29,9 @@ class project(rootx):
             dbase = self.dbase
             mdata = self.mdata
             pinky = self.pinky
+
+        from . import tools
+        self.tools = tools.index(core=core)
 
         from . import mates
         self.mates = mates.index(core=core)
@@ -40,5 +55,5 @@ class project(rootx):
         from . import solve
         self.solve = solve.index(core=core)
 
-        from . import rrfbs
-        self.rrfbs = rrfbs.index(core=core)
+        from . import cadob
+        self.cadob = cadob.index(core=core)

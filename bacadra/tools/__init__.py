@@ -1,17 +1,39 @@
-#!/usr/bin/python
-#-*-coding: UTF-8-*-
-from .bsv import bsv
+from .bsver import bsver
+from .rootx import rootx
+from .utile import utile
 
-#$ ____ import _____________________________________________________________ #
+#$ class index
+class index(rootx):
+    #$$ --init--
+    def __init__(self, core):
+        self.core = core
+        self.sub_init('utile', core)
+
+    def sub_add_pattern(self, module):
+        '''
+        Return new object of submodule.
+        '''
+        if module=='utile':
+            return utile(core=self.core)
 
 
 
-#$ ____ function ___________________________________________________________ #
-#$$ ________ def translate _________________________________________________ #
 
+#$ module definition
+
+#$$ def translate
 def translate(text, wordDict):
-    '''Replace string by dict'''
+    '''
+    Replace string by dict.
+    '''
+
+    # loop over keys in dict
     for key in wordDict:
+        # replace text
         text = text.replace(str(key), str(wordDict[key]))
+
+    # return modyfied text
     return text
-    # return text.format(**wordDict)
+
+class struct:
+    pass

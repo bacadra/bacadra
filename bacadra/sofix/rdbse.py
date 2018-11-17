@@ -1,5 +1,13 @@
 '''
-***** (R)elational (d)ata(b)ase (s)chem(e) *****
+------------------------------------------------------------------------------
+BCDR += ***** (r)elational (d)ata(b)ase (s)chem(e) *****
+==============================================================================
+
+------------------------------------------------------------------------------
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Team members developing this package:
+    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+------------------------------------------------------------------------------
 '''
 
 from ctypes import *

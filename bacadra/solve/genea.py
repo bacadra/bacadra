@@ -1,3 +1,15 @@
+'''
+------------------------------------------------------------------------------
+BCDR += ***** (gene)thic (a)lgotirthm *****
+==============================================================================
+
+------------------------------------------------------------------------------
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Team members developing this package:
+    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+------------------------------------------------------------------------------
+'''
+
 import random
 
 class genea:

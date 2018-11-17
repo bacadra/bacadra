@@ -251,6 +251,7 @@ class Texttable:
             * "f": treat as float in decimal format
             * "e": treat as float in exponential format
             * "i": treat as int
+            * "p": treat as floating percent
             * a callable: should return formatted string for any value given
         - by default, automatic datatyping is used for each column
         """
@@ -399,6 +400,16 @@ class Texttable:
         return '%.*f' % (n, cls._to_float(x))
 
     @classmethod
+    def _fmt_percent(cls, x, **kw):
+        """Float formatting class-method.
+        - x parameter is ignored. Instead kw-argument f being x float-converted
+          will be used.
+        - precision will be taken from `n` kw-argument.
+        """
+        n = kw.get('n')
+        return '%.*f %%' % (n, cls._to_float(x)*100)
+
+    @classmethod
     def _fmt_exp(cls, x, **kw):
         """Exponential formatting class-method.
         - x parameter is ignored. Instead kw-argument f being x float-converted
@@ -451,6 +462,7 @@ class Texttable:
             'a':self._fmt_auto,
             'i':self._fmt_int,
             'f':self._fmt_float,
+            'p':self._fmt_percent,
             'e':self._fmt_exp,
             'E':self._fmt_Exp,
             't':self._fmt_text,

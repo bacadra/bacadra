@@ -1,3 +1,15 @@
+'''
+------------------------------------------------------------------------------
+BCDR += ***** create (reg)ular expressions (m)assive (e)nvelope *****
+==============================================================================
+
+------------------------------------------------------------------------------
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Team members developing this package:
+    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+------------------------------------------------------------------------------
+'''
+
 import re
 import regex
 from ... import tools

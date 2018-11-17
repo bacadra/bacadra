@@ -1,5 +1,19 @@
+'''
+------------------------------------------------------------------------------
+BCDR += ***** (u)nit (sect)ions *****
+==============================================================================
+
+------------------------------------------------------------------------------
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Team members developing this package:
+    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+------------------------------------------------------------------------------
+'''
+
+from ..tools.rootx import rootx
+
 #$ class index
-class index:
+class index(rootx):
     #$$ --init--
     def __init__(self, core):
         from . import usec1
@@ -9,11 +23,3 @@ class index:
         self.usec1 = usec1.index(core=core)
         self.usec2 = usec2.index(core=core)
         self.usec3 = usec3.index(core=core)
-
-    #$$ def --enter--
-    def __enter__(self):
-        return self
-
-    #$$ def --exit--
-    def __exit__(self, type, value, traceback):
-        pass

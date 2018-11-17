@@ -1,7 +1,16 @@
+'''
+------------------------------------------------------------------------------
+BCDR += ***** stress (point)s in 1d unit-sections *****
+==============================================================================
 
+------------------------------------------------------------------------------
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Team members developing this package:
+    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+------------------------------------------------------------------------------
+'''
 
-#$ ____ class point ________________________________________________________ #
-
+#$ class point
 class point:
     #$$ def --init--
     def __init__(self, core):

@@ -1,3 +1,16 @@
+'''
+------------------------------------------------------------------------------
+BCDR += ***** eurocode (en) (155)28 *****
+==============================================================================
+
+------------------------------------------------------------------------------
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Team members developing this package:
+    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+------------------------------------------------------------------------------
+'''
+
+
 import math
 import matplotlib as mpl
 import matplotlib.pyplot as plt

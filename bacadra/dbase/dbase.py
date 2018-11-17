@@ -1,14 +1,13 @@
 '''
 ------------------------------------------------------------------------------
-bacadra-dbase
+BCDR += ***** (d)ata(base) ceneter *****
 ==============================================================================
 Database tools set, including table rdbse and parse functions.
 
-------------------------------------------------------------------------------
-Copyright (C) 2018 bacadra <bacadra@gmail.com>
-Team members who develop this file:
-- Sebastian Balcerowiak <asiloisad; asiloisad.93@gmail.com>
-
+==============================================================================
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Team members developing this package:
+    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
 

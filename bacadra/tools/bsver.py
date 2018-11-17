@@ -1,3 +1,15 @@
+'''
+------------------------------------------------------------------------------
+BCDR += ***** (b)acadra (s)ystem (ver)sion *****
+==============================================================================
+
+------------------------------------------------------------------------------
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Team members developing this package:
+    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+------------------------------------------------------------------------------
+'''
+
 import shutil
 import datetime
 import os
@@ -9,13 +21,7 @@ from ..cunit.units import cunit
 
 #$ ____ class baclup _______________________________________________________ #
 
-class bsv:
-    '''
-    bacadra.tools.bsv
-    =================
-    bacadra system version
-    ----------------------
-    '''
+class bsver:
 
     def __init__(self, source='.', destination='backup', description=None, exclude=[''], name=None, active=True, gitignoreQ=True, dtime=cunit(0, 's'), id=None):
         self.active      = active

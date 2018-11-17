@@ -1,3 +1,15 @@
+'''
+------------------------------------------------------------------------------
+BCDR += ***** create (r)e(s)ructured (t)ext (m)assive (e)nvelope *****
+==============================================================================
+
+------------------------------------------------------------------------------
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Team members developing this package:
+    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+------------------------------------------------------------------------------
+'''
+
 import os
 import numpy as np
 import sympy as sp
@@ -69,7 +81,9 @@ class rstme:
 
 
     #$$ def push
-    def push(self, mode='a'):
+    def push(self, mode='a', path=None):
+        if path:
+            self.path = path
         self.save(mode=mode)
         self.clear_buffer()
 
@@ -191,7 +205,12 @@ class rstme:
             code = '#t Tab. ' + caption + '\n' + code
 
         self._last_TeXM = 't'
-        return self.add('table', code, inherit)
+
+        return self.add(
+            name    = 'table',
+            code    = code,
+            inherit = inherit,
+        )
     t = table
 
 
