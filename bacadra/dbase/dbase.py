@@ -66,7 +66,7 @@ class dbase:
         # if user use path, then create local copy of db; otherwise :memory:
         if path:
             # if user defined other extension than bcdr, then add it to name
-            if path[-5] is not '.bcdr':
+            if path[-5:] != '.bcdr':
                 path = path + '.bcdr'
             # save name in object atribute
             self.path = path

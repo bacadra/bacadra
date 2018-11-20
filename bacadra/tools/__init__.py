@@ -7,7 +7,7 @@ class index(rootx):
     #$$ --init--
     def __init__(self, core):
         self.core = core
-        self.sub_init('utile', core)
+        self.sub_init('utile', True)
 
     def sub_add_pattern(self, module):
         '''

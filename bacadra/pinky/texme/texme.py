@@ -1131,7 +1131,7 @@ class texme(metaclass=texmemeta):
 
         return self.add(
             submodule = _name1,
-            code      = code,
+            code      = tex,
             inherit   = inherit,
             echo      = echo,
         )

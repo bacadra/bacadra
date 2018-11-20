@@ -316,6 +316,10 @@ class Texttable:
         - cells can contain newlines and tabs
         """
 
+        if type(array) is dict:
+            self._rows.append(array)
+            return self
+
         self._check_row_size(array)
 
         if not hasattr(self, "_dtype"):
@@ -364,11 +368,22 @@ class Texttable:
             if self._has_header():
                 out += self._hline_header()
         length = 0
-        for row in self._rows:
+        for i in range(len(self._rows)):
+            row = self._rows[i]
             length += 1
+
+            if type(row) is dict:
+                continue
+
             out += self._draw_line(row)
+
             if self._has_hlines() and length < len(self._rows):
-                out += self._hline()
+                if type(self._rows[i+1]) is dict:
+                    out += self._hline_special(symbol=self._rows[i+1]['h_symbol'])
+                else:
+                    out += self._hline()
+
+
         if self._has_border():
             out += self._hline()
         return out[:-1]
@@ -518,6 +533,12 @@ class Texttable:
 
         return self._build_hline(True)
 
+    def _hline_special(self, symbol):
+        """Print special's horizontal line
+        """
+
+        return self._build_hline(symbol=symbol)
+
     def _hline(self):
         """Print an horizontal line
         """
@@ -526,13 +547,15 @@ class Texttable:
             self._hline_string = self._build_hline()
         return self._hline_string
 
-    def _build_hline(self, is_header=False):
+    def _build_hline(self, is_header=False, symbol=None):
         """Return a string used to separated rows or separate header from
         rows
         """
         horiz = self._char_horiz
         if (is_header):
             horiz = self._char_header
+        if symbol:
+            horiz = symbol
         # compute cell separator
         s = "%s%s%s" % (horiz, [horiz, self._char_corner][self._has_vlines()],
             horiz)

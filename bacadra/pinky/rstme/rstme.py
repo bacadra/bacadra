@@ -32,12 +32,8 @@ class rstme:
         # automaticly call to msg method after all built method
         self.display = False
 
-        # path to created file
-        if path is None:
-            if self.core:
-                path = os.path.splitext(self.core.dbase.path)[0] + '.brst'
-            else:
-                self.path = path
+        # output file path
+        self._path = None
 
         # buffer list
         self.buffer = []
@@ -47,6 +43,18 @@ class rstme:
 
         # last one used command, its helpful to stylish file
         self.__last_type = None
+
+
+    @property
+    def path(self):
+        if self._path is None and self.core:
+            return os.path.splitext(self.core.dbase.path)[0] + '.brst'
+        else:
+            return self._path
+
+    @path.setter
+    def path(self, value):
+        self._path = value
 
 
     #$$ def -add
@@ -59,32 +67,34 @@ class rstme:
             elif inherit == 'print':
                 self.msg(name, code)
 
-
     #$$ def msg
     def msg(self, module=None, code=None):
         print(f'[pinky.rstme.{module}]\n{code}')
-
 
     #$$ def clear-buffer
     def clear_buffer(self):
         self.buffer = []
 
-
-    def clear_file(self):
-        open(self.path, 'w').close()
-
+    #$$ def clear-file
+    def clear_file(self, path=None):
+        if path is None: path = self.path
+        open(path, 'w').close()
 
     #$$ def save
-    def save(self, mode='a'):
-        with open(self.path, mode, encoding='utf-8') as f:
+    def save(self, mode='a', path=None):
+        if path is None: path = self.path
+
+        with open(path, mode, encoding='utf-8') as f:
             f.writelines(self.buffer)
 
-
     #$$ def push
-    def push(self, mode='a', path=None):
-        if path:
-            self.path = path
-        self.save(mode=mode)
+    def push(self, mode='a', path=None, clear=True):
+        if path is None: path = self.path
+
+        if clear:
+            self.clear_file(path=path)
+        self.save(mode=mode, path=path)
+
         self.clear_buffer()
 
 

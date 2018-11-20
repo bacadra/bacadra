@@ -55,7 +55,7 @@ class conce:
         # parse data for concrete material
         cols,data = self.core.dbase.parse(
             id        = id,
-            grade    = grade,
+            grade     = grade,
             f_ck      = f_ck,
             f_ck_cube = f_ck_cube,
             f_cm      = f_cm,
@@ -78,3 +78,17 @@ class conce:
             cols  = cols,
             data  = data,
         )
+
+    def get(self, id):
+        cols = '[id],[grade],[f_ck],[f_ck_cube],[f_cm],[f_ctm],[f_ctk_005],[f_ctk_095],[E_cm],[ε_c1],[ε_cu1],[ε_c2],[ε_cu2],[n_c],[ε_c3],[ε_cu3]'
+
+        data = self.core.dbase.get(f'''
+        SELECT {cols} FROM [012:mates:conce] WHERE [id]="{id}"
+        ''')[0]
+
+        output = {}
+        for key,val in zip(cols.split(','),data):
+            output.update({key[1:-1]:val})
+
+        return output
+

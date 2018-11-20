@@ -34,14 +34,14 @@ class rootx:
         self.__dict__[f'_{module}_list'] = {'__active_id__':None}
         self.__dict__[module] = self.sub_add_pattern(module)
         self.sub_add(module, id)
-        self.sub_checkout(module, id)
+        self.sub_chk(module, id)
 
     def sub_add(self, module, id, checkout=False):
         self.__dict__[f'_{module}_list'].update({id:self.sub_add_pattern(module)})
         if checkout:
-            self.sub_checkout(module, id)
+            self.sub_chk(module, id)
 
-    def sub_checkout(self, module, id, add=True):
+    def sub_chk(self, module, id, add=True):
         self.__dict__[f'_{module}_list'].update({'__active_id__':id})
         self.__dict__[module].__dict__ = self.__dict__[f'_{module}_list'][id].__dict__
 
