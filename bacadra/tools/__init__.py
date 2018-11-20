@@ -18,7 +18,6 @@ class index(rootx):
 
 
 
-
 #$ module definition
 
 #$$ def translate
@@ -34,6 +33,3 @@ def translate(text, wordDict):
 
     # return modyfied text
     return text
-
-class struct:
-    pass

@@ -55,5 +55,5 @@ class project(rootx):
         from . import solve
         self.solve = solve.index(core=core)
 
-        from . import cadob
-        self.cadob = cadob.index(core=core)
+        from . import brica
+        self.brica = brica.index(core=core)
