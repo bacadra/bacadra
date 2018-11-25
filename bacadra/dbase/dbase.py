@@ -208,6 +208,9 @@ class dbase:
                 code = f'DROP TABLE IF EXISTS [{name}];'
                 self.exe(code)
 
+    #$$ def clear-all
+    def clear_all(self):
+        self.delete_table(mode=1)
 
     #$$ def create-system
     def create_system(self):

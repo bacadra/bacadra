@@ -55,5 +55,5 @@ class project(rootx):
         from . import solve
         self.solve = solve.index(core=core)
 
-        from . import brica
-        self.brica = brica.index(core=core)
+        from . import bicad
+        self.bicad = bicad.index(core=core)

@@ -1,6 +1,6 @@
 '''
 ------------------------------------------------------------------------------
-BCDR += ***** (bri)dge (c)omputer (a)ided design *****
+BCDR += ***** (v)arious (err)or(s) *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
@@ -10,16 +10,15 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
-from ..tools.rootx import rootx
+class BCDR_mates_steea_Error(Exception):
+    pass
 
-from . import railb
-from . import roadb
-from . import footb
+def f1_BCDR_mates_steea_Error(grade):
+    raise BCDR_mates_steea_Error(f'Material grade <{grade}> can not be assigned to any one of already defined code patterns.')
 
-#$ class index
-class index(rootx):
-    def __init__(self, core):
 
-        self.railb = railb.index(core=core)
-        self.roadb = roadb.index(core=core)
-        self.footb = footb.index(core=core)
+class BCDR_mates_steea_Error(Warning):
+    pass
+
+def f1_BCDR_mates_steea_Warning(limit, f):
+    pass

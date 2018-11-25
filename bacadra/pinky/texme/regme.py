@@ -12,13 +12,14 @@ Team members developing this package:
 
 import re
 import regex
+import numpy as np
 from ... import tools
 from ...cunit.units import cunit
 
 #$ ____ class RegME ________________________________________________________ #
 
 
-regme_bslash = re.compile(r'( |^|\n|~|\+|\-|\%|\@|=|\*|\(|\)|\{|\}|\$|\:)(begin|end|cfrac|frac|vec|ref|eqref|figref|tabref|lstref|cite|vspace|makecell|sqrt|b|i|u|t|bu|ub|iu|ui|ib|bi|ibu|iub|biu|bui|uib|ubi|mn|mt|mi|mb|mm|tm)(\{|\[)')
+regme_bslash = re.compile(r'( |^|\n|~|\+|\-|\%|\@|=|\*|\(|\)|\{|\}|\$|\:)(begin|end|cfrac|frac|vec|ref|eqref|equref|figref|tabref|lstref|figlab|tablab|lstlab|equlab|cite|vspace|makecell|sqrt|b|i|u|t|bu|ub|iu|ui|ib|bi|ibu|iub|biu|bui|uib|ubi|mn|mt|mi|mb|mm|tm)(\{|\[)')
 
 regme_recomp1 = re.compile(r'(\{?[a-zA-Z0-9α-ωΑ-Ω]\}?\_)([a-zA-Z0-9α-ωΑ-Ω\_,]+)')
 
@@ -99,24 +100,61 @@ class regme:
         def root(text):
             old = cunit.style
             cunit.style = 'latex'
-            a = [text.find('@')]
-            i = 0
-            while True:
-                if a[i] == -1:
-                    break
-                a.append(text.find('@', a[i] + 1))
-                i += 1
-            a.insert(0, -1)
-            a.insert(len(a) - 1, len(text))
-            if len(a) > 3:
-                new = ''
-                for i in range(len(a) - 2):
-                    if i % 2 == 0:
-                        new += text[a[i] + 1:a[i + 1]]
-                    if i % 2 == 1:
-                        new += str(eval(self.text[a[i] + 1:a[i + 1]], self.dict))
-                text = new
-            cunit.style = old
+            try:
+                a = [text.find('@')]
+                i = 0
+                while True:
+                    if a[i] == -1:
+                        break
+                    a.append(text.find('@', a[i] + 1))
+                    i += 1
+                a.insert(0, -1)
+                a.insert(len(a) - 1, len(text))
+                if len(a) > 3:
+                    new = ''
+                    for i in range(len(a) - 2):
+                        if i % 2 == 0:
+                            new += text[a[i] + 1:a[i + 1]]
+                        if i % 2 == 1:
+                            new1 = eval(self.text[a[i] + 1:a[i + 1]], self.dict)
+
+                            # if type is list form like list or ndarray
+                            if type(new1) in [list, np.ndarray]:
+
+                                dim = 1
+                                for row in new1:
+                                    if type(row) in [list, np.ndarray]:
+                                        dim = 2
+                                        for row1 in row:
+                                            if type(row1) in [list, np.ndarray]:
+                                                dim = 3
+                                                break
+
+                                if dim==1:
+                                    code = r'\begin{bmatrix}'"\n"
+                                    code += '&'.join(str(val) for val in new1)
+                                    code += "\n"r'\end{bmatrix}'
+
+                                elif dim==2:
+                                    code = r'\begin{bmatrix}'"\n"
+                                    for row in new1:
+                                        if type(row) in [list, np.ndarray]:
+                                            code += '&'.join(str(val) for val in row)
+                                        else:
+                                            code += str(row)
+                                        code += r'\\'
+                                    code = code[:-2]+ "\n"r'\end{bmatrix}'
+
+                                else:
+                                    code = str(new1)
+
+                                new += code
+
+                            else:
+                                new += str(new1)
+                    text = new
+            finally:
+                cunit.style = old
             return text
 
 

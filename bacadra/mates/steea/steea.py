@@ -1,4 +1,4 @@
-from .  import pbase
+from .pbase  import pbase
 from ...cunit import cunit
 
 class steea:
@@ -13,26 +13,26 @@ class steea:
     #$$ def add
     def add(self,
     # parametry ogolne
-    id=None, ρ_o=78.5*cunit('kN')/(cunit('m'))**3, E_1=None, v_1=0.30, G_1=None, t_e=12*10**-6, ttl=None,
+    id=None, ρ_o=cunit(7850, {'kg':1, 'm':-3}), E_1=None, v_1=0.30, G_1=None, t_e=cunit(12*10**-6, {'°C':-1}), ttl=None, orm=False,
 
-    # parametry betonu
-    cclass=None, max_t=None,
+    grade=None, max_t=None,
     f_yk=None, f_uk =None, E_a=None, ε_yk=None, ε_uk=None, γ_M0=None, γ_M1=None, γ_M2=None, γ_M3=None, γ_M4=None, γ_M5=None, γ_M6=None):
 
-        if cclass:
-            cdata = pbase.pbase().get(cclass)
-            if not f_yk     : f_yk      = cdata['f_yk']
-            if not f_uk     : f_uk      = cdata['f_uk']
-            if not E_a      : E_a       = cdata['E_a']
-            if not ε_yk     : ε_yk      = cdata['ε_yk']
-            if not ε_uk     : ε_uk      = cdata['ε_uk']
-            # if not γ_M0     : γ_M0      = cdata['γ_M0']
-            # if not γ_M1     : γ_M1      = cdata['γ_M1']
-            # if not γ_M2     : γ_M2      = cdata['γ_M2']
-            # if not γ_M3     : γ_M3      = cdata['γ_M3']
-            # if not γ_M4     : γ_M4      = cdata['γ_M4']
-            # if not γ_M5     : γ_M5      = cdata['γ_M5']
-            # if not γ_M6     : γ_M6      = cdata['γ_M6']
+        if grade:
+            pbase.set(grade=grade, max_t=max_t, f_yk=f_yk)
+
+            f_yk      = pbase.get(f_yk      , 'f_yk'      )
+            f_uk      = pbase.get(f_uk      , 'f_uk'      )
+            E_a       = pbase.get(E_a       , 'E_a'       )
+            ε_yk      = pbase.get(ε_yk      , 'ε_yk'      )
+            ε_uk      = pbase.get(ε_uk      , 'ε_uk'      )
+            γ_M0      = pbase.get(γ_M0      , 'γ_M0'      )
+            γ_M1      = pbase.get(γ_M1      , 'γ_M1'      )
+            γ_M2      = pbase.get(γ_M2      , 'γ_M2'      )
+            γ_M3      = pbase.get(γ_M3      , 'γ_M3'      )
+            γ_M4      = pbase.get(γ_M4      , 'γ_M4'      )
+            γ_M5      = pbase.get(γ_M5      , 'γ_M5'      )
+            γ_M6      = pbase.get(γ_M6      , 'γ_M6'      )
 
         if not E_1: E_1 = E_a
 
@@ -51,7 +51,7 @@ class steea:
         # parse data for steel material
         cols,data  = self.core.dbase.parse(
             id     = id,
-            cclass = cclass,
+            grade = grade,
             max_t  = max_t,
             f_yk   = f_yk,
             f_uk   = f_uk,
@@ -74,3 +74,18 @@ class steea:
             data  = data,
         )
 
+        if orm:
+            return self.orm(where=f'id={id}')
+
+    #$$ def orm
+    def orm(self, where):
+        from ...dbase.bxorm import bcdr_mates_steea
+
+        return bcdr_mates_steea(
+            dbase = self.core.dbase,
+            where = where,
+        )
+
+
+
+    # def estimate(self, data):

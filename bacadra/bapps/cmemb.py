@@ -13,8 +13,6 @@ Team members developing this package:
 from ..cunit import cunit
 from ..cunit.system.math import sqrt
 
-cunit.acc = None,4
-
 class cmemb:
     def __init__(self, h, b, a_1, M_y_Ed, f_cd, f_sd):
         self.b = b

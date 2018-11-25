@@ -24,7 +24,15 @@
 
 \usepackage{silence}
 \WarningFilter{memoir}{You are using the caption package with the memoir class}
-
+\WarningFilter{minitoc(hints)}{W0023}
+\WarningFilter{minitoc(hints)}{W0024}
+\WarningFilter{minitoc(hints)}{W0028}
+\WarningFilter{minitoc(hints)}{W0030}
+\WarningFilter{minitoc(hints)}{W0033}
+\WarningFilter{minitoc(hints)}{W0078}
+\WarningFilter{minitoc(hints)}{W0079}
+\WarningFilter{minitoc(hints)}{W0080}
+\WarningFilter{minitoc(hints)}{W0099}
 
 %### ____________ reference ________________________________________________ %
 
@@ -39,6 +47,22 @@
 \usepackage{titlesec}
     % uproszczona modyfikacja sections head
 
+%### ____________ minitoc __________________________________________________ %
+
+\usepackage[polish]{minitoc} % male spisy trosci po sekcjach
+%\usepackage{mtcoff} % wylacza minitoca
+\dominitoc % bedzie generowac toc rozdzialu
+%\dominilof % bedzie generowac tof rozdzialu
+%\dominilot % bedzie generowac tot rozdzialu
+% \addto{\captionspolish}{% Nazwa spisu rozdzialu
+%   \renewcommand{\mtctitle}{Spis rozdziału}
+% }
+\setcounter{minitocdepth}{5} % globokosc poziomow minitoc
+%\mtcsetoffset{minitoc}{-1.15em}  % przesuniecie listy minitoc
+%\setlength{\mtcindent}{-0em} % rozszerzenie listy minitoc
+%\mtcsetrules{*}{off} % wylacza poziomie linie minotoca
+% \mtcaddchapter[Streszczenie]
+\mtcsettitle{minitoc}{}
 
 %## ________ math __________________________________________________________ %
 
@@ -73,6 +97,12 @@
 
 \usepackage[T1]{fontenc}
 
+\usepackage[babel=true]{microtype}
+
+\usepackage{siunitx}
+
+\usepackage{newunicodechar}
+
 \usepackage{lipsum}
     %% dummy text package
 
@@ -94,7 +124,7 @@
     top        = 37mm,
     headsep    = 5mm,
     headheight = 18mm,
-    bottom     = 32mm,
+    bottom     = 37mm,
     footskip   = 15mm,
 	% showframe,
 }
@@ -159,8 +189,11 @@
 
 %## ________ text style ____________________________________________________ %
 
-\usepackage{times}
+% \usepackage{times}
     %% change font to TimesNewRoman
+\usepackage{lmodern}
+% \usepackage{kpfonts}
+% \usepackage{mathptmx}
 
 \usepackage{indentfirst}
     %% lamanie pierwszej linii po naglowku
@@ -603,43 +636,24 @@
 
 \newcommand{\figlab}[1]{\label{fig:#1}}       % figure label
 \NewDocumentCommand{\figref}{o m}{%
-    \IfNoValueTF{#1}{
-        (Rys.~\ref{fig:#2})%
-        }{%
-        \hyperref[fig:#2]{#1}%
-        }
-}
+    \IfNoValueTF{#1}{(Rys.~\ref{fig:#2})}{\hyperref[fig:#2]{#1}}}
 
 \newcommand{\tablab}[1]{\label{tab:#1}}       % table label
-\NewDocumentCommand{\tabref}{o m}{%
-    \IfNoValueTF{#1}{
-        (Tab.~\ref{tab:#2})%
-        }{%
-        \hyperref[tab:#2]{#1}%
-        }
-}
+\NewDocumentCommand{\tabref}{o m}{
+    \IfNoValueTF{#1}{(Tab.~\ref{tab:#2})}{\hyperref[tab:#2]{#1}}}
 
 \newcommand{\lstlab}[1]{\label{lst:#1}}       % code label
 \NewDocumentCommand{\lstref}{o m}{%
-    \IfNoValueTF{#1}{%
-        (Kod~\ref{lst:#2})%
-        }{%
-        \hyperref[lst:#2]{#1}%
-        }
-}
+    \IfNoValueTF{#1}{(Kod~\ref{lst:#2})}{\hyperref[lst:#2]{#1}}}
 
 \newcommand{\equlab}[1]{\label{equ:#1}}       % equation label
 \NewDocumentCommand{\equref}{o m}{%
-    \IfNoValueTF{#1}{%
-        (\ref{equ:#2})%
-        }{%
-        \hyperref[equ:#2]{#1}%
-        }
-}
+    \IfNoValueTF{#1}{(\ref{equ:#2})}{\hyperref[equ:#2]{#1}}}
 
 %# ____ document ___________________________________________________________ %
 
 \begin{document}
+\adjustmtc
 
 %## ________ lists _________________________________________________________ %
 

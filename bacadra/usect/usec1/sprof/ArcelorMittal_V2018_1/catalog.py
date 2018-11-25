@@ -82,7 +82,7 @@ class catalog:
             A      = data[10]*1e-6,
             A_z    = data[22]*1e-6,
             I_t    = data[28]*1e-12,
-            I_ω    = data[29]*1e-18,
+            I_ω    = data[29]*1e-15,
             I_y    = data[18]*1e-12,
             I_z    = data[23]*1e-12,
             I_ξ    = data[18]*1e-12,

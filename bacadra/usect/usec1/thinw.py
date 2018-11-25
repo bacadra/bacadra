@@ -112,7 +112,7 @@ class thinw:
         I_y = I_y0 - A*z_gc**2
 
         # Moment bezwładności przekroju względem pierwotnej osi z-z
-        I_z0 = sum([(y[i]**2 + y[i-1]**2 + y[i]*z[i-1])*dA[i]/3 for i in ii])
+        I_z0 = sum([(y[i]**2 + y[i-1]**2 + y[i]*y[i-1])*dA[i]/3 for i in ii])
 
         # Moment bezwładności z-z przekroju względem osi centralnej
         I_z = I_z0 - A*y_gc**2
@@ -162,6 +162,8 @@ class thinw:
         if I_y*I_z-I_yz**2 != 0:
             y_sc = (I_zω*I_z - I_yω*I_yz)/(I_y*I_z-I_yz**2)
             z_sc = (-I_yω*I_y + I_zω*I_yz)/(I_y*I_z-I_yz**2)
+        print(I_y*I_z-I_yz**2)
+
 
         # Wycinkowy moment bezwładności
         I_ω = I_ωsω + z_sc*I_yω-y_sc*I_zω

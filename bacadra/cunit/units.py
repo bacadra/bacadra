@@ -9,10 +9,12 @@ import numpy as np
 from .ndict import ndict
 
 from . import verrs
+from . import nprec
 
 #$ ____ metaclass cunitmeta ________________________________________________ #
 
 class cunitmeta(type):
+#$$ ________ def system ____________________________________________________ #
     @property
     def system(cls):
         return cls._system
@@ -22,8 +24,13 @@ class cunitmeta(type):
         cls.base = eval('cls.base_'+value)
         cls._system = value
 
-#$ class cunit_range
+#$$ ________ def create-system _____________________________________________ #
+    def create_system(cls, name={}):
+        eval('cls.base_'+name+'='+str(name))
+
+#$ ____ class crange _______________________________________________________ #
 class crange:
+    #$$ def --init--
     def __init__(self, unit=1, val1=None, val2=None, val3=None):
         if type(val1) is cunit: val1 = int(val1.d(unit))
         if type(val2) is cunit: val2 = int(val2.d(unit))
@@ -38,6 +45,7 @@ class crange:
 
         self.value = [cunit(val, unit) for val in data]
 
+    #$$ def --iter--
     def __iter__(self):
         return (x for x in self.value)
 
@@ -49,8 +57,17 @@ class cunit(object, metaclass=cunitmeta):
     # accuracy of printed value
     acc = (None,None)
 
+    # exponent round point
+    eacc = 5
+
     # print style, style of print
     style = 'pretty'
+
+    # trailing zero print's flag (True|False)
+    trail = False
+
+    # number notations (a|f|e|E)
+    nnot = 'f'
 
     # system definition
     # the system atribute type must be dictonary. Inside them we need include the fallowing type:
@@ -68,23 +85,22 @@ class cunit(object, metaclass=cunitmeta):
         'rad' : (1,             {}                          ),
         'mrad': (0.001,         {}                          ),
         'deg' : (math.pi/180,   {}                          ),
-        'C'   : (273.15,        {'K':1}                     ),
+        '°'   : (math.pi/180,   {}                          ),
+        '°C'  : (1,             {'K':1}                     ),
         'Hz'  : (1,             {'s':-1}                    ),
         't'   : (1000,          {'kg':1}                    ),
-        'kNm' : (10**2,         {'kg':1,'m':2, 's':-2}      ),
-        'MNm' : (10**5,         {'kg':1,'m':2, 's':-2}      ),
-        'N'   : (0.1,           {'kg':1,'m':1, 's':-2}      ),
         'cm'  : (0.01,          {'m':1}                     ),
         'mm'  : (0.001,         {'m':1}                     ),
         'km'  : (1000,          {'m':1}                     ),
         'dm'  : (0.1,           {'m':1}                     ),
-        'kN'  : (10**2,         {'kg':1, 'm':1,  's':-2}    ),
-        'MN'  : (10**5,         {'kg':1, 'm':1,  's':-2}    ),
-        'GN'  : (10**8,         {'kg':1, 'm':1,  's':-2}    ),
+        'N'   : (1,             {'kg':1, 'm':1,  's':-2}    ),
+        'kN'  : (10**3,         {'kg':1, 'm':1,  's':-2}    ),
+        'MN'  : (10**6,         {'kg':1, 'm':1,  's':-2}    ),
+        'GN'  : (10**9,         {'kg':1, 'm':1,  's':-2}    ),
         'Pa'  : (1,             {'kg':1, 'm':-1, 's':-2}    ),
-        'kPa' : (10**2,         {'kg':1, 'm':-1, 's':-2}    ),
-        'MPa' : (10**5,         {'kg':1, 'm':-1, 's':-2}    ),
-        'GPa' : (10**8,         {'kg':1, 'm':-1, 's':-2}    ),
+        'kPa' : (10**3,         {'kg':1, 'm':-1, 's':-2}    ),
+        'MPa' : (10**6,         {'kg':1, 'm':-1, 's':-2}    ),
+        'GPa' : (10**9,         {'kg':1, 'm':-1, 's':-2}    ),
         'yr'  : (60*60*24*365,  {'s':1}                     ),
         'day' : (60*60*24,      {'s':1}                     ),
         'hr'  : (60*60,         {'s':1}                     ),
@@ -95,18 +111,17 @@ class cunit(object, metaclass=cunitmeta):
     base_ce = {
         'kN'  : (None                                       ),
         'm'   : (None                                       ),
-        'C'   : (None                                       ),
+        '°C'  : (None                                       ),
         's'   : (None                                       ),
         '%'   : (0.01,          {}                          ),
         'rad' : (1,             {}                          ),
         'mrad': (0.001,         {}                          ),
         'deg' : (math.pi/180,   {}                          ),
+        '°'   : (math.pi/180,   {}                          ),
         'Hz'  : (1,             {'s':-1}                    ),
-        'kNm' : (1,             {'kN':1, 'm':1}             ),
-        'MNm' : (1000,          {'kN':1, 'm':1}             ),
-        'kg'  : (0.01,          {'kN':1, 'm':-1, 's':2}     ),
+        'kg'  : (0.001,         {'kN':1, 'm':-1, 's':2}     ),
         't'   : (10,            {'kN':1}                    ),
-        'K'   : (-273.15,       {'C':1}                     ),
+        'K'   : (1,             {'°C':1}                    ),
         'km'  : (1000,          {'m':1}                     ),
         'dm'  : (0.1,           {'m':1}                     ),
         'cm'  : (0.01,          {'m':1}                     ),
@@ -124,15 +139,12 @@ class cunit(object, metaclass=cunitmeta):
         'Pa'  : (0.001,         {'m':-2, 'kN':1}            ),
     }
 
-
-    # system default
-    _system = 'ce'    # system -> metaclass setter
-    base  = base_ce # non-dynamicly so 2x definitions
+    _system = 'ce'
 
 
 #$$ ________ def --init-- __________________________________________________ #
 
-    def __init__(self, value=1, units={}):
+    def __init__(self, value=1, units=None):
         '''
         Called class return cunit object. It have two arguments: value and units. The value can be numeric type data, while units accept only dictonary and string.
         '''
@@ -143,7 +155,7 @@ class cunit(object, metaclass=cunitmeta):
             units = ndict.str2dict(units)
 
         # if value's type is string, then try to get unit definition from base_{x}.
-        if type(value) == str:
+        if type(value)==str and units==None:
             self._get(value)
         else:
             # else set up atributes for value and units as user input
@@ -191,7 +203,7 @@ class cunit(object, metaclass=cunitmeta):
         if (not overwrite) and (name in cunit.base):
 
             # if flag if False and name alredy exists, then raise error
-            verrs.f3CunitSystemError(cunit._system, name)
+            verrs.f3CunitSystemError(cunit.system, name)
 
         # extend base dict
         cunit.base.update({name:(value, units)})
@@ -275,7 +287,7 @@ class cunit(object, metaclass=cunitmeta):
 
         # return new cunit, does not convert old!
         return cunit(cval, cdict)
-
+    p = primary
 
 #$$ ________ def convert ___________________________________________________ #
 
@@ -360,7 +372,7 @@ class cunit(object, metaclass=cunitmeta):
 
 #$$ ________ def edit ______________________________________________________ #
 
-    def edit(self, units=None, acc=None, style=None, fcover=False, post=True):
+    def edit(self, units=None, acc=None, style=None, fcover=False, post=True, trail=None, nnot=None):
         '''
         Change self in-place like acc, style or units.
         '''
@@ -368,12 +380,14 @@ class cunit(object, metaclass=cunitmeta):
             units=units, fcover=fcover, inplace=True)
         if acc  : self.acc   = acc
         if style: self.style = style
+        if trail: self.trail = trail
+        if nnot : self.nnot  = nnot
         return self
     e = edit
 
 #$$ ________ def show ______________________________________________________ #
 
-    def show(self, units=None, acc=None, style=None, fcover=False, post=True):
+    def show(self, units=None, acc=None, style=None, fcover=False, post=True, trail=None, nnot=None):
         '''
         Change self only to print, like acc, style or units.
         '''
@@ -382,13 +396,32 @@ class cunit(object, metaclass=cunitmeta):
             units=units, fcover=fcover, inplace=True)
         if acc  : othe.acc   = acc
         if style: othe.style = style
+        if trail: othe.trail = trail
+        if nnot : othe.nnot  = nnot
         return othe
     s = show
 
+#$$ ________ def show-external _____________________________________________ #
+
+    @staticmethod
+    def show_external(self, units=None, acc=None, style=None, fcover=False, post=True, trail=None, nnot=None):
+
+        if type(self) in [list, np.ndarray]:
+            return [cunit.show_external(obj, units, acc, style, fcover, post, trail, nnot) for obj in self]
+
+        elif type(self) is cunit:
+            return cunit.show(self, units, acc, style, fcover, post, trail, nnot)
+
+        else:
+            return self
+
+    se = show_external
+
 #$$ ________ def unit ______________________________________________________ #
 
-    def unit(self):
+    def units(self):
         return cunit(1, self._units)
+    u = units
 
 #$$ ________ def range _____________________________________________________ #
 
@@ -787,7 +820,7 @@ class cunit(object, metaclass=cunitmeta):
 
 #$$$ ____________ def --nstyle-- ___________________________________________ #
 
-    def __nstyle__(self, acc):
+    def __nstyle__(self):
         '''
         Prepare numeric type data to print it.
         '''
@@ -797,23 +830,40 @@ class cunit(object, metaclass=cunitmeta):
 
         # if self value type is numeric type then round and sign value
         if type(value) in [int,float]:
+            value = nprec.to_precision(
+                value       = value,
+                nround      = self.acc[0],
+                precision   = self.acc[1],
+                notation    = self.nnot,
+                strip_zeros = not self.trail,
+            )
 
-            # decimal places
-            if acc[0]:
-                value = round(value, acc[0])
+            for key,val in self._units.items():
+                self._units[key] = round(val, self.eacc)
 
-                # loop over units and round unit's power
-                for key,val in self._units.items():
-                    self._units[key] = round(val, acc[0])
+        else:
+            value = str(value)
 
-            # significant numbers
-            if acc[1]:
-                # TODO: verify how numbers are rounded, ceil, floor or what?
-                if value != 0:
-                    value = round(value, -int(math.floor(math.log10(abs(value)))) + (acc[1]-1))
+            # # significant numbers
+            # if acc[1]:
+            #     # TODO: verify how numbers are rounded, ceil, floor or what?
+            #     if value != 0:
+            #         value = round(value, -int(math.floor(math.log10(abs(value)))) + (acc[1]-1))
+            #
+            # if int(value) == value:
+            #     value = int(value)
+            #
+            # # decimal places
+            # if acc[0]:
+            #     if trail is False:
+            #         value = round(value, acc[0])
+            #
+            #         # loop over units and round unit's power
+            #         for key,val in self._units.items():
+            #             self._units[key] = round(val, acc[0])
+            #     elif trail is True:
+            #         value = '{:.{prec}f}'.format(self._value, prec=acc[0])
 
-            if int(value) == value:
-                value = int(value)
 
         # return new units, with acc deci and prec
         return cunit(value, self._units)
@@ -828,15 +878,15 @@ class cunit(object, metaclass=cunitmeta):
         '''
 
         # prepare numeric data
-        new = self.__nstyle__(self.acc)
+        new = self.__nstyle__()
 
         # convert style to lowercase
-        self.style = cunit.style.lower()
+        style = self.style.lower()
 
         # if-block depend on presentation style
-        if   self.style == 'pretty': return self.__repr__pretty(new)
-        elif self.style == 'python': return self.__repr__python(new)
-        elif self.style == 'latex' : return self.__repr__latex(new)
+        if   style == 'pretty': return self.__repr__pretty(new)
+        elif style == 'python': return self.__repr__python(new)
+        elif style == 'latex' : return self.__repr__latex(new)
 
 
     @staticmethod
@@ -869,7 +919,7 @@ class cunit(object, metaclass=cunitmeta):
             elif u_val<0  : d += '[' + u_str + '^' + str(-u_val) + ']'
 
         # convert self value to string
-        val = str(self._value)
+        val = self._value
 
         # if-block depend on counter and denominator empty's
         # if all is empty
@@ -914,12 +964,12 @@ class cunit(object, metaclass=cunitmeta):
             elif u_val<0  : d += '*' + u_str + '**' + str(-u_val)
 
         # convert self value to string
-        val = str(self._value)
+        val = self._value
 
         # if-block depend on counter and denominator empty's
         # if all is empty
         if u=='' and d=='':
-            return val + '*(1)'
+            return val
         elif u=='':
             return val + '*(1)/(' + d[1:] + ')'
         elif d=='':
@@ -942,35 +992,39 @@ class cunit(object, metaclass=cunitmeta):
 
             u_str = u_str[u_str.rfind('/')+1:]
 
+            u_str = u_str.replace(r'°C',r'^{\circ}C')
+
             # if-block depend on power
             # if power is zero, then pass
             if   u_val==0 : pass
 
             # if power is one, then expand counter
-            elif u_val==1 : u += r'~\textrm{' + u_str + '}'
+            elif u_val==1 : u += r'\,\mathrm{' + u_str + '}'
 
             # if power is more than one, then expand counter with "^" symbol
-            elif u_val>0  : u += r'~\textrm{' +u_str + '}^{' + str(u_val) + '}'
+            elif u_val>0  : u += r'\,\mathrm{' +u_str + '}^{' + str(u_val) + '}'
 
             # if power is one, then expand denominator
-            elif u_val==-1: d += r'~\textrm{' + u_str + '}'
+            elif u_val==-1: d += r'\,\mathrm{' + u_str + '}'
 
             # if power is less than one, then expand denominator with "^" symbol
-            elif u_val<0  : d += r'~\textrm{' +u_str + '}^{' + str(-u_val) + '}'
+            elif u_val<0  : d += r'\,\mathrm{' +u_str + '}^{' + str(-u_val) + '}'
+
+        # u = u.replace(r'\,^',r'^')
 
         # convert self value to string
-        val = str(self._value)
+        val = self._value
 
         # if-block depend on counter and denominator empty's
         # if all is empty
         if u=='' and d=='':
             return val
         elif u=='':
-            return val + '~(1)/(' + d[1:] + ')'
+            return val + r'\,(1)/(' + d[2:] + ')'
         elif d=='':
             return val + u
         else:
-            return val + r'~\cfrac{' + u[1:] + '}{' + d[1:] + '}'
+            return val + r'\,\cfrac{' + u[2:] + '}{' + d[2:] + '}'
 
 
 
@@ -1253,29 +1307,4 @@ class cunit(object, metaclass=cunitmeta):
 
     def __bool__(self):
         return bool(self._value)
-
-
-#$$$ ____________ def --iter-- _____________________________________________ #
-
-    # def __iter__(self):
-    #     if type(self._value)==list or type(self._value)==tuple:
-    #         return (x for x in self._value)
-    #
-    # def __call__(self):
-    #     print(
-    #           'style  = ', self.style,
-    #         '\nacc   = ', self.acc,
-    #         '\nvalue = ', self._value,
-    #         '\nunits = ', self._units)
-
-
-
-#$$ ________ @property convert _______________________________________________ #
-
-    # for key,val in base.items():
-    #     command = ("@property\n"
-    #                "def  _" + str(key) + "(self):\n"
-    #                "   return self.convert({'" + str(key) + "':1})")
-    #     exec(command)
-
 

@@ -1,6 +1,6 @@
 '''
 ------------------------------------------------------------------------------
-BCDR += ***** (b)a(c)a(dr)a *****
+***** bacadra *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
@@ -16,7 +16,7 @@ from . import pinky
 from . import sofix
 from . import tools
 from . import bapps
-from . import cadob
+from . import bicad
 
 # project
 from .project import project

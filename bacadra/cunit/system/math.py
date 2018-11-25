@@ -5,6 +5,7 @@ from .. import verrs
 
 π   = math.pi
 e   = math.e
+g   = cunit(10, {'m':1, 's':-2})
 
 def sin(x):
     if type(x) == cunit:
@@ -51,7 +52,12 @@ def sqrt(x, n=2):
     if type(x) == cunit:
         return cunit(x._value**(1/n), ndict.vmul(x._units, 1/n))
     else:
-        return 1/math.atan(x)
+        if n==2:
+            return math.sqrt(x)
+        else:
+            return x**(1/n)
 
-def exp(x):
-    return math.exp(x)
+exp   = math.exp
+log   = math.log
+ln    = math.log
+log10 = math.log10

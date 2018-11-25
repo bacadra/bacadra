@@ -18,7 +18,7 @@ import shutil
 import json
 import subprocess
 
-from IPython.display import Image, Latex, Markdown
+from IPython.display import Image, Latex, HTML
 from IPython.display import display as ipdisplay
 
 from . import verrs
@@ -182,7 +182,10 @@ class texmemeta(type):
             return self._echo
         @echo.setter
         def echo(self, value):
-            self._echo = value
+            if value is True:
+                self._echo = 'thmp'
+            else:
+                self._echo = value
     ''']
 
 
@@ -322,7 +325,7 @@ class texme(metaclass=texmemeta):
     # additional header level
     _lvl_add = 0
 
-
+    _minitoc = True
 
     # x: global
     _x_rm_text = 1
@@ -340,6 +343,7 @@ class texme(metaclass=texmemeta):
     # m: global
     _m_mode = 'e*'
     _m_rm_equation = 11
+    _m_rm_text     = 1
 
     # t: global
     _t_rm_float = False
@@ -357,7 +361,9 @@ class texme(metaclass=texmemeta):
 
     # i: global
     _i_width = 70
+    _i_prefix  = '*'
     _i_postfix = ':'
+    _i_mode    = 'i*'
     _i_rm_text = 1
     _i_rm_equation = 11
 
@@ -623,27 +629,62 @@ class texme(metaclass=texmemeta):
 
     #$$ generate methods
 
-    #$$$ def page-break
-    def page_break(self, mode, inherit=None, echo=None):
+    #$$$ def page
+    def page(self, mode, inherit=None, echo=None):
         '''
-        Prevent page break between mode=true nad mode=false.
+        Check reference:
+
+        https://tex.stackexchange.com/questions/45609/is-it-wrong-to-use-clearpage-instead-of-newpage
+
+        https://tex.stackexchange.com/questions/9852/what-is-the-difference-between-page-break-and-new-page
+
         '''
 
         if not self._active:
             return
 
-        if mode:
-            code = '\\begin{absolutelynopagebreak}'
+        if inherit        is None: inherit       = self._inherit
+        if echo           is None: echo          = self._echo
+
+        if mode in ['cpage', 'cp', 'clearpage']:
+            '''
+            Clearpage statment break page and block range for float items.
+            '''
+            code = r'\clearpage'
+
+        elif mode in ['cdpage', 'cdp', 'cleardoublepage']:
+            '''
+            Clearpage statment break page and block range for float items.
+            '''
+            code = r'\cleardoublepage'
+
+        elif mode in ['npage','np','newpage']:
+            '''
+            Clearpage statment break page and don't block range for float items.
+            '''
+            code = r'\newpage'
+
+        elif mode in ['bpage', 'bp', 'breakpage', 'pagebreak']:
+            code = r'\pagebreak'
+
+        elif mode in ['gpage', 'gp', 'goodbreak']:
+            code = r'\goodbreak'
+
+        elif mode in ['anpb-b', 'absolutelynopagebreak-b']:
+            code = r'\begin{absolutelynopagebreak}'
+
+        elif mode in ['anpb-e', 'absolutelynopagebreak-e']:
+            code = r'\end{absolutelynopagebreak}'
+
         else:
-            code = '\\end{absolutelynopagebreak}'
+            raise ValueError('Unknow mode')
 
         return self.add(
-            submodule = 'pb',
+            submodule = 'page',
             code      = code,
             inherit   = inherit,
             echo      = echo,
         )
-
 
     #$$$ def text
     def text(self, text, rm_text=None, strip=True, inherit=None, echo=None):
@@ -673,7 +714,7 @@ class texme(metaclass=texmemeta):
 
 
     #$$$ def head
-    def head(self, lvl, text, label=None, text2=None, rm_text=None, without_number=False, inherit=None, echo=None):
+    def head(self, lvl, text, label=None, text2=None, rm_text=None, without_number=False, minitoc=None, inherit=None, echo=None):
         '''
         '''
 
@@ -685,6 +726,7 @@ class texme(metaclass=texmemeta):
         if echo           is None: echo          = self._echo
         if label          is None: label         = self._h_label
         if rm_text        is None: rm_text       = self._h_rm_text
+        if minitoc        is None: minitoc       = self._minitoc
 
         text = regme(text, self.scope).package(rm_text)
 
@@ -706,9 +748,13 @@ class texme(metaclass=texmemeta):
 
         if lvl+self._lvl_add == -1:
             tex = '\\part' + without_number + '%2{%1} ' + lab
+            if minitoc:
+                tex += '\n\\minitoc'
 
         elif lvl+self._lvl_add == 0:
             tex = '\\chapter' + without_number + '%2{%1} ' + lab
+            if minitoc:
+                tex += '\n\\minitoc'
 
         elif lvl+self._lvl_add == 1:
             tex = '\\section' + without_number + '%2{%1} ' + lab
@@ -738,9 +784,21 @@ class texme(metaclass=texmemeta):
         code = code.replace('%2', text2)
 
         if 'h' in echo:
-            ipdisplay(Markdown(
-                '#'*(max(1,lvl+self._lvl_add)) + ' ' + text.strip()
-            ))
+            lvlnow = lvl+self._lvl_add+1
+
+            if   lvlnow==1: color = "255,127,80"
+            elif lvlnow==2: color = "165,127,80"
+            elif lvlnow==3: color = "125,127,80"
+            elif lvlnow==4: color = "125,177,80"
+            else          : color = "255,255,255"
+
+            source = "<h{2} style='color: rgb({0})'>{1}</h1>".format(
+                color,
+                text,
+                lvlnow,
+            )
+
+            ipdisplay(HTML(source.strip()))
 
 
         return self.add(
@@ -836,10 +894,10 @@ class texme(metaclass=texmemeta):
 
 
                 if type(label) is str:
-                    code += '\\label{{0}}\n'.replace('{0}', label)
+                    code += '\\figref{{0}}\n'.replace('{0}', label)
 
                 elif label == True:
-                    code += '\\label{{0}}\n'.replace('{0}', 'fig:'+user_path.replace('\\', '').replace('/', ''))
+                    code += '\\figref{{0}}\n'.replace('{0}', 'fig:'+user_path.replace('\\', '').replace('/', ''))
 
             code += '}\\end{figure}'
 
@@ -909,37 +967,49 @@ class texme(metaclass=texmemeta):
 
 
     #$$$ def math
-    def math(self, equation, mode=None, label=None, rm_equation=None, exe=False, inherit=None, echo=None):
+    def math(self, equation, mode=None, label=None, rm_equation=None, rm_text=None, exe=False, inherit=None, echo=None):
         '''
+        Please remember about problem with equation block - there is fault working labels. To fix it use gather instead equation block. \\leavemode should fix it, but it is not tested yet.
         '''
 
         if not self.active:
             return
+
+        # if given is list, then return self looped
+        if type(equation)==list:
+            return [self.math(eq1, mode, label, rm_equation, rm_text, exe, inherit, echo) for eq1 in equation]
 
         # use global settings
         if inherit        is None: inherit       = self._inherit
         if echo           is None: echo          = self._echo
         if mode           is None: mode          = self._m_mode
         if rm_equation    is None: rm_equation   = self._m_rm_equation
+        if rm_text        is None: rm_text       = self._m_rm_text
 
 
         if mode not in ['t*', 't+', 't']:
             equation = regme(equation, self.scope).package(rm_equation)
 
+        elif mode in ['t*', 't+', 't']:
+            return self.add(
+                submodule = 'mt',
+                code      = regme(equation, self.scope).package(rm_text),
+                inherit   = inherit,
+                echo      = echo,
+            )
 
         if exe:
             exec(equation, self.scope)
 
-
         if label:
-            lab = '\\label{' + label + '}'
+            lab = '\\equlab{' + label + '}'
 
         else:
             lab = ''
 
 
         if mode == 'e+':
-            code = '\\begin{equation} ' + lab + \
+            code = '\\leavevmode\\begin{equation} ' + lab + \
                 '\n' + equation + '\n\\end{equation}'
 
         elif mode == 'e*':
@@ -977,13 +1047,9 @@ class texme(metaclass=texmemeta):
             code = '\\begin{gather*} ' + lab + \
                 '\n' + equation + '\n\\end{gather*}'
 
-        elif mode == 't*' or mode == 't+':
-            code = equation
-
-
         if 'm' in echo:
             ipdisplay(Latex(
-                '$'+regme(equation).package(99)+'$'
+                '$'+regme(equation, self.scope).package(99)+'$'
             ))
 
         return self.add(
@@ -1015,18 +1081,18 @@ class texme(metaclass=texmemeta):
 
         if caption:
             if label:
-                label = '\\label{'+label+'}'
+                label = '\\tablab{'+label+'}'
             else:
                 label = ''
             caption = '\\caption{' + \
-                regme(caption).package(rm_caption) + '}'+ label +'\\\\'
+                regme(caption, self.scope).package(rm_caption) + '}'+ label +'\\\\'
         else:
             caption = ''
 
 
         if header:
             header = '\\hline\n' + \
-                regme(header).package(rm_data) + \
+                regme(header, self.scope).package(rm_data) + \
                 '\n\\\\\\hline\\hline\\hline\\hline\n\\endhead'
         elif not float:
             header = '\\endhead'
@@ -1048,7 +1114,7 @@ class texme(metaclass=texmemeta):
                  '%StV': str(stretchV),
                  '%Lab': label,
                  '%Hea': header,
-                 '%Dat': regme(data).package(rm_data)}
+                 '%Dat': regme(data, self.scope).package(rm_data)}
         tex = tools.translate(tex, ndict)
 
         if float == True:
@@ -1116,13 +1182,13 @@ class texme(metaclass=texmemeta):
         elif type(code) == str:
 
             tex = '\\begin{lstlisting}[caption={%1},label={%2}%3%4]'
-            caption = regme(caption).package(rm_caption)
+            caption = regme(caption, self.scope).package(rm_caption)
             tex = tex.replace('%1', caption)
             tex = tex.replace('%2', label)
             tex = tex.replace('%4', var1)
             tex = tex.replace('%3', var2)
 
-            code = regme(code).package(rm_code)
+            code = regme(code, self.scope).package(rm_code)
             tex += '\n' + code + '\n'
             tex += '\\end{lstlisting}'
 
@@ -1170,7 +1236,7 @@ class texme(metaclass=texmemeta):
             label = ''
 
         tex = '\\lstinputlisting[language=%5, firstline=%3, lastline=%4, caption={%1}, label={%2}, inputencoding=utf8, mathescape]{%6}'
-        tex = tex.replace('%1', regme(caption).package(rm_caption))
+        tex = tex.replace('%1', regme(caption, self.scope).package(rm_caption))
         tex = tex.replace('%2', label)
         tex = tex.replace('%3', first_line)
         tex = tex.replace('%4', last_line)
@@ -1187,7 +1253,158 @@ class texme(metaclass=texmemeta):
 
 
     #$$$ def item
-    def item(self, text=None, equation=None, mode='i*', mline=False, lalign=None, label=None, width=None, lvl=1, postfix=None, aligment=None, rm_text=None, rm_equation=None, vspace1='-9.5mm', vspace2='-8mm', prefix='*', add_space=False, exe=False, inherit=None, echo=None,
+    def item(self, text=None, equation=None, mode=None, lmath=None, label=None, width=None, level=1, prefix=None, postfix=None, rm_text=None, rm_equation=None, exe=False, inherit=None, echo=None):
+        '''
+        '''
+
+        # if active flag is False then with None return
+        if not self.active:
+            return
+
+        # use global settings
+        if inherit        is None: inherit       = self._inherit
+        if echo           is None: echo          = self._echo
+        if width          is None: width         = self._i_width
+        if mode           is None: mode          = self._i_mode
+        if prefix         is None: prefix        = self._i_prefix
+        if postfix        is None: postfix       = self._i_postfix
+        if rm_text        is None: rm_text       = self._i_rm_text
+        if rm_equation    is None: rm_equation   = self._i_rm_equation
+
+
+        # prefix if-block
+        if prefix in ['',' ']:
+            ptext = r'{}&'*(level-1)
+            pcols = r'q{3mm}'*(level-1)
+            width -= (level-1)*5
+
+        elif prefix in ['|']:
+            ptext = r''
+            pcols = r'@{\hspace{1mm}}|' + r'@{\hspace{3mm}}|'*(level-1)
+            width -= 2+(level-1)*4
+
+            # ptext = r'{}&'*(level-1)
+            # pcols = r'@{\hspace{1mm}}|'+r'q{1mm}|'*(level-1)
+            # width -= (level-1)*5
+
+        elif prefix in ['-']:
+            ptext = r'{}&'*(level-1) + r'-- & '
+            pcols = r'q{3mm}'*level
+            width -= (level-1)*7
+
+        elif prefix in ['*']:
+            ptext = r'{}&'*(level-1) + r'\textbullet & '
+            pcols = r'q{3mm}'*level
+            width -= (level-1)*7
+
+        else:
+            raise ValueError('Unrecognized prefix element')
+
+
+        # remove too big space between to texme-items
+        if self.__last_type == 'i':
+            space_bt = '\\vspace*{-12pt}\n'
+        else:
+            space_bt = ''
+
+
+        # flush math equation to left, rith or center
+        if lmath is True:
+            flush_math = '\\mathleft\n'
+        else:
+            flush_math = ''
+
+
+        # here, if block 3 options: t&e, t, e
+        if text and equation:
+            if mode in ['i*', 't*', 'g*', 'm*']:
+
+                # create column pattern
+                columns = tools.translate('{{pcols}p{{width}}L}', {
+                    '{pcols}': pcols,
+                    '{width}': str(width)+'mm',
+                })
+
+                tex = (
+                    r"{space_bt}"
+                    r"\begin{tabularx}{\textwidth}{columns}""\n"
+                    r"{ptext}{text}{postfix}&%""\n"
+                    r"{flush_math}"
+                    r"{equation}""\n"
+                    r"\end{tabularx}"
+                    )
+
+                glue = '\n' + r'\newline' + '\n'
+
+            else:
+                # create column pattern
+                columns = '{{pcols}L}'.replace('{pcols}', pcols)
+
+                # tex = self.page('anpb-b', inherit=True)
+
+                if not prefix in ['|']:
+                    tex = (
+                        r"{space_bt}"
+                        r"\begin{tabularx}{\textwidth}{columns}""\n"
+                        r"{ptext}{text}{postfix}%""\n"
+                        r"{flush_math}"
+                        r"\end{tabularx}""\n"
+                        r"\vspace*{-8mm}""\n"
+                        r"{equation}"
+                        )
+                else:
+                    tex = (
+                        r"{space_bt}"
+                        r"\begin{tabularx}{\textwidth}{columns}""\n"
+                        r"{ptext}{text}{postfix}%""\n"
+                        r"{flush_math}"
+                        r"{equation}"
+                        r"\vspace*{-3mm}""\n"
+                        r"\end{tabularx}""\n"
+                        )
+
+                # tex += self.page('anpb-e', inherit=True)
+
+                glue = '\n'
+
+
+            equation = self.math(
+                mode        = mode,
+                equation    = equation,
+                label       = label,
+                rm_equation = rm_equation,
+                rm_text     = rm_text,
+                inherit     = True,
+                exe         = exe)
+
+            if type(equation)==list:
+                equation = glue.join(equation)
+
+
+            tex = tools.translate(tex, {
+                '{space_bt}'  : space_bt,
+                '{columns}'   : columns,
+                '{ptext}'     : ptext,
+                '{text}'      : regme(text.strip(), self.scope).package(rm_text),
+                '{postfix}'   : postfix,
+                '{flush_math}': flush_math,
+                '{equation}'  : equation,
+            })
+
+        self.__last_type = 'i'
+
+        return self.add(
+            submodule = 'i',
+            code      = tex,
+            inherit   = inherit,
+            echo      = echo,
+        )
+    i = item
+
+
+
+    #$$$ def item2
+    def item2(self, text=None, equation=None, mode='i*', mline=False, lalign=None, label=None, width=None, lvl=1, postfix=None, aligment=None, rm_text=None, rm_equation=None, vspace1='-9.5mm', vspace2='-8mm', prefix='*', add_space=False, exe=False, inherit=None, echo=None,
     e=None, # shortcut for equation
     x=None, # shortcut for text
     m=None, # shortcut for mode
@@ -1228,7 +1445,7 @@ class texme(metaclass=texmemeta):
         else:
             tex = ''
 
-        if text and equation and mode in ['i*', 't*', 't+', False] and not mline:
+        if text and equation and mode in ['i*', 't*', 't+', False, 't'] and not mline:
             if aligment: pass
             else:
                 aligment = lvl+'q{{width}mm} L'
@@ -1298,7 +1515,7 @@ class texme(metaclass=texmemeta):
                 )
 
 
-        if equation and mode:
+        if equation and mode is not 't':
             equation = self.math(
                 mode        = mode,
                 equation    = equation,
@@ -1307,11 +1524,11 @@ class texme(metaclass=texmemeta):
                 inherit     = True,
                 exe         = exe)
 
-        elif mode is False:
-            equation = regme(equation).package(rm_text)
+        elif mode is 't':
+            equation = regme(equation, self.scope).package(rm_text)
 
         ndict = {
-            '{text}': (regme(text).package(rm_text) + postfix if text is not None else ''),
+            '{text}': (regme(text, self.scope).package(rm_text) + postfix if text is not None else ''),
             '{equation}': equation,
             '{aligment}': aligment.replace('{width}',str(width)),
             '{vspace1}': vspace1,
@@ -1329,4 +1546,6 @@ class texme(metaclass=texmemeta):
             inherit   = inherit,
             echo      = echo,
         )
-    i = item
+    i2 = item2
+
+

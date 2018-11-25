@@ -30,6 +30,9 @@ from . import verrs
 class sbase:
 
     def __init__(self):
+        pass
+
+    def path(self):
         self.sofi_env()
         self.sofi_run()
         self.sofi_urs()

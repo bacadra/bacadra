@@ -20,7 +20,7 @@ class conce:
     f_ck=None, f_ck_cube=None, f_cm=None, f_ctm=None, f_ctk_005=None, f_ctk_095=None, E_cm=None, ε_c1=None, ε_cu1=None, ε_c2=None, ε_cu2=None, n_c=None, ε_c3=None, ε_cu3=None, γ_M=None):
 
         if grade:
-            pbase.set(grade, f_ck=f_ck, f_ck_cube=f_ck_cube)
+            pbase.set(grade=grade, f_ck=f_ck, f_ck_cube=f_ck_cube)
 
             f_ck      = pbase.get(f_ck      , 'f_ck'      )
             f_ck_cube = pbase.get(f_ck_cube , 'f_ck_cube' )

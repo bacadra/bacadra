@@ -1,15 +1,15 @@
 #$ definicja jednostek
 from ..units import cunit # przypisanie klasy do zmiennej, mniej pisania
 cunit.system = 'si'
+cu   = cunit(1, {})
 kN   = cunit('kN')
 m    = cunit('m')
 rad  = cunit('rad')
 mrad = cunit('mrad')
-C    = cunit('C')
+C    = cunit('°C')
 s    = cunit('s')
 deg  = cunit('deg')
-kNm  = cunit('kNm')
-MNm  = cunit('MNm')
+kNm  = kN*m
 kg   = cunit('kg')
 ton  = cunit('t')
 K    = cunit('K')
@@ -19,6 +19,7 @@ cm   = cunit('cm')
 mm   = cunit('mm')
 GN   = cunit('GN')
 MN   = cunit('MN')
+MNm  = MN*m
 N    = cunit('N')
 yr   = cunit('yr')
 day  = cunit('day')

@@ -12,12 +12,13 @@ Team members developing this package:
 
 import unittest
 import bacadra as bcdr
-from bacadra.cunit.ce    import *
+from bacadra.cunit.system.ce import *
 from bacadra.cunit.verrs import *
 
 import numpy as np
 
 #$ ____ class TestMe _______________________________________________________ #
+
 
 class TestMe(unittest.TestCase):
 
@@ -93,30 +94,30 @@ class TestMe(unittest.TestCase):
     def test_system_006(self):
         '''
         '''
-        bcdr.cunit.mode = 'pretty'
+        bcdr.cunit.style = 'pretty'
         bcdr.cunit.acc = 1,1
         self.assertEqual(repr(1564896.01236456*m), '2000000 [m]')
 
     def test_system_007(self):
         '''
         '''
-        bcdr.cunit.mode = 'pretty'
-        bcdr.cunit.acc = 1,100
+        bcdr.cunit.style = 'pretty'
+        bcdr.cunit.acc = 1,20
         self.assertEqual(repr(1564896.01236456*m), '1564896 [m]')
 
     def test_system_008(self):
         '''
         '''
-        bcdr.cunit.mode = 'pretty'
+        bcdr.cunit.style = 'pretty'
         bcdr.cunit.acc = 2,12
         self.assertEqual(repr(1564896.01236456*m), '1564896.01 [m]')
 
     def test_system_009(self):
         '''
         '''
-        bcdr.cunit.mode = 'latex'
+        bcdr.cunit.style = 'latex'
         bcdr.cunit.acc = 2,12
-        self.assertEqual(repr(1564896.01236456*m), r'1564896.01~\textrm{m}')
+        self.assertEqual(repr(1564896.01236456*m), r'1564896.01\,\mathrm{m}')
 
 
 
@@ -192,6 +193,6 @@ class TestMe(unittest.TestCase):
 #$ ____ Run tests __________________________________________________________ #
 
 if __name__ == '__main__':
-    unittest.main(argv=[''], verbosity=2, exit=False)
+    unittest.main(argv=[''], verbosity=3, exit=False)
 
 
