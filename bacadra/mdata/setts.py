@@ -26,7 +26,7 @@ class setts:
             'scope'         : {},
             'nodes_fix'     : None,
             'system_space'  : None,
-            'node_tol'      : 0.01*cunit('m'),
+            'node_tol'      : cunit(0.01, 'm'),
             'xy->xz'        : True,
         }
 

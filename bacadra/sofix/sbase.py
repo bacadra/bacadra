@@ -28,65 +28,84 @@ from . import verrs
 
 
 class sbase:
+    _sofi_env = None
+    _sofi_run = None
+    _sofi_urs = None
+    _magi_env = None
+    _magi_mck = None
 
     def __init__(self):
         pass
 
-    def path(self):
-        self.sofi_env()
-        self.sofi_run()
-        self.sofi_urs()
-        self.magi_env()
-        self.magi_mck()
+    @classmethod
+    def path(self, sofi_env=None, sofi_run=None, sofi_urs=None, magi_env=None, magi_mck=None):
+        self.sofi_env(sofi_env)
+        self.sofi_run(sofi_run)
+        self.sofi_urs(sofi_urs)
+        self.magi_env(magi_env)
+        self.magi_mck(magi_mck)
 
     @classmethod
-    def sofi_env(self, path='v2018', inherit=False):
+    def sofi_env(self, path=None):
         '''
         Create self._sofi_env atribute.
         '''
 
-        if path=='v2018':
-            _sofi_env = r'c:\Program Files\SOFiSTiK\2018\SOFiSTiK 2018'
+        if self._sofi_env is None and path is None:
+            self._sofi_env = r'c:\Program Files\SOFiSTiK\2018\SOFiSTiK 2018'
+
+        elif path=='v2018':
+            self._sofi_env = r'c:\Program Files\SOFiSTiK\2018\SOFiSTiK 2018'
+
         elif path=='v2016':
-            _sofi_env = r'c:\Program Files\SOFiSTiK\2016\ANALYSIS_33_X64'
+            self._sofi_env = r'c:\Program Files\SOFiSTiK\2016\ANALYSIS_33_X64'
+
         elif path:
-            _sofi_env = path
+            self._sofi_env = path
 
-        if not os.path.exists(_sofi_env):
-            verrs.envcheckBCDRsofixError(_sofi_env)
+        if not os.path.exists(self._sofi_env):
+            verrs.envcheckBCDRsofixError(self._sofi_env)
 
-        if inherit:
-            return _sofi_env
-        else:
-            self._sofi_env = _sofi_env
+        return self._sofi_env
 
 
     @classmethod
-    def sofi_run(self, path='sps'):
+    def sofi_run(self, path=None and path is None):
         '''
         Create self._sofi_run atribute.
         '''
+        if self._sofi_run is None:
+            self._sofi_run = r'sps.exe'
 
-        if path=='wps':
+        elif path=='wps':
             self._sofi_run = r'wps.exe'
+
         elif path=='sps':
             self._sofi_run = r'sps.exe'
-        else:
+
+        elif path:
             self._sofi_run = path
-        os.path.exists(os.path.join(self._sofi_env, self._sofi_run))
+
+        if not os.path.exists(os.path.join(self._sofi_env, self._sofi_run)):
+            verrs.envcheckBCDRsofixError(os.path.join(self._sofi_env, self._sofi_run))
+
         return self._sofi_run
 
+
     @classmethod
-    def sofi_urs(self, path=None):
+    def sofi_urs(self, path=None and path is None):
         '''
         Create self._sofi_urs atribute.
         '''
-
-        if path is None:
+        if self._sofi_urs is None:
             self._sofi_urs  = r'ursula.exe'
-        else:
+
+        elif path:
             self._sofi_urs  = path
-        os.path.exists(os.path.join(self._sofi_env, self._sofi_urs))
+
+        if not os.path.exists(os.path.join(self._sofi_env, self._sofi_urs)):
+            verrs.envcheckBCDRsofixError(os.path.join(self._sofi_env, self._sofi_urs))
+
         return self._sofi_urs
 
     @classmethod
@@ -128,28 +147,41 @@ class sbase:
 
 
     @classmethod
-    def magi_env(self, path='v7.0.7-Q16'):
+    def magi_env(self, path=None):
         '''
         Create self._magi_env atribute.
         '''
-
-        if path=='v7.0.7-Q16':
+        if self._magi_env is None and path is None:
             self._magi_env = r'c:\Program Files\ImageMagick-7.0.7-Q16'
-        else:
+
+        elif path=='v7.0.7-Q16':
+            self._magi_env = r'c:\Program Files\ImageMagick-7.0.7-Q16'
+
+        elif path:
             self._magi_env = path
-        os.path.exists(self._magi_env)
+
+        if not os.path.exists(self._magi_env):
+            verrs.envcheckBCDRsofixError(self._magi_env)
+
+        return self._magi_env
+
 
     @classmethod
     def magi_mck(self, path=None):
         '''
         Create self._magi_mck atribute.
         '''
-
-        if path is None:
+        if self._magi_mck is None and path is None:
             self._magi_mck = r'magick.exe'
-        else:
+
+        elif path:
             self._magi_mck = path
-        os.path.exists(os.path.join(self._magi_env, self._magi_mck))
+
+        if not os.path.exists(os.path.join(self._magi_env, self._magi_mck)):
+            verrs.envcheckBCDRsofixError(os.path.join(self._magi_env, self._magi_mck))
+
+        return self._magi_env
+
 
     def connect(self, path, ver_edu=True, cdbIndex=99):
         '''
@@ -176,8 +208,13 @@ class sbase:
                      (<0 if error, see clib1.h for meaning of error codes)
                      ( 0 if not a database when called with Index = 99)
         '''
+        # establish defualt settings if not defined explicit
+        self.path()
+
+        # create dll container
         self.sofi_dll(ver_edu=ver_edu)
 
+        # create index instance of cdb
         self._sofi_icdb = self._sofi_dll.sof_cdb_init(path.encode('ascii'), cdbIndex)
 
 
