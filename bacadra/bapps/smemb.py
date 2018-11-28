@@ -10,14 +10,19 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
-
+import numpy as np
+from ..cunit import cunit
 from ..cunit.system.math import sqrt
+
+
+
 
 class smemb:
     def __init__(self):
         pass
 
-    def slederness(self, α_cr=None, val_Rk=None, val_Ek=None, val_cr=None):
+    @staticmethod
+    def slederness(α_cr=None, val_Rk=None, val_Ek=None, val_cr=None):
 
         if α_cr and val_Rk and val_Ek:
 
@@ -36,11 +41,12 @@ class smemb:
         return λ_op
 
 
-    def stability_uniaxial(self, σ_nmy_Ed, σ_mz_Ed, σ_x_Rk, α_imp=0.76, γ_a_M1=1.1, λ_op=True,
+    @staticmethod
+    def stability_uniaxial(σ_nmy_Ed, σ_mz_Ed, σ_x_Rk, α_imp=0.76, γ_a_M1=1.1, λ_op=True,
     α_cr=None, val_Rk=None, val_Ek=None, val_cr=None):
 
         if λ_op==True:
-            λ_op = self.slederness(
+            λ_op = smemb.slederness(
                 α_cr   = α_cr,
                 val_Rk = val_Rk,
                 val_Ek = val_Ek,
@@ -64,4 +70,16 @@ class smemb:
             'util': util.s('%'),
         }
 
+
+    @staticmethod
+    def tension(A, A_net, f_yk, f_uk, γ_M0, γ_M2):
+        N_pl_Rd  = A     * f_yk       / γ_M0
+        N_u_Rd   = 0.9   * A_net*f_uk / γ_M2
+        N_net_Rd = A_net * f_yk       / γ_M0
+
+        return {
+            'N_pl_Rd': N_pl_Rd,
+            'N_u_Rd':N_u_Rd,
+            'N_net_Rd':N_net_Rd,
+        }
 

@@ -125,11 +125,22 @@ def to_precision(
 
         value = converter(value, precision, delimiter, strip_zeros, preserve_integer)
 
-    value = str(value)
-    if precision is None and value[-2:]=='.0':
-        value = value[:-2]
+    if precision is None:
+        value = str(value)
 
-    return str(value)
+        if value[-2:]=='.0':
+            value = value[:-2]
+
+        if not strip_zeros and nround>0:
+            if value.find('.') >= 0:
+                ad = len(value) - value.find('.') - 1
+                for i in range(ad-nround):
+                    value += '0'
+            else:
+                value += '.'+'0'*nround
+
+
+    return value
 
 def _std_notation(value, precision, _, strip_zeros, preserve_integer):
     '''

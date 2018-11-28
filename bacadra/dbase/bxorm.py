@@ -89,7 +89,7 @@ class bcdr_mates_steea(bcdr_mates):
         i+=1; self.E_1   = data[i] * c_pressu
         i+=1; self.v_1   = data[i] * c_unitle
         i+=1; self.G_1   = data[i] * c_pressu
-        i+=1; self.t_e   = data[i] * c_temper
+        i+=1; self.t_e   = data[i] * c_temper**-1
         i+=1; self.ttl   = data[i]
 
 

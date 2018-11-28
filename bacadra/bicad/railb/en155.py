@@ -116,14 +116,16 @@ class dfact:
             plt.savefig(name, dpi = 300)
 
     #$$ def sofi
-    def sofi(self, var='PHI_15528', cdb=None, name='x_impact-factor-15528.dat', active=True, make=True):
-        se = sofix.trade(cdb=cdb, name=name, active=active)
-        se.sto(name=var, val=self.φ_dyn, comment='bcdr:auto-created')
+    def sofi(self, var='PHI_15528', cdb=None, name='x_impact-factor-15528.dat', active=True, make=True, sofix=None):
+        if sofix is None:
+            se = sofix.trade(cdb=cdb, name=name, active=active)
+            se.sto(name=var, val=self.φ_dyn, comment='bcdr:auto-created')
 
-        se.push()
-        if make:
-            se.make()
-
+            se.push()
+            if make:
+                se.make()
+        else:
+            sofix.sto(name=var, val=self.φ_dyn, comment='bcdr:auto-created')
 
 #$ class en155
 class en155:

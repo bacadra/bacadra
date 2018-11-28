@@ -57,6 +57,15 @@ def sqrt(x, n=2):
         else:
             return x**(1/n)
 
+def floor(x, n=0, unit=None):
+    if type(x) == cunit:
+        if unit:
+            return cunit(math.floor(x.c(unit)*10**n)/10**n, unit)
+        else:
+            return cunit(math.floor(x*10**n)/10**n, x._units)
+    else:
+        return math.floor(x*10**n)/10**n
+
 exp   = math.exp
 log   = math.log
 ln    = math.log

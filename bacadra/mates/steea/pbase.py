@@ -71,7 +71,7 @@ class pbase:
 
         data.update({
                 'E_a'  : 210*GPa,
-                'ε_yk' : data['f_yk'] / (210*GPa),
+                'ε_yk' : (f_yk if f_yk else data['f_yk']) / (210*GPa),
                 'ε_uk' : 0.05,
                 'γ_M0' : 1.00,
                 'γ_M1' : 1.10,

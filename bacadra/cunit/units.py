@@ -82,6 +82,7 @@ class cunit(object, metaclass=cunitmeta):
         's'   : (None                                       ),
         'K'   : (None                                       ),
         's'   : (None                                       ),
+        '%'   : (0.01,          {}                          ),
         'rad' : (1,             {}                          ),
         'mrad': (0.001,         {}                          ),
         'deg' : (math.pi/180,   {}                          ),
@@ -414,8 +415,8 @@ class cunit(object, metaclass=cunitmeta):
 
         else:
             return self
-
     se = show_external
+
 
 #$$ ________ def unit ______________________________________________________ #
 
@@ -829,7 +830,8 @@ class cunit(object, metaclass=cunitmeta):
         value = self._value
 
         # if self value type is numeric type then round and sign value
-        if type(value) in [int,float]:
+        if type(value) in [int,float, np.float64]:
+
             value = nprec.to_precision(
                 value       = value,
                 nround      = self.acc[0],
@@ -993,6 +995,9 @@ class cunit(object, metaclass=cunitmeta):
             u_str = u_str[u_str.rfind('/')+1:]
 
             u_str = u_str.replace(r'°C',r'^{\circ}C')
+
+            if u_str=='%':
+                u_str = r'\%'
 
             # if-block depend on power
             # if power is zero, then pass

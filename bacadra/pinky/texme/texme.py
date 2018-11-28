@@ -894,10 +894,10 @@ class texme(metaclass=texmemeta):
 
 
                 if type(label) is str:
-                    code += '\\figref{{0}}\n'.replace('{0}', label)
+                    code += '\\figlab{{0}}\n'.replace('{0}', label)
 
                 elif label == True:
-                    code += '\\figref{{0}}\n'.replace('{0}', 'fig:'+user_path.replace('\\', '').replace('/', ''))
+                    code += '\\figlab{{0}}\n'.replace('{0}', 'fig:'+user_path.replace('\\', '').replace('/', ''))
 
             code += '}\\end{figure}'
 
@@ -987,12 +987,12 @@ class texme(metaclass=texmemeta):
         if rm_text        is None: rm_text       = self._m_rm_text
 
 
-        if mode not in ['t*', 't+', 't']:
+        if mode not in ['t*', 't+']:
             equation = regme(equation, self.scope).package(rm_equation)
 
-        elif mode in ['t*', 't+', 't']:
+        elif mode in ['t*', 't+']:
             return self.add(
-                submodule = 'mt',
+                submodule = 'm',
                 code      = regme(equation, self.scope).package(rm_text),
                 inherit   = inherit,
                 echo      = echo,
@@ -1253,8 +1253,9 @@ class texme(metaclass=texmemeta):
 
 
     #$$$ def item
-    def item(self, text=None, equation=None, mode=None, lmath=None, label=None, width=None, level=1, prefix=None, postfix=None, rm_text=None, rm_equation=None, exe=False, inherit=None, echo=None):
+    def item(self, text=None, equation=None, mode=None, lmath=None, label=None, width=None, level=1, prefix=None, postfix=None, rm_text=None, rm_equation=None, exe=False, col_type='q', inherit=None, echo=None):
         '''
+        Column type must can defined explicit size in length dimension (like p{50mm} (or q,w,e).
         '''
 
         # if active flag is False then with None return
@@ -1303,7 +1304,7 @@ class texme(metaclass=texmemeta):
 
         # remove too big space between to texme-items
         if self.__last_type == 'i':
-            space_bt = '\\vspace*{-12pt}\n'
+            space_bt = '\\vspace*{-11pt}\n'
         else:
             space_bt = ''
 
@@ -1320,9 +1321,10 @@ class texme(metaclass=texmemeta):
             if mode in ['i*', 't*', 'g*', 'm*']:
 
                 # create column pattern
-                columns = tools.translate('{{pcols}p{{width}}L}', {
-                    '{pcols}': pcols,
-                    '{width}': str(width)+'mm',
+                columns = tools.translate('{{pcols}{col_type}{{width}}L}', {
+                    '{pcols}'   : pcols,
+                    '{col_type}': col_type,
+                    '{width}'   : str(width)+'mm',
                 })
 
                 tex = (
@@ -1334,7 +1336,7 @@ class texme(metaclass=texmemeta):
                     r"\end{tabularx}"
                     )
 
-                glue = '\n' + r'\newline' + '\n'
+                glue = '\n' + r'\newline' + '\n\n'
 
             else:
                 # create column pattern
@@ -1349,7 +1351,7 @@ class texme(metaclass=texmemeta):
                         r"{ptext}{text}{postfix}%""\n"
                         r"{flush_math}"
                         r"\end{tabularx}""\n"
-                        r"\vspace*{-8mm}""\n"
+                        r"\vspace*{-7mm}""\n"
                         r"{equation}"
                         )
                 else:
