@@ -182,8 +182,10 @@ class texmemeta(type):
             return self._echo
         @echo.setter
         def echo(self, value):
-            if value is True:
+            if value == True:
                 self._echo = 'thmp'
+            elif value == False:
+                self._echo = ''
             else:
                 self._echo = value
     ''']
@@ -217,6 +219,16 @@ class texmemeta(type):
         @picture_root.setter
         def picture_root(self, value):
             self._picture_root = value
+    ''']
+
+    #$$$ def *prop&sett pic-error
+    propme += ['''
+        @property
+        def pic_error(self):
+            return self._pic_error
+        @pic_error.setter
+        def pic_error(self, value):
+            self._pic_error = value
     ''']
 
     #$$$ def *prop&sett lvl-add
@@ -326,6 +338,8 @@ class texme(metaclass=texmemeta):
     _lvl_add = 0
 
     _minitoc = True
+
+    _pic_error = True
 
     # x: global
     _x_rm_text = 1
@@ -687,12 +701,18 @@ class texme(metaclass=texmemeta):
         )
 
     #$$$ def text
-    def text(self, text, rm_text=None, strip=True, inherit=None, echo=None):
+    def text(self, text, rm_text=None, strip=True, inherit=None, echo=None, page=None, scope=None):
         '''
         '''
 
         if not self._active:
             return
+
+        if page:
+            self.page(page)
+
+        if scope:
+            self.scope.update(scope)
 
         # use global settings
         if inherit        is None: inherit       = self._inherit
@@ -714,12 +734,18 @@ class texme(metaclass=texmemeta):
 
 
     #$$$ def head
-    def head(self, lvl, text, label=None, text2=None, rm_text=None, without_number=False, minitoc=None, inherit=None, echo=None):
+    def head(self, lvl, text, label=None, text2=None, rm_text=None, without_number=False, minitoc=None, inherit=None, echo=None, page=None, scope=None):
         '''
         '''
 
         if not self.active:
             return
+
+        if page:
+            self.page(page)
+
+        if scope:
+            self.scope.update(scope)
 
         # use global settings
         if inherit        is None: inherit       = self._inherit
@@ -732,10 +758,10 @@ class texme(metaclass=texmemeta):
 
         if label is True:
             firstletters = ''.join([i[0].lower() for i in text.split()])
-            lab = '\\label{h'+str(lvl)+':' + firstletters + '}'
+            lab = '\\hedlab{h'+str(lvl)+':' + firstletters + '}'
 
         elif label:
-            lab = '\\label{' + label + '}'
+            lab = '\\hedlab{' + label + '}'
 
         else:
             lab = ''
@@ -813,12 +839,18 @@ class texme(metaclass=texmemeta):
 
 
     #$$$ def pic
-    def pic(self, path, caption=False, label=None, float=False, abs_path=False, frame=True, grey_scale=None, caption2=False, rm_caption=None, width_factor=1, height_factor=0.9, mode='fig', inherit=None, echo=None):
+    def pic(self, path, caption=False, label=None, float=False, abs_path=False, frame=True, grey_scale=None, caption2=False, rm_caption=None, width_factor=1, height_factor=0.9, mode='fig', inherit=None, echo=None, page=None, scope=None):
         '''
         '''
 
         if not self.active:
             return
+
+        if page:
+            self.page(page)
+
+        if scope:
+            self.scope.update(scope)
 
         # use global settings
         if inherit        is None: inherit       = self._inherit
@@ -836,7 +868,11 @@ class texme(metaclass=texmemeta):
 
         # first check if file is exists
         if not os.path.exists(path):
-            verrs.pathError(path)
+            if self.pic_error:
+                verrs.pathError(path)
+            else:
+                print('Path does not exists. Picture error flag is False.')
+                return
 
         # create absoule path
         pathA = os.path.abspath(path).replace('\\', '/')
@@ -868,9 +904,11 @@ class texme(metaclass=texmemeta):
         # fig must be deafult!
         if mode=='fig':
 
-            if float:
+            if float is True:
                 code = '\\begin{figure}\n\\centering{'
-            else:
+            elif float is False:
+                code = '\\begin{center}\n'
+            elif float is 'H':
                 code = '\\begin{figure}[H]\n\\centering{'
 
             code += tools.translate( '\\includegraphics[{1}width={2}\\linewidth,height={3}\\textheight,keepaspectratio]{{0}}\n',
@@ -889,8 +927,12 @@ class texme(metaclass=texmemeta):
                     cap2 = ''
 
 
-                code += tools.translate('\\caption{1}{{0}}\n',
-                    {'{0}': caption, '{1}':cap2})
+                code += tools.translate('\\caption{float}{1}{{0}}\n',
+                    {
+                        '{0}'    : caption,
+                        '{1}'    : cap2,
+                        '{float}': ('of{figure}' if not float else '')
+                    })
 
 
                 if type(label) is str:
@@ -899,7 +941,10 @@ class texme(metaclass=texmemeta):
                 elif label == True:
                     code += '\\figlab{{0}}\n'.replace('{0}', 'fig:'+user_path.replace('\\', '').replace('/', ''))
 
-            code += '}\\end{figure}'
+            if float is False:
+                code += '\\end{center}'
+            else:
+                code += '}\\end{figure}'
 
             _name1='pic-fig'
 
@@ -967,13 +1012,19 @@ class texme(metaclass=texmemeta):
 
 
     #$$$ def math
-    def math(self, equation, mode=None, label=None, rm_equation=None, rm_text=None, exe=False, inherit=None, echo=None):
+    def math(self, equation, mode=None, label=None, rm_equation=None, rm_text=None, exe=False, inherit=None, echo=None, page=None, scope=None):
         '''
         Please remember about problem with equation block - there is fault working labels. To fix it use gather instead equation block. \\leavemode should fix it, but it is not tested yet.
         '''
 
-        if not self.active:
+        if not self.active or equation is None:
             return
+
+        if page:
+            self.page(page)
+
+        if scope:
+            self.scope.update(scope)
 
         # if given is list, then return self looped
         if type(equation)==list:
@@ -987,16 +1038,18 @@ class texme(metaclass=texmemeta):
         if rm_text        is None: rm_text       = self._m_rm_text
 
 
-        if mode not in ['t*', 't+']:
-            equation = regme(equation, self.scope).package(rm_equation)
+        if mode in ['t*', 't+']:
+            if 'm' in echo:
+                ipdisplay(HTML(equation))
 
-        elif mode in ['t*', 't+']:
             return self.add(
                 submodule = 'm',
                 code      = regme(equation, self.scope).package(rm_text),
                 inherit   = inherit,
                 echo      = echo,
             )
+
+        equation = regme(equation, self.scope).package(rm_equation)
 
         if exe:
             exec(equation, self.scope)
@@ -1065,12 +1118,18 @@ class texme(metaclass=texmemeta):
 
 
     #$$$ def tab
-    def tab(self, cols, data, options='\\textwidth', caption=None, label=None, float=False, header=None, stretchV=1.5, rm_caption=None, rm_data=None, inherit=None, echo=None):
+    def tab(self, cols, data, options='\\textwidth', caption=None, label=None, float=False, header=None, stretchV=1.5, rm_caption=None, rm_data=None, inherit=None, echo=None, page=None, scope=None):
         '''
         '''
 
         if not self.active:
             return
+
+        if page:
+            self.page(page)
+
+        if scope:
+            self.scope.update(scope)
 
         # use global settings
         if inherit        is None: inherit       = self._inherit
@@ -1132,12 +1191,18 @@ class texme(metaclass=texmemeta):
 
 
     #$$$ def code
-    def code(self, code, caption='', label='', language='python', rm_code=None, rm_caption=None, mathescape=True, inherit=None, echo=None):
+    def code(self, code, caption='', label='', language='python', rm_code=None, rm_caption=None, mathescape=True, inherit=None, echo=None, page=None, scope=None):
         '''
         '''
 
         if not self.active:
             return
+
+        if page:
+            self.page(page)
+
+        if scope:
+            self.scope.update(scope)
 
         # use global settings
         if inherit        is None: inherit       = self._inherit
@@ -1253,7 +1318,7 @@ class texme(metaclass=texmemeta):
 
 
     #$$$ def item
-    def item(self, text=None, equation=None, mode=None, lmath=None, label=None, width=None, level=1, prefix=None, postfix=None, rm_text=None, rm_equation=None, exe=False, col_type='q', inherit=None, echo=None):
+    def item(self, text=None, equation=None, mode=None, lmath=None, label=None, width=None, level=1, prefix=None, postfix=None, rm_text=None, rm_equation=None, exe=False, col_type='q', inherit=None, echo=None, page=None, scope=None):
         '''
         Column type must can defined explicit size in length dimension (like p{50mm} (or q,w,e).
         '''
@@ -1261,6 +1326,12 @@ class texme(metaclass=texmemeta):
         # if active flag is False then with None return
         if not self.active:
             return
+
+        if page:
+            self.page(page)
+
+        if scope:
+            self.scope.update(scope)
 
         # use global settings
         if inherit        is None: inherit       = self._inherit
@@ -1370,28 +1441,43 @@ class texme(metaclass=texmemeta):
                 glue = '\n'
 
 
-            equation = self.math(
-                mode        = mode,
-                equation    = equation,
-                label       = label,
-                rm_equation = rm_equation,
-                rm_text     = rm_text,
-                inherit     = True,
-                exe         = exe)
+        elif text:
 
-            if type(equation)==list:
-                equation = glue.join(equation)
+            # create column pattern
+            columns = '{{pcols}L}'.replace('{pcols}', pcols)
+
+            tex = (
+                r"{space_bt}"
+                r"\begin{tabularx}{\textwidth}{columns}""\n"
+                r"{ptext}{text}{postfix}%""\n"
+                r"\end{tabularx}"
+                )
+
+            glue = ''
 
 
-            tex = tools.translate(tex, {
-                '{space_bt}'  : space_bt,
-                '{columns}'   : columns,
-                '{ptext}'     : ptext,
-                '{text}'      : regme(text.strip(), self.scope).package(rm_text),
-                '{postfix}'   : postfix,
-                '{flush_math}': flush_math,
-                '{equation}'  : equation,
-            })
+        equation = self.math(
+            mode        = mode,
+            equation    = equation,
+            label       = label,
+            rm_equation = rm_equation,
+            rm_text     = rm_text,
+            inherit     = True,
+            exe         = exe)
+
+        if type(equation)==list:
+            equation = glue.join(equation)
+
+
+        tex = tools.translate(tex, {
+            '{space_bt}'  : space_bt,
+            '{columns}'   : columns,
+            '{ptext}'     : ptext,
+            '{text}'      : regme(text.strip(), self.scope).package(rm_text),
+            '{postfix}'   : postfix,
+            '{flush_math}': flush_math,
+            '{equation}'  : equation,
+        })
 
         self.__last_type = 'i'
 

@@ -42,8 +42,40 @@ class smemb:
 
 
     @staticmethod
-    def stability_uniaxial(σ_nmy_Ed, σ_mz_Ed, σ_x_Rk, α_imp=0.76, γ_a_M1=1.1, λ_op=True,
-    α_cr=None, val_Rk=None, val_Ek=None, val_cr=None):
+    def stability_datas(α_imp, γ_M1, α_cr, val_Rk, val_Ek, σ_x_Rk):
+
+        if   α_imp=='a0': α_imp = 0.13
+        elif α_imp=='a' : α_imp = 0.21
+        elif α_imp=='b' : α_imp = 0.34
+        elif α_imp=='c' : α_imp = 0.49
+        elif α_imp=='d' : α_imp = 0.76
+
+        λ_op = smemb.slederness(
+            α_cr   = α_cr,
+            val_Rk = val_Rk,
+            val_Ek = val_Ek
+        )
+
+        # coefficient
+        φ_op = 0.5*(1 + α_imp*(λ_op - 0.2) + λ_op**2)
+        χ_op = min((1)/(φ_op + sqrt(φ_op**2 - λ_op**2)), 1.0)
+
+        σ_Rd = σ_x_Rk * χ_op / γ_M1
+
+        # returned dictonary
+        return {
+            'α_imp': α_imp,
+            'α_ult': val_Rk/val_Ek,
+            'λ_op' : λ_op,
+            'χ_op' : χ_op,
+            'σ_Rd' : σ_Rd,
+        }
+
+
+
+
+    @staticmethod
+    def stability_uniaxial(σ_nmy_Ed, σ_mz_Ed, σ_x_Rk, α_imp=0.76, γ_M1=1.1, λ_op=True, α_cr=None, val_Rk=None, val_Ek=None, val_cr=None):
 
         if λ_op==True:
             λ_op = smemb.slederness(
@@ -59,8 +91,8 @@ class smemb:
 
         # utilization
         util = (
-            (σ_nmy_Ed)/(σ_x_Rk / γ_a_M1 * χ_op) +
-            (σ_mz_Ed )/(σ_x_Rk / γ_a_M1)
+            (σ_nmy_Ed)/(σ_x_Rk / γ_M1 * χ_op) +
+            (σ_mz_Ed )/(σ_x_Rk / γ_M1)
         )
 
         # returned dictonary

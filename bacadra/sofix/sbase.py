@@ -180,7 +180,7 @@ class sbase:
         if not os.path.exists(os.path.join(self._magi_env, self._magi_mck)):
             verrs.envcheckBCDRsofixError(os.path.join(self._magi_env, self._magi_mck))
 
-        return self._magi_env
+        return self._magi_mck
 
 
     def connect(self, path, ver_edu=True, cdbIndex=99):

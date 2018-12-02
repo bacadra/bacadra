@@ -633,6 +633,9 @@
 \newcommand{\bcdrfb}[1]{\textcolor{bcdr2}{\m{\b{#1}}}}
 \newcommand{\bcdrfc}[1]{\textcolor{black}{\m{\b{#1}}}}
 
+\newcommand{\hedlab}[1]{\label{hed:#1}}       % header label
+\NewDocumentCommand{\hedref}{o m}{%
+    \IfNoValueTF{#1}{(\ref{hed:#2})}{\hyperref[hed:#2]{#1}}}
 
 \newcommand{\figlab}[1]{\label{fig:#1}}       % figure label
 \NewDocumentCommand{\figref}{o m}{%

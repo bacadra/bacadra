@@ -13,4 +13,4 @@ Team members developing this package:
 from .sbase import sbase
 from .tools import tools
 from .trade import trade
-# from .wgraf import wgraf
+from .wgraf import wgraf

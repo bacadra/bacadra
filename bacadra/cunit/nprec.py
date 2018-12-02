@@ -132,8 +132,8 @@ def to_precision(
             value = value[:-2]
 
         if not strip_zeros and nround>0:
-            if value.find('.') >= 0:
-                ad = len(value) - value.find('.') - 1
+            if value.rfind('.') >= 0:
+                ad = len(value) - value.rfind('.') - 1
                 for i in range(ad-nround):
                     value += '0'
             else:

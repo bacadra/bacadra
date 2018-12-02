@@ -19,10 +19,14 @@ from . import sbase
 class tools:
     sbase = sbase()
 
-    def watermark(self, name, output='pic-fix', copy=False, echo=True):
+    @staticmethod
+    def watermark(name, output='pic-fix', rename=False, echo=True, active=True):
         '''
         Convert graphic file, trim and delete watermark symbol.
         '''
+
+        if not active:
+            return None
 
         # if output folder does not exists, then create it
         if not os.path.isdir(os.path.abspath(output)):
@@ -32,7 +36,7 @@ class tools:
         # loop over files adequete to file pattern
         for file in glob.glob(name):
             i+=1
-            if copy:
+            if rename:
                 splitted = os.path.basename(file).split('.')
                 name_out = splitted[0] + '_out.' + splitted[1]
             else:
@@ -45,7 +49,7 @@ class tools:
                 # output path
                 'p0': os.path.dirname(name),
                 # create ImageMagick execute file path
-                'p1': os.path.join(self.sbase._magi_env, self.sbase._magi_mck),
+                'p1': os.path.join(tools.sbase.magi_env(), tools.sbase.magi_mck()),
                 # create base file
                 'p2': os.path.basename(file),
                 # output name
@@ -58,11 +62,14 @@ class tools:
                 print(f'in [{i}]:',os.path.abspath(file))
                 print(f'out[{i}]:',name_out)
 
-
-    def pdf2jpg(self, pdf_path, jpg_output='pdf2jpg', format_name='{name}-%03d.jpg', delete_pdf=False, echo=True, delete_old_jpg=True):
+    @staticmethod
+    def pdf2jpg(pdf_path, jpg_output='pdf2jpg', format_name='{name}-%03d.jpg', delete_pdf=False, echo=True, delete_old_jpg=True, active=True):
         '''
         Explode multipage pdf to single page graphics .jpg.
         '''
+
+        if not active:
+            return None
 
         # if output folder does not exists, then create it
         if not os.path.isdir(os.path.abspath(jpg_output)):
@@ -87,7 +94,7 @@ class tools:
                 # change current dir to project folder
                 'p0': os.path.abspath(os.path.dirname(pdf)),
                 # create path to ImageMagick execute file
-                'p1': os.path.join(self.sbase._magi_env, self.sbase._magi_mck),
+                'p1': os.path.join(tools.sbase.magi_env(), tools.sbase.magi_mck()),
                 # crete name of pdf file
                 'p2': os.path.basename(pdf),
                 # create output base path

@@ -105,7 +105,7 @@ class ecode:
         Lpδ = np.interp(v, P[:,0], P[:,1])
 
         # deflection limit
-        dz_Rd = L / max(600, Lpδ * span / comfort) * cunit('m')
+        dz_Rd = cunit(L, 'm') / max(600, Lpδ * span / comfort)
 
         return dz_Rd
 
@@ -188,7 +188,7 @@ class ecode:
 
 
     @staticmethod
-    def fatigue(L_φ, L_w, σ_p_max, Δσ_c, σ_p_min=0):
+    def fatigue(L_φ, L_w, σ_p_max, Δσ_c, σ_p_min=0, λ_1_type='EC_MIX', q_w=cunit(25*10**6,'t yr**-1'), σ1pσ12=1.00, t_life=cunit(100,'yr')):
         '''
         Przy określaniu Å, krytyczną długość linii Wpłyvvu przyjmuje się jak następuje:
         dla momentów:
@@ -220,15 +220,15 @@ class ecode:
 
 
         # Współczynnik, wyrażający efekt uszkodzenia od ruchu, zależny od długości linii wpływu;
-        λ_1_type = 'EC_MIX'
+
         if λ_1_type == 'EC_MIX':
             λ_1 = np.interp(
                 L_w.d('m'),
                 np.array([0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0,6,7,8,9,10,12.5,15,17.5,20,25,30,35,40,45,50,60,70,80,90,100]),
                 np.array([1.60,1.60,1.60,1.46,1.38,1.35,1.17,1.07,1.02,1.03,1.03,0.97,0.92,0.88,0.85,0.82,0.76,0.70,0.67,0.66,0.65,0.64,0.64,0.64,0.63,0.63,0.62,0.61,0.61,0.60]),
             )
-
-        q_w = 25*10**6*t/yr
+        else:
+            raise ValueError()
 
         # Współczynnik wyrażający wpływ natężenia ruchu;
         λ_2 = np.interp(
@@ -237,16 +237,12 @@ class ecode:
             [0.72,0.83,0.90,0.96,1,1.04,1.07,1.10,1.15],
         )
 
-        t_life = 100*yr
-
         # Współczynnik wyrażający wpływ okresu użytkowania mostu;
         λ_3 = np.interp(
             t_life.d('yr'),
             [50,60,70,80,90,100,120],
             [0.87,0.90,0.93,0.96,0.98,1.00,1.04],
         )
-
-        σ1pσ12 = 1.00
 
         # współczynnik stosowany W elementach konstrukcyjnych obciążonych na więcej niż jednym torze;
         λ_4 = np.interp(
@@ -265,17 +261,24 @@ class ecode:
         Δσ_p = abs(σ_p_max - σ_p_min)
 
         # Efekty uszkodzeń na skutek spektrum zakresu naprężenia można przedstawić za pomocą równoważnego zakresu naprężenia odniesionego do 2 ×1O6 cykli
-        Δσ_E2=λ*φ_2*Δσ_p
+        Δσ_E2= λ * φ_2 * Δσ_p
 
         # Ocenę zmęczenia należy przeprowadzić jak następuje
-        γ_Ff * Δσ_E2 <= Δσ_c/γ_Mf
-
-        util = (γ_Ff * Δσ_E2)/(Δσ_c/γ_Mf)
+        util = (γ_Ff * Δσ_E2) / (Δσ_c/γ_Mf)
 
         return {
-            'φ_2':φ_2,
-            'λ':λ,
-            'Δσ_E2':Δσ_E2,
-            'Δσ_c':Δσ_c,
-            'util':util.s('%')
+            'σ_p_max':σ_p_max,
+            'σ_p_min':σ_p_min,
+            'γ_Ff' : γ_Ff,
+            'γ_Mf' : γ_Mf,
+            'λ_1'  : λ_1,
+            'λ_2'  : λ_2,
+            'λ_3'  : λ_3,
+            'λ_4'  : λ_4,
+            'λ'    : λ,
+            'φ_2'  : φ_2,
+            'Δσ_p' : Δσ_p,
+            'Δσ_E2': Δσ_E2,
+            'Δσ_c' : Δσ_c,
+            'util' : util.s('%')
         }
