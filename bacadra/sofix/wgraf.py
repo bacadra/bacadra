@@ -17,7 +17,7 @@ import glob
 from . import sbase
 from . import verrs
 
-class wgraf1:
+class wgraf:
     sbase = sbase()
 
     size     = {'h':'2023x1296+289+289',
@@ -36,7 +36,7 @@ class wgraf1:
         self.watermark = watermark
 
         # start system while class object defined
-        self._start_system()
+        # self._start_system()
 
 
     def _check_gra(self, path):
@@ -159,7 +159,11 @@ class wgraf1:
             os.remove(file)
 
 
-    def _start_system(self):
+    @staticmethod
+    def run(**kwargs):
+
+        self = wgraf(**kwargs)
+
         if self.active:
             # check that cdb exists
             if not os.path.exists(self.cdb):
@@ -169,47 +173,37 @@ class wgraf1:
             for data in self.wdata:
 
                 # if active is true
-                if data[0]:
+                if data[2]:
 
                     # check that gra exists
-                    self._check_gra(data[2])
+                    self._check_gra(data[1])
 
                     # run sps with wingraf file
-                    self._gra2plb(data[2])
+                    self._gra2plb(data[1])
 
                     # convert .plb to .pdf
-                    self._plb2pdf(data[2])
+                    self._plb2pdf(data[1])
 
                     # delete old images
                     if self.delete:
-                        self._del_old_jpg(data[2])
+                        self._del_old_jpg(data[1])
 
                     # convert .pdf to .jpg
-                    self._pdf2jpg(data[2])
+                    self._pdf2jpg(data[1])
 
                     # convert jpg files
-                    self._jpg_convert(data[2], data[1])
+                    self._jpg_convert(data[1], data[0])
 
 
+    @staticmethod
+    def run_mass(output, cdb, wdata, delete=True, active=True, watermark=True):
 
-class wgraf:
-    def __init__(self, output, cdb, wdata, delete=True, active=True, watermark=True):
-        self.active = active
-        self.output = output
-        self.cdb    = cdb
-        self.wdata  = wdata
-        self.delete = delete
-        self.watermark=watermark
-
-        self._start_system()
-
-    def _start_system(self):
-        if self.active:
+        if active:
             i=0
-            for cdb in self.cdb:
-                i+=1
-                print(i,'. ',cdb)
+            for cdb in cdb:
+                i+=1; print(str(i)+'.', cdb)
 
-                output_path = os.path.join(self.output, os.path.basename(cdb[1]))
+                output_path = os.path.join(output, os.path.basename(cdb[0]))
 
-                wgraf1(cdb=cdb[1], wdata=self.wdata, delete=self.delete, output=output_path, active=cdb[0], watermark=self.watermark)
+                wgraf.run(cdb=cdb[0], wdata=wdata, delete=delete, output=output_path, active=cdb[1], watermark=watermark)
+

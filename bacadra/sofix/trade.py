@@ -94,8 +94,8 @@ $ --------- set defines ----------------------------------------------------- $
 #include "{data0}"
 
 $ --------------------------------------------------------------------------- $
-+prog template
-head bcdr:pinky
+-prog template
+head bcdr : {name}
 dbg#2 $ debugging mode turn on
 
 $ --------- delete variables ------------------------------------------------ $
@@ -107,6 +107,7 @@ $ --------- set variables --------------------------------------------------- $
 $ --------------------------------------------------------------------------- $
 end
 '''[1:-1].format(**{
+            'name' :self.name,
             'data0':os.path.splitext(self.name)[0]+'.$d0',
             'data1':os.path.splitext(self.name)[0]+'.$d1',
             'data2':os.path.splitext(self.name)[0]+'.$d2'})

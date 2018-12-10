@@ -4,7 +4,7 @@
     "hline1"  : "~",
     "hline2"  : "~",
     "footL"   : "\\small{\\contour{black}{\\textsc{PBW INŻYNIERIA}}} \\\\ ul. Sokolnicza 5/72-75 \\\\ 53-676 Wrocław",
-    "logo-pbw": "logo-pbw.png",
+    "logo-path": "logo-pbw.png",
     "author"  : " ",
     "bibpath" : "main.bib"
     }

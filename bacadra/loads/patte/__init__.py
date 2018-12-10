@@ -1,6 +1,6 @@
 '''
 ------------------------------------------------------------------------------
-BCDR += ***** general finite and free (loads) *****
+BCDR += ***** load (patte)rn *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
@@ -10,20 +10,14 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
-from ..tools.rootx import rootx
+
+from ...tools.rootx import rootx
 
 #$ class index
 class index(rootx):
-    #$$ --init--
-    def __init__(self, core):
-        from .ltree import cates
-        from .ltree import lcase
-        from .assig import nodes
-        from .assig import handy
-        from . import patte
+    def __init__(self, core=None):
+        from .windl import windl
+        from .therl import therl
 
-        self.cates = cates.cates(core=core)
-        self.lcase = lcase.lcase(core=core)
-        self.nodes = nodes.nodes(core=core)
-        self.handy = handy.handy(core=core)
-        self.patte = patte.index(core=core)
+        self.windl = windl(core=core)
+        self.therl = therl(core=core)        

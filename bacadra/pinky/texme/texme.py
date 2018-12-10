@@ -156,11 +156,11 @@ class texmemeta(type):
     #$$$ def *prop&sett output-dir
     propme += ['''
         @property
-        def output_dir(self):
-            return self._output_dir
-        @output_dir.setter
-        def output_dir(self, value):
-            self._output_dir = value
+        def out_path(self):
+            return self._out_path
+        @out_path.setter
+        def out_path(self, value):
+            self._out_path = value
     ''']
 
 
@@ -214,11 +214,11 @@ class texmemeta(type):
     #$$$ def *prop&sett picture-root
     propme += ['''
         @property
-        def picture_root(self):
-            return self._picture_root
-        @picture_root.setter
-        def picture_root(self, value):
-            self._picture_root = value
+        def pic_root(self):
+            return self._pic_root
+        @pic_root.setter
+        def pic_root(self, value):
+            self._pic_root = value
     ''']
 
     #$$$ def *prop&sett pic-error
@@ -256,11 +256,21 @@ class texmemeta(type):
     #$$$ def *prop&sett picture-root
     propme += ['''
         @property
-        def picture_root(self):
-            return self._picture_root
-        @picture_root.setter
-        def picture_root(self, value):
-            self._picture_root = value
+        def pic_root(self):
+            return self._pic_root
+        @pic_root.setter
+        def pic_root(self, value):
+            self._pic_root = value
+    ''']
+
+    #$$$ def *prop&sett minitoc
+    propme += ['''
+        @property
+        def minitoc(self):
+            return self._minitoc
+        @minitoc.setter
+        def minitoc(self, value):
+            self._minitoc  = value
     ''']
 
     propme = inspect.cleandoc('\n'.join(propme))
@@ -308,7 +318,7 @@ class texme(metaclass=texmemeta):
     _input_name = 'main.tex'
 
     # output folder
-    _output_dir = r'.\tex'
+    _out_path = r'.\tex'
 
     # last code generation
     __last_type = ''
@@ -332,7 +342,7 @@ class texme(metaclass=texmemeta):
     _display_width = 600
 
     # prepath of image path
-    _picture_root = '.'
+    _pic_root = '.'
 
     # additional header level
     _lvl_add = 0
@@ -475,32 +485,33 @@ class texme(metaclass=texmemeta):
         '''
         Copy template tree from input to output dir. It working in two mode: force and inteligent (.fcopy is cotroler).
         '''
+        # print(self._out_path)
 
         # if force copy is True
-        if self._fcopy or not os.path.exists(self._output_dir):
+        if self._fcopy or not os.path.exists(self._out_path):
             # first, if output dir exists, then delete is
-            if os.path.isdir(self._output_dir):
+            if os.path.isdir(self._out_path):
                 # by full tree
-                shutil.rmtree(self._output_dir)
+                shutil.rmtree(self._out_path)
 
             # then update bibliography by central data
             self._bibliography_update()
 
             # at least copy dir from input to output
-            shutil.copytree(self._input_dir, self._output_dir)
+            shutil.copytree(self._input_dir, self._out_path)
 
         # if force mode is deactive
         else:
             # exists of path is alredy done
             # save base path
-            path = os.path.join(self._output_dir, self._input_name)
+            path = os.path.join(self._out_path, self._input_name)
 
             # if output folder exists, then check if bak folder exists
             if os.path.exists(path):
                 os.remove(path)
 
             if not os.path.exists(path + '.bak'):
-                pathT = os.path.join(self._input_dir, self._input_name)
+                pathT = os.path.join(self._input_dir, self._input_name + '.bak')
                 shutil.copyfile(pathT, path)
 
 
@@ -525,7 +536,7 @@ class texme(metaclass=texmemeta):
         # try import data from project default
         try:
             name = os.path.splitext(self._input_name)[0] + '.json'
-            path = os.path.abspath(os.path.join(self._output_dir, name))
+            path = os.path.abspath(os.path.join(self._out_path, name))
 
             with open(path, encoding='utf8') as f:
                 for key,val in json.load(f)['keys'].items():
@@ -541,7 +552,7 @@ class texme(metaclass=texmemeta):
 
     #$$$ def -replace-in-file
     def _replace_in_file(self, Dict, mode):
-        path1 = os.path.join(self._output_dir, self._input_name)
+        path1 = os.path.join(self._out_path, self._input_name)
         path2 = path1 + '.bak'
 
         with open(path2, encoding='utf-8') as infile, open(path1, mode, encoding='utf-8') as outfile:
@@ -557,7 +568,7 @@ class texme(metaclass=texmemeta):
         if shell_escape: sett += '--shell-escape'
 
         code = 'cd "{0}" & pdflatex {1} "{2}"'.format(
-            self._output_dir, sett, self._input_name)
+            self._out_path, sett, self._input_name)
         subprocess.run(code, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     #$$$ def -bib-loader
@@ -568,13 +579,13 @@ class texme(metaclass=texmemeta):
         # if bibtex:
         if mode=='bibtex':
             code = 'cd "{0}" & bibtex "{1}"'.format(
-                self._output_dir, name_noext + '.aux')
+                self._out_path, name_noext + '.aux')
         elif mode=='biber':
             code = 'cd "{0}" & biber "{1}"'.format(
-            self._output_dir, name_noext + '.bcf')
+            self._out_path, name_noext + '.bcf')
         elif mode=='bibtex8':
             code = 'cd "{0}" & bibtex8 "{1}"'.format(
-            self._output_dir, name_noext + '.bcf')
+            self._out_path, name_noext + '.bcf')
 
         subprocess.run(code, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
@@ -594,8 +605,8 @@ class texme(metaclass=texmemeta):
         name_noext = os.path.basename(os.path.splitext(self._input_name)[0])
 
         for ext in ext_list:
-            if os.path.exists(os.path.join(self._output_dir, name_noext) + ext):
-                os.remove(os.path.join(self._output_dir, name_noext) + ext)
+            if os.path.exists(os.path.join(self._out_path, name_noext) + ext):
+                os.remove(os.path.join(self._out_path, name_noext) + ext)
 
     #$$$ def save
     def save(self, mode='w', active=None):
@@ -644,7 +655,7 @@ class texme(metaclass=texmemeta):
     #$$ generate methods
 
     #$$$ def page
-    def page(self, mode, inherit=None, echo=None):
+    def page(self, mode, val1=None, inherit=None, echo=None):
         '''
         Check reference:
 
@@ -689,6 +700,9 @@ class texme(metaclass=texmemeta):
 
         elif mode in ['anpb-e', 'absolutelynopagebreak-e']:
             code = r'\end{absolutelynopagebreak}'
+
+        elif mode in ['vs', 'vspace']:
+            code = r'\vspace*{'+val1+'}'
 
         else:
             raise ValueError('Unknow mode')
@@ -864,7 +878,7 @@ class texme(metaclass=texmemeta):
         user_path = path
 
         # user can define prepath for picture
-        path = os.path.join(self._picture_root, path)
+        path = os.path.join(self._pic_root, path)
 
         # first check if file is exists
         if not os.path.exists(path):
@@ -883,7 +897,7 @@ class texme(metaclass=texmemeta):
 
         # but if not, then create relative path from current dir
         else:
-            path = os.path.relpath(path, self._output_dir).replace('\\', '/')
+            path = os.path.relpath(path, self._out_path).replace('\\', '/')
 
         # if creat
         if grey_scale:
@@ -1012,7 +1026,7 @@ class texme(metaclass=texmemeta):
 
 
     #$$$ def math
-    def math(self, equation, mode=None, label=None, rm_equation=None, rm_text=None, exe=False, inherit=None, echo=None, page=None, scope=None):
+    def math(self, equation, mode=None, label=None, rm_equation=None, rm_text=None, exe=False, inherit=None, echo=None, strip=True, page=None, scope=None):
         '''
         Please remember about problem with equation block - there is fault working labels. To fix it use gather instead equation block. \\leavemode should fix it, but it is not tested yet.
         '''
@@ -1028,7 +1042,13 @@ class texme(metaclass=texmemeta):
 
         # if given is list, then return self looped
         if type(equation)==list:
-            return [self.math(eq1, mode, label, rm_equation, rm_text, exe, inherit, echo) for eq1 in equation]
+            if type(mode)==list:
+                return [self.math(eq1, m1, label, rm_equation, rm_text, exe, inherit, echo) for eq1,m1 in zip(equation, mode)]
+            else:
+                return [self.math(eq1, mode, label, rm_equation, rm_text, exe, inherit, echo) for eq1 in equation]
+
+        if strip:
+            equation = equation.strip()
 
         # use global settings
         if inherit        is None: inherit       = self._inherit
@@ -1038,7 +1058,7 @@ class texme(metaclass=texmemeta):
         if rm_text        is None: rm_text       = self._m_rm_text
 
 
-        if mode in ['t*', 't+']:
+        if mode in ['t*', 't+', 't']:
             if 'm' in echo:
                 ipdisplay(HTML(equation))
 
@@ -1061,42 +1081,42 @@ class texme(metaclass=texmemeta):
             lab = ''
 
 
-        if mode == 'e+':
+        if mode in ['e+']:
             code = '\\leavevmode\\begin{equation} ' + lab + \
                 '\n' + equation + '\n\\end{equation}'
 
-        elif mode == 'e*':
+        elif mode in ['e*', 'e']:
             code = '\\begin{equation*} ' + lab + \
                 '\n' + equation + '\n\\end{equation*}'
 
-        elif mode == 'i*':
+        elif mode in ['i*', 'i']:
             code = '$' + equation + '$'
 
-        elif mode == 'm+':
+        elif mode in ['m+']:
             code = '\\begin{multline} ' + lab + \
                 '\n' + equation + '\n\\end{multline}'
 
-        elif mode == 'm*':
+        elif mode in ['m*', 'm']:
             code = '\\begin{multline*} ' + lab + \
                 '\n' + equation + '\n\\end{multline*}'
 
-        elif mode == 'a+':
+        elif mode in ['a+']:
             code = '\\begin{align} ' + lab + \
                 '\n' + equation + '\n\\end{align}'
 
-        elif mode == 'a*':
+        elif mode in ['a*','a']:
             code = '\\begin{align*} ' + lab + \
                 '\n' + equation + '\n\\end{align*}'
 
-        elif mode == 'd+':
+        elif mode in ['d+']:
             code = '\\begin{dmath} ' + lab + \
                 '\n' + equation + '\n\\end{dmath}'
 
-        elif mode == 'g+':
+        elif mode in ['g+']:
             code = '\\begin{gather} ' + lab + \
                 '\n' + equation + '\n\\end{gather}'
 
-        elif mode == 'g*':
+        elif mode in ['g*', 'g']:
             code = '\\begin{gather*} ' + lab + \
                 '\n' + equation + '\n\\end{gather*}'
 
@@ -1159,7 +1179,7 @@ class texme(metaclass=texmemeta):
             header = ''
 
         tex = ("\\begingroup"
-            "\\def\\arraystretch{%StV}"
+            "\\renewcommand*{\\arraystretch}{%StV}"
             "\\begin{tabularx}{%Opt}{%Col}"
             "%Cap"
             "%Hea"
@@ -1179,6 +1199,8 @@ class texme(metaclass=texmemeta):
         if float == True:
             tex = '\\begin{table}\n' + tex + '\n\\end{table}'
         elif float == False:
+            pass
+        elif float == 'H':
             tex = '\\begin{table}[H]\n' + tex + '\n\\end{table}'
 
         return self.add(
@@ -1389,7 +1411,7 @@ class texme(metaclass=texmemeta):
 
         # here, if block 3 options: t&e, t, e
         if text and equation:
-            if mode in ['i*', 't*', 'g*', 'm*']:
+            if mode in ['i*', 't*', 'g*', 'm*', 'i', 't', 'g', 'm']:
 
                 # create column pattern
                 columns = tools.translate('{{pcols}{col_type}{{width}}L}', {
@@ -1435,8 +1457,6 @@ class texme(metaclass=texmemeta):
                         r"\vspace*{-3mm}""\n"
                         r"\end{tabularx}""\n"
                         )
-
-                # tex += self.page('anpb-e', inherit=True)
 
                 glue = '\n'
 

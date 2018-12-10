@@ -174,7 +174,7 @@
 	\renewcommand{\headrulewidth}{2.0pt}
 	\renewcommand{\footrulewidth}{2.0pt}
 
-  \lhead{\includegraphics[height=1.5cm]{%<logo-pbw>%}}
+  \lhead{\includegraphics[height=1.5cm]{%<logo-path>%}}
 
   \rhead{\small %<hline0>% \\
   \medskip

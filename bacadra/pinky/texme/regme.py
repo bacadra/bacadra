@@ -19,7 +19,7 @@ from ...cunit.units import cunit
 #$ ____ class RegME ________________________________________________________ #
 
 
-regme_bslash = re.compile(r'( |^|\n|~|\+|\-|\%|\@|=|\*|\(|\)|\{|\}|\$|\:)(begin|end|cfrac|frac|vec|ref|eqref|equref|figref|tabref|lstref|figlab|tablab|lstlab|equlab|cite|vspace|makecell|sqrt|b|i|u|t|bu|ub|iu|ui|ib|bi|ibu|iub|biu|bui|uib|ubi|mn|mt|mi|mb|mm|tm)(\{|\[)')
+regme_bslash = re.compile(r'( |^|\n|~|\+|\-|\%|\@|=|\*|\(|\)|\{|\}|\$|\:)(begin|end|cfrac|frac|vec|ref|eqref|equref|figref|tabref|hedref|lstref|figlab|tablab|lstlab|equlab|hedlab|cite|vspace|makecell|sqrt|b|i|u|t|bu|ub|iu|ui|ib|bi|ibu|iub|biu|bui|uib|ubi|mn|mt|mi|mb|mm|tm)(\{|\[)')
 
 regme_recomp1 = re.compile(r'(\{?[a-zA-Z0-9α-ωΑ-Ω]\}?\_)([a-zA-Z0-9α-ωΑ-Ω\_,]+)')
 
@@ -289,39 +289,49 @@ class regme:
     #$$ def symbols
     def symbols(self):
         def root(text):
-            ndict = {'**': '^',
-                     '*':  ' \\cdot ',
-                     '⋅':  ' \\cdot ',
-                     '<=': ' \\leqslant ',
-                     '>=': ' \\geqslant ',
-                     '==': ' \\equiv ',
-                     '=~=': ' \\approx ',
-                     '!=': ' \\neq ',
-                     '≠': ' \\neq ',
-                     #'/':  ' \\div ',
-                     '||': ' \\parallel',
-                     '_|_': ' \perp',
+            ndict = {
+                '**': '^',
+                 '*': ' \\cdot ',
+                 '⋅': ' \\cdot ',
+                 '<=': ' \\leqslant ',
+                 '>=': ' \\geqslant ',
+                 '==': ' \\equiv ',
+                 '=~=': ' \\approx ',
+                 '!=': ' \\neq ',
+                 '≠': ' \\neq ',
+                 #'/':  ' \\div ',
+                 '||': ' \\parallel',
+                 '_|_': ' \perp',
 
-                     '<->': ' \\Leftrightarrow ',
-                     '->': ' \\Rightarrow ',
-                     '<-': ' \\Leftarrow ',
+                 '<->': ' \\Leftrightarrow ',
+                 '->': ' \\Rightarrow ',
+                 '<-': ' \\Leftarrow ',
 
-                     '∫[':  '\\int\\limits_[',
-                     '∫{':  '\\int\\limits_{',
-                     '∫':   '\\int\\limits ',
-                     '∬[':  '\\iint\\limits_[',
-                     '∬{':  '\\iint\\limits_{',
-                     '∬':  '\\iint\\limits ',
-                     '∭[':  '\\iiint\\limits_[',
-                     '∭{':  '\\iiint\\limits_{',
-                     '∭':  '\\iiint\\limits ',
-                     '∑[':  '\\sum\\limits_[',
-                     '∑{':  '\\sum\\limits_{',
-                     '∑':  '\\sum\\limits ',
-                     '√':  '\\sqrt',
-                     '∂':  '\\partial ',
-                     '∞':  '\\infty '}
+                 '∫[':  '\\int\\limits_[',
+                 '∫{':  '\\int\\limits_{',
+                 '∫':   '\\int\\limits ',
+                 '∬[':  '\\iint\\limits_[',
+                 '∬{':  '\\iint\\limits_{',
+                 '∬':  '\\iint\\limits ',
+                 '∭[':  '\\iiint\\limits_[',
+                 '∭{':  '\\iiint\\limits_{',
+                 '∭':  '\\iiint\\limits ',
+                 '∑[':  '\\sum\\limits_[',
+                 '∑{':  '\\sum\\limits_{',
+                 '∑':  '\\sum\\limits ',
+                 '√':  '\\sqrt',
+                 '∂':  '\\partial ',
+                 '∞':  '\\infty ',
+            }
             text = tools.translate(text, ndict)
+
+            # reverse badly convert
+            ndict = {
+                 '{^}': '**',
+                 '{ \\cdot }': '*',
+            }
+            text = tools.translate(text, ndict)
+
             return text
 
         if self.math_mode:  self.text = self.math_inline(root)
@@ -367,28 +377,32 @@ class regme:
         elif mode==1:
             self.math_mode = False
             self.eval()
-            self.bslash()
-            self.rmfunction()
-            self.greek()
-            self.wb()
             self.math_mode = True
             self.math_fraction()
             self.symbols_bracket()
             self.unit()
             self.subscript()
             self.symbols()
-        elif mode==11:
             self.math_mode = False
-            self.eval()
             self.bslash()
             self.rmfunction()
             self.greek()
             self.wb()
+
+
+        elif mode==11:
+            self.math_mode = False
+            self.eval()
             self.math_fraction()
             self.symbols_bracket()
             self.unit()
             self.subscript()
             self.symbols()
+            self.bslash()
+            self.rmfunction()
+            self.greek()
+            self.wb()
+
         elif mode==99:
             self.mcadenv()
             self.textstyle()

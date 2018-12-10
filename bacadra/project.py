@@ -37,14 +37,16 @@ class project(rootx):
         self.mates = mates.index(core=core)
 
         from . import usect
-        self.usec1 = usect.index(core=core).usec1
-        self.usec2 = usect.index(core=core).usec2
-        self.usec3 = usect.index(core=core).usec3
+        _temp_ = usect.index(core=core)
+        self.usec1 = _temp_.usec1
+        self.usec2 = _temp_.usec2
+        self.usec3 = _temp_.usec3
 
         from . import geomx
-        self.geomf = geomx.index(core=core).geomf
-        self.geoms = geomx.index(core=core).geoms
-        self.geome = geomx.index(core=core).geome
+        _temp_ = geomx.index(core=core)
+        self.geomf = _temp_.geomf
+        self.geoms = _temp_.geoms
+        self.geome = _temp_.geome
 
         from . import loads
         self.loads = loads.index(core=core)

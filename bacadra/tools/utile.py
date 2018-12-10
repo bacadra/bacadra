@@ -79,62 +79,63 @@ class utile:
 
             data = [(v['UQ'],v['Level'],v['Description']) for v in self.data_ls.values()]
 
-            i_max,i_min,u1,u2 = 0,0,0,0
-            for i in range(len(data)):
-                if data[i][1] > data[i_max][1]: i_max = i
-                if data[i][1] < data[i_min][1]: i_min = i
-                if data[i][1] > 1: u1 += 1
-                if data[i][1] < 0: u2 += 1
+            if len(data)>0:
+                i_max,i_min,u1,u2 = 0,0,0,0
+                for i in range(len(data)):
+                    if data[i][1] > data[i_max][1]: i_max = i
+                    if data[i][1] < data[i_min][1]: i_min = i
+                    if data[i][1] > 1: u1 += 1
+                    if data[i][1] < 0: u2 += 1
 
-            data.append({'h_symbol':'='})
-
-
-            if u1==0:
-                text = 'All utilization statment are satisfy'
-            else:
-                text = f'Few <{u1}> utilization statment are not satisfy'
-            data.append(('', '', text))
+                data.append({'h_symbol':'='})
 
 
-            if u2==0:
-                text = 'All utilization statment were defiend correctly'
-            else:
-                text = f'Few <{u2}> utilization statment were defiend uncorrectly'
-            data.append(('', '', text))
+                if u1==0:
+                    text = 'All utilization statment are satisfy'
+                else:
+                    text = f'Few <{u1}> utilization statment are not satisfy'
+                data.append(('', '', text))
 
 
-            data.append(('MAX', data[i_max][1], data[i_max][2]))
+                if u2==0:
+                    text = 'All utilization statment were defiend correctly'
+                else:
+                    text = f'Few <{u2}> utilization statment were defiend uncorrectly'
+                data.append(('', '', text))
 
-            data.append(('MIN', data[i_min][1], data[i_min][2]))
 
-            output += [self.pinky.rstme.table(
-                caption= 'Level\'s utilization statments',
-                wrap   = [False, True, True],
-                width  = [3,8,True],
-                halign = ['l','r','l'],
-                valign = ['u','u','u'],
-                dtype  = ['t','p','t'],
-                header = ['UQ', 'Level', 'Description'],
-                data   = data,
-                precision = 2,
-                inherit = inherit,
-            )]
+                data.append(('MAX', data[i_max][1], data[i_max][2]))
 
-            self.pinky.rstme.table(
-                wrap   = [False, False, True],
-                width  = [15, 2, True],
-                halign = ['r','c','l'],
-                valign = ['u','u','u'],
-                dtype  = ['t','t','t'],
-                data   = [
-                    ['UQ' ,'-', 'Utilization questions:\n* OK  - utilization is satisfy,\n* (!) - utilization is overhead,\n* (?) - utilization is wrong formulated.'],
-                    ['Level','-', 'Level of utilization in percent scale.'],
-                    ['Description', '-', 'Description of utilization level.'],
+                data.append(('MIN', data[i_min][1], data[i_min][2]))
 
-                ],
-                border = False,
-                inherit = inherit,
-            )
+                output += [self.pinky.rstme.table(
+                    caption= 'Level\'s utilization statments',
+                    wrap   = [False, True, True],
+                    width  = [3,8,True],
+                    halign = ['l','r','l'],
+                    valign = ['u','u','u'],
+                    dtype  = ['t','p','t'],
+                    header = ['UQ', 'Level', 'Description'],
+                    data   = data,
+                    precision = 2,
+                    inherit = inherit,
+                )]
+
+                self.pinky.rstme.table(
+                    wrap   = [False, False, True],
+                    width  = [15, 2, True],
+                    halign = ['r','c','l'],
+                    valign = ['u','u','u'],
+                    dtype  = ['t','t','t'],
+                    data   = [
+                        ['UQ' ,'-', 'Utilization questions:\n* OK  - utilization is satisfy,\n* (!) - utilization is overhead,\n* (?) - utilization is wrong formulated.'],
+                        ['Level','-', 'Level of utilization in percent scale.'],
+                        ['Description', '-', 'Description of utilization level.'],
+
+                    ],
+                    border = False,
+                    inherit = inherit,
+                )
 
 
 
@@ -142,44 +143,46 @@ class utile:
 
             data = [(v['UQ'],v['Description']) for v in self.data_cs.values()]
 
-            u1 = 0
-            for i in range(len(data)):
-                if data[i][0] is False: u1 += 1
+            if len(data)>0:
 
-            data.append({'h_symbol':'='})
+                u1 = 0
+                for i in range(len(data)):
+                    if data[i][0] is False: u1 += 1
 
-            if u1==0:
-                text = 'All utilization statment are satisfy'
-            else:
-                text = f'Few <{u1}> utilization statment are not satisfy'
-            data.append(('', text))
+                data.append({'h_symbol':'='})
 
-            output += [self.pinky.rstme.table(
-                caption= 'Check\'s utilization statments',
-                wrap   = [False, True],
-                width  = [3,True],
-                halign = ['l','l'],
-                valign = ['u','u'],
-                dtype  = ['t','t'],
-                header = ['UQ', 'Description'],
-                data   = data,
-                inherit = inherit,
-            )]
+                if u1==0:
+                    text = 'All utilization statment are satisfy'
+                else:
+                    text = f'Few <{u1}> utilization statment are not satisfy'
+                data.append(('', text))
 
-            self.pinky.rstme.table(
-                wrap   = [False, False, True],
-                width  = [15, 2, True],
-                halign = ['r','c','l'],
-                valign = ['u','u','u'],
-                dtype  = ['t','t','t'],
-                data   = [
-                    ['UQ' ,'-', 'Utilization questions:\n* OK  - utilization is satisfy,\n* (!) - utilization is overhead.'],
-                    ['Description', '-', 'Description of utilization level.'],
+                output += [self.pinky.rstme.table(
+                    caption= 'Check\'s utilization statments',
+                    wrap   = [False, True],
+                    width  = [3,True],
+                    halign = ['l','l'],
+                    valign = ['u','u'],
+                    dtype  = ['t','t'],
+                    header = ['UQ', 'Description'],
+                    data   = data,
+                    inherit = inherit,
+                )]
 
-                ],
-                border = False,
-                inherit = inherit,
-            )
+                self.pinky.rstme.table(
+                    wrap   = [False, False, True],
+                    width  = [15, 2, True],
+                    halign = ['r','c','l'],
+                    valign = ['u','u','u'],
+                    dtype  = ['t','t','t'],
+                    data   = [
+                        ['UQ' ,'-', 'Utilization questions:\n* OK  - utilization is satisfy,\n* (!) - utilization is overhead.'],
+                        ['Description', '-', 'Description of utilization level.'],
+
+                    ],
+                    border = False,
+                    inherit = inherit,
+                )
 
 
         if inherit:

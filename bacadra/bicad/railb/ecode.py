@@ -10,6 +10,7 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
+import os
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -157,6 +158,9 @@ class ecode:
 
             # print settings
             plt.tight_layout()
+            if not os.path.isdir(os.path.dirname(name)):
+                os.makedirs(os.path.dirname(name))
+
             plt.savefig(name, dpi = 300)
 
         def fig(n_0, name):
@@ -178,12 +182,13 @@ class ecode:
 
     @staticmethod
     def φ_dyn(mode, L_φ):
+        L_φ = L_φ.d('m')
         if mode.lower() == 'clea':
-            φ = 1.44/((L_φ/m)**0.5-0.2)+0.85
+            φ = 1.44/((L_φ)**0.5-0.2)+0.85
             return min(max(φ,1.0),1.67)
 
         elif mode.lower() == 'stan':
-            φ = 2.16/((L_φ/m)**0.5-0.2)+0.73
+            φ = 2.16/((L_φ)**0.5-0.2)+0.73
             return min(max(φ,1.0),2.00)
 
 
