@@ -21,6 +21,7 @@ m  = cunit(1, 'm')
 Hz = cunit(1, 'Hz')
 t  = cunit(1, 't' )
 yr = cunit(1, 'yr')
+cu = cunit(1, {})
 
 
 #$ class ecode
@@ -185,15 +186,22 @@ class ecode:
         L_φ = L_φ.d('m')
         if mode.lower() == 'clea':
             φ = 1.44/((L_φ)**0.5-0.2)+0.85
-            return min(max(φ,1.0),1.67)
+            return min(max(φ,1.0),1.67)*cu
 
         elif mode.lower() == 'stan':
             φ = 2.16/((L_φ)**0.5-0.2)+0.73
-            return min(max(φ,1.0),2.00)
+            return min(max(φ,1.0),2.00)*cu
+
+
+
+
+
+
+
 
 
     @staticmethod
-    def fatigue(L_φ, L_w, σ_p_max, Δσ_c, σ_p_min=0, λ_1_type='EC_MIX', q_w=cunit(25*10**6,'t yr**-1'), σ1pσ12=1.00, t_life=cunit(100,'yr')):
+    def fatigue(L_φ, L_w, Δσ_c, σ_p_max=0, σ_p_min=0, λ_1_type='EC_MIX', q_w=cunit(25*10**6,'t yr**-1'), σ1pσ12=1.00, t_life=cunit(100,'yr')):
         '''
         Przy określaniu Å, krytyczną długość linii Wpłyvvu przyjmuje się jak następuje:
         dla momentów:
@@ -221,7 +229,10 @@ class ecode:
         γ_Mf = 1.15
 
         # współczynnik dynamiczny równoważny uszkodzenia na skutek uderzenia.
-        φ_2 = min(max(1.44/((L_φ/m)**0.5-0.2)+0.85,1.0),1.67)
+        if L_φ:
+            φ_2 = min(max(1.44/((L_φ/m)**0.5-0.2)+0.85,1.0),1.67)
+        else:
+            φ_2 = 1
 
 
         # Współczynnik, wyrażający efekt uszkodzenia od ruchu, zależny od długości linii wpływu;
@@ -285,5 +296,112 @@ class ecode:
             'Δσ_p' : Δσ_p,
             'Δσ_E2': Δσ_E2,
             'Δσ_c' : Δσ_c,
+            'util' : util.s('%')
+        }
+
+
+
+
+    @staticmethod
+    def fatigue_Rd(L_w, Δσ_c, λ_1_type='EC_MIX', q_w=cunit(25*10**6,'t yr**-1'), σ1pσ12=1.00, t_life=cunit(100,'yr')):
+
+        γ_Ff = 1.0
+
+        # +współczynnik zniszczenia elementu duży
+        # +metoda tolerowanych uszkodzeń
+        γ_Mf = 1.15
+
+        # Współczynnik, wyrażający efekt uszkodzenia od ruchu, zależny od długości linii wpływu;
+
+        if λ_1_type == 'EC_MIX':
+            λ_1 = np.interp(
+                L_w.d('m'),
+                np.array([0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0,6,7,8,9,10,12.5,15,17.5,20,25,30,35,40,45,50,60,70,80,90,100]),
+                np.array([1.60,1.60,1.60,1.46,1.38,1.35,1.17,1.07,1.02,1.03,1.03,0.97,0.92,0.88,0.85,0.82,0.76,0.70,0.67,0.66,0.65,0.64,0.64,0.64,0.63,0.63,0.62,0.61,0.61,0.60]),
+            )
+        else:
+            raise ValueError()
+
+        # Współczynnik wyrażający wpływ natężenia ruchu;
+        λ_2 = np.interp(
+            q_w.drop('t yr**-1'),
+            [5,10,15,20,25,30,35,40,50],
+            [0.72,0.83,0.90,0.96,1,1.04,1.07,1.10,1.15],
+        )
+
+        # Współczynnik wyrażający wpływ okresu użytkowania mostu;
+        λ_3 = np.interp(
+            t_life.d('yr'),
+            [50,60,70,80,90,100,120],
+            [0.87,0.90,0.93,0.96,0.98,1.00,1.04],
+        )
+
+        # współczynnik stosowany W elementach konstrukcyjnych obciążonych na więcej niż jednym torze;
+        λ_4 = np.interp(
+            σ1pσ12,
+            [0.50,0.60,0.70,0.80,0.90,1.00],
+            [0.71,0.72,0.77,0.84,0.91,1.00],
+        )
+
+        # maksymalna Wartość /I uwzględniająca granicę zmęczenia, patrz (9).
+        λ_max = 1.40
+
+        # współczynnik równoważności uszkodzenia określony W 9.5
+        λ = min(λ_1 * λ_2 * λ_3 * λ_4 , λ_max)
+
+
+        return {
+        # to print
+        'γ_Ff'   : γ_Ff*cu,
+        'γ_Mf'   : γ_Mf*cu,
+
+        'L_w'    : L_w*cu,
+        'λ_1'    : λ_1*cu,
+
+        'q_w'    : q_w.e('t yr**-1'),
+        'λ_2'    : λ_2*cu,
+
+        't_life' : t_life.e('yr'),
+        'λ_3'    : λ_3*cu,
+
+        'σ1pσ12' : σ1pσ12*cu,
+        'λ_4'    : λ_4*cu,
+
+        'λ_max'  : λ_max*cu,
+
+        'λ'      : λ*cu,
+        'Δσ_c'   : Δσ_c*cu,
+        }
+
+
+    @staticmethod
+    def fatigue_Ed(σ_p_max, σ_p_min=0, L_φ=1,  data=None):
+
+        λ    = data["λ"]
+        γ_Ff = data["γ_Ff"]
+        γ_Mf = data["γ_Mf"]
+        Δσ_c = data["Δσ_c"]
+
+        # współczynnik dynamiczny równoważny uszkodzenia na skutek uderzenia.
+        if type(L_φ) is cunit:
+            L_φi = L_φ.d('m')
+            φ_2 = min(max(1.44/((L_φi)**0.5-0.2)+0.85,1.0),1.67)*cu
+        else:
+            φ_2 = L_φ
+
+        # Zakres naprężenia odniesienia A0,, do określania spektrum (widma) efektów uszkodzeń na skutek naprężeń oblicza się z wzoru
+        Δσ_p = abs(σ_p_max - σ_p_min)
+
+        # Efekty uszkodzeń na skutek spektrum zakresu naprężenia można przedstawić za pomocą równoważnego zakresu naprężenia odniesionego do 2 ×1O6 cykli
+        Δσ_E2= λ * φ_2 * Δσ_p
+
+        # Ocenę zmęczenia należy przeprowadzić jak następuje
+        util = (γ_Ff * Δσ_E2) / (Δσ_c/γ_Mf)
+
+        return {
+            'σ_p_max':σ_p_max,
+            'σ_p_min':σ_p_min,
+            'Δσ_p' : Δσ_p,
+            'Δσ_E2': Δσ_E2,
             'util' : util.s('%')
         }

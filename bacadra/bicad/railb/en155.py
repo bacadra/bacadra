@@ -144,54 +144,82 @@ class en155:
     #$$ obj dfact
     dfact = dfact()
 
-    def speed_summary(self, A=0, B1=0, B2=0, C2=0, C3=0, C4=0, D2=0, D3=0, D4=0, inherit=False, mode='1t', label=None, caption=None):
+    def speed_summary(self, A=True, B1=True, B2=True, C2=True, C3=True, C4=True, D2=True, D3=True, D4=-1, inherit=False, mode='1t', label=None, caption=None):
         '''
         Generate texme table with speed summary of 15528 trains.
         '''
 
         if mode=='1t':
+
             # drop units
-            if type(A)  is cunit: A  = int( A.d('km hr**-1')*1.00001)
-            if type(B1) is cunit: B1 = int(B1.d('km hr**-1')*1.00001)
-            if type(B2) is cunit: B2 = int(B2.d('km hr**-1')*1.00001)
-            if type(C2) is cunit: C2 = int(C2.d('km hr**-1')*1.00001)
-            if type(C3) is cunit: C3 = int(C3.d('km hr**-1')*1.00001)
-            if type(C4) is cunit: C4 = int(C4.d('km hr**-1')*1.00001)
-            if type(D2) is cunit: D2 = int(D2.d('km hr**-1')*1.00001)
-            if type(D3) is cunit: D3 = int(D3.d('km hr**-1')*1.00001)
-            if type(D4) is cunit: D4 = int(D4.d('km hr**-1')*1.00001)
+            if type(A)  is cunit:
+                    A  = int( A.d('km hr**-1')*1.00001)
+            elif A is True:
+                    A  = -1
+            if type(B1) is cunit:
+                    B1 = int(B1.d('km hr**-1')*1.00001)
+            elif B1 is True:
+                    B1 = -1
+            if type(B2) is cunit:
+                    B2 = int(B2.d('km hr**-1')*1.00001)
+            elif B2 is True:
+                    B2 = -1
+            if type(C2) is cunit:
+                    C2 = int(C2.d('km hr**-1')*1.00001)
+            elif C2 is True:
+                    C2 = -1
+            if type(C3) is cunit:
+                    C3 = int(C3.d('km hr**-1')*1.00001)
+            elif C3 is True:
+                    C3 = -1
+            if type(C4) is cunit:
+                    C4 = int(C4.d('km hr**-1')*1.00001)
+            elif C4 is True:
+                    C4 = -1
+            if type(D2) is cunit:
+                    D2 = int(D2.d('km hr**-1')*1.00001)
+            elif D2 is True:
+                    D2 = -1
+            if type(D3) is cunit:
+                    D3 = int(D3.d('km hr**-1')*1.00001)
+            elif D3 is True:
+                    D3 = -1
+            if type(D4) is cunit:
+                    D4 = int(D4.d('km hr**-1')*1.00001)
+            elif D4 is True:
+                    D4 = -1
 
 
             # try get value
-            if   A  == 0:  A  = max(B1,B2,C2,C3,C4,D2,D3,D4)
-            elif A  <  0:  A  = '--'
+            if   A  ==-1:  A  = max(B1,B2,C2,C3,C4,D2,D3,D4)
+            if   A  <  0:  A  = '--'
 
-            if   B1 == 0:  B1 = max(   B2,C2,C3,C4,D2,D3,D4)
-            elif B1 <  0:  B1 = '--'
+            if   B1 ==-1:  B1 = max(   B2,C2,C3,C4,D2,D3,D4)
+            if   B1 <  0:  B1 = '--'
 
-            if   B2 == 0:  B2 = max(      C2,C3,C4,D2,D3,D4)
-            elif B2 <  0:  B2 = '--'
+            if   B2 ==-1:  B2 = max(      C2,C3,C4,D2,D3,D4)
+            if   B2 <  0:  B2 = '--'
 
-            if   C2 == 0:  C2 = max(         C3,C4,D2,D3,D4)
-            elif C2 <  0:  C2 = '--'
+            if   C2 ==-1:  C2 = max(         C3,C4,D2,D3,D4)
+            if   C2 <  0:  C2 = '--'
 
-            if   C3 == 0:  C3 = max(            C4,   D3,D4)
-            elif C3 <  0:  C3 = '--'
+            if   C3 ==-1:  C3 = max(            C4,   D3,D4)
+            if   C3 <  0:  C3 = '--'
 
-            if   C4 == 0:  C4 =                          D4
-            elif C4 <  0:  C4 = '--'
+            if   C4 ==-1:  C4 =                          D4
+            if   C4 <  0:  C4 = '--'
 
-            if   D2 == 0:  D2 = max(                  D3,D4)
-            elif D2 <  0:  D2 = '--'
+            if   D2 ==-1:  D2 = max(                  D3,D4)
+            if   D2 <  0:  D2 = '--'
 
-            if   D3 == 0:  D3 =                          D4
-            elif D3 <  0:  D3 = '--'
+            if   D3 ==-1:  D3 =                          D4
+            if   D3 <  0:  D3 = '--'
 
             if   D4 <  0:  D4 = '--'
 
 
             if caption is None:
-                caption = 'Prędkości dopuszczalne dla modeli rzeczywistego ruchu kolejowego cite{pnen15528}'
+                caption = 'Prędkości dopuszczalne dla modeli ruchu kolejowego cite{pnen15528}'
 
             return self.core.pinky.texme.t(
                     cols     = r'|e{4cm}|C|C|C|C|C|C|C|C|C|',

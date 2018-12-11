@@ -201,9 +201,11 @@ class wgraf:
         if active:
             i=0
             for cdb in cdb:
-                i+=1; print(str(i)+'.', cdb)
+                i+=1; print(str(i)+'. Q:', str(cdb[1])+', "'+cdb[0]+'"')
 
                 output_path = os.path.join(output, os.path.basename(cdb[0]))
 
                 wgraf.run(cdb=cdb[0], wdata=wdata, delete=delete, output=output_path, active=cdb[1], watermark=watermark)
+
+            print('Operation Wingraf-convert-mass complete!')
 

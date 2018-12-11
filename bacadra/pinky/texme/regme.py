@@ -19,7 +19,7 @@ from ...cunit.units import cunit
 #$ ____ class RegME ________________________________________________________ #
 
 
-regme_bslash = re.compile(r'( |^|\n|~|\+|\-|\%|\@|=|\*|\(|\)|\{|\}|\$|\:)(begin|end|cfrac|frac|vec|ref|eqref|equref|figref|tabref|hedref|lstref|figlab|tablab|lstlab|equlab|hedlab|cite|vspace|makecell|sqrt|b|i|u|t|bu|ub|iu|ui|ib|bi|ibu|iub|biu|bui|uib|ubi|mn|mt|mi|mb|mm|tm)(\{|\[)')
+regme_bslash = re.compile(r'( |^|\n|~|\+|\-|\%|\@|=|\*|\(|\)|\{|\}|\$|\:)(begin|end|cfrac|frac|vec|ref|eqref|equref|figref|tabref|hedref|lstref|figlab|tablab|lstlab|equlab|hedlab|cite|vspace|makecell|sqrt|b|i|u|t|bu|ub|iu|ui|ib|bi|ibu|iub|biu|bui|uib|ubi|mn|mt|mi|mb|mm|tm|trm)(\{|\[)')
 
 regme_recomp1 = re.compile(r'(\{?[a-zA-Z0-9α-ωΑ-Ω]\}?\_)([a-zA-Z0-9α-ωΑ-Ω\_,]+)')
 
@@ -37,7 +37,7 @@ str_begin = r'( |[0-9]|\n|~|\+|\-|\%|\@|=|\*|\(|\)|{|}|\$|\:)[ ]*'
 regme_unit2 = re.compile(str_begin + str_unit + str_end)
 
 str_begin = r'( |[0-9]|\n|~|\+|\-|\%|\@|=|\*|\(|\)|{|}|\$|\:)[ ]*'
-str_function = r'(arccos|arcsin|arctan|arg|cos|cosh|cot|coth|csc|deg|det|dim|exp|inf|lim|log|max|ln|min|sin|sinh|sup|tan|tanh|if)'
+str_function = r'(arccos|arcsin|arctan|arg|cos|cosh|cot|coth|csc|deg|det|dim|exp|inf|lim|log|max|ln|min|sin|sinh|sup|tan|tanh|if|abs)'
 str_end = r'(~*)([a-zA-Z0-9α-ωΑ-Ω\~\(\\\)]*)'
 regme_function1 = re.compile(str_begin + str_function + str_end)
 
@@ -374,6 +374,7 @@ class regme:
     def package(self, mode=1):
         if mode==0:
             pass
+            
         elif mode==1:
             self.math_mode = False
             self.eval()

@@ -183,7 +183,7 @@ class texmemeta(type):
         @echo.setter
         def echo(self, value):
             if value == True:
-                self._echo = 'thmp'
+                self._echo = 'hmp'
             elif value == False:
                 self._echo = ''
             else:

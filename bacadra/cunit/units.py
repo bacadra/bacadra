@@ -362,6 +362,23 @@ class cunit(object, metaclass=cunitmeta):
     d = drop
 
 
+#$$ ________ def drop-external _____________________________________________ #
+
+    @staticmethod
+    def drop_external(self, units=None):
+
+        if type(self) in [list, np.ndarray]:
+            return [cunit.drop_external(obj, units) for obj in self]
+
+        elif type(self) is cunit:
+            return cunit.drop(self, units)
+
+        else:
+            return self
+    de = drop_external
+
+
+
 #$$ ________ def copy ______________________________________________________ #
 
     def copy(self):
@@ -418,7 +435,7 @@ class cunit(object, metaclass=cunitmeta):
     se = show_external
 
 
-#$$ ________ def unit ______________________________________________________ #
+#$$ ________ def units _____________________________________________________ #
 
     def units(self):
         return cunit(1, self._units)
@@ -830,7 +847,7 @@ class cunit(object, metaclass=cunitmeta):
         value = self._value
 
         # if self value type is numeric type then round and sign value
-        if type(value) in [int,float, np.float64]:
+        if type(value) in [int, float, np.float64]:
 
             value = nprec.to_precision(
                 value       = value,
