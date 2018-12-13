@@ -1,8 +1,11 @@
-import math
 
 from . import verrs
 
-from ...cunit.system.ce import MPa,mm,GPa
+from ...cunit import cunit
+
+m   = cunit(1, 'm')
+mm  = cunit(1, 'mm')
+MPa = cunit(1, 'MPa')
 
 
 class pbase:
@@ -33,9 +36,16 @@ class pbase:
 #$$ ________ en 1993 _______________________________________________________ #
 
     @classmethod
-    def _en_1993_S(self, grade, max_t=None, f_yk=None):
+    def _en_1993_S(self, grade, t_max=40*mm, f_yk=None):
 
-        if max_t <= 40*mm:
+        if grade == 'S 235':
+            if           t_max <= 40*mm: data = {'f_yk':235*MPa, 'f_uk':360*MPa}
+            elif 40*mm < t_max <= 80*mm: data = {'f_yk':215*MPa, 'f_uk':360*MPa}
+
+
+
+
+        if t_max <= 40*mm:
             data = {
                 'S 235'         :{'f_yk':235*MPa, 'f_uk':360*MPa},
                 'S 275'         :{'f_yk':275*MPa, 'f_uk':430*MPa},
@@ -62,7 +72,7 @@ class pbase:
             }[grade]
 
             data.update({
-                'max_t': 40*mm,
+                't_max': 40*mm,
             })
 
         else:

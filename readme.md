@@ -28,19 +28,19 @@ import bacadra as bcdr
 bacadra software provide also customable units package, which object set is already defined in depend package. To use SI system type get object from si file.
 
 ~~~
-from bacadara.cunit.si import *
+from bacadara.units.si import *
 ~~~
 
 or to use CE (Civil Engineering) system type get object from si file.
 
 ~~~
-from bacadara.cunit.ce import *
+from bacadara.units.ce import *
 ~~~
 
-Additional import math function which was customize to full compability with cunit.
+Additional import math function which was customize to full compability with units.
 
 ~~~
-from bacadara.cunit.cmath import *
+from bacadara.units.cmath import *
 ~~~
 
 

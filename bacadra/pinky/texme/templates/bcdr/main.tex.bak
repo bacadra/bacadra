@@ -174,16 +174,16 @@
 	\renewcommand{\headrulewidth}{2.0pt}
 	\renewcommand{\footrulewidth}{2.0pt}
 
-  \lhead{\includegraphics[height=1.5cm]{%<logo-path>%}}
+  %<logo_path>%
 
-  \rhead{\small %<hline0>% \\
+  \rhead{\small %<head_line_0>% \\
   \medskip
-  \footnotesize %<hline1>% \\
-  \scriptsize   %<hline2>%
+  %<head_line_1>% \\
+  %<head_line_2>%
   \smallskip}
   \cfoot{\small %<author>%}
   \fancyfoot[R]{\footnotesize{Strona \thepage\ z \pageref{LastPage}}}
-  \fancyfoot[C]{\footnotesize{\textcolor{Gray}{\MONTH~\YEAR}}} \fancyfoot[L]{\footnotesize %<footL>%}
+  \fancyfoot[C]{\footnotesize{\textcolor{Gray}{\MONTH~\YEAR}}} %<foot_line_left>%
 }
 \pagestyle{plain}
 
@@ -582,7 +582,7 @@
 ]{biblatex}
     % https://www.sharelatex.com/learn/Biblatex_citation_styles#Further_reading
     % https://www.sharelatex.com/learn/Bibliography_management_with_biblatex
-\addbibresource{%<bibpath>%}
+\addbibresource{%<bib_path>%}
 
 
 
@@ -661,7 +661,7 @@
 
 % -------------------------------------------------------------------------- %
 
-%<titlepage>%
+%<title_page>%
 
 %## ________ lists _________________________________________________________ %
 
