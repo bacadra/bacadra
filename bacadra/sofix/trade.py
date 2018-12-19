@@ -89,7 +89,7 @@ class trade:
         with open(path1, 'w') as f: f.write(data1)
         with open(path2, 'w') as f: f.write(data2)
 
-        if len(data0>0) or len(data1>0) or len(data2>0):
+        if len(data0)>0 or len(data1)>0 or len(data2)>0:
             temp = '''
 $ --------- set defines ----------------------------------------------------- $
 #include "{data0}"
@@ -114,7 +114,7 @@ end
             'data2':os.path.splitext(self.name)[0]+'.$d2'})
         else:
             temp = ''
-            
+
         with open(pathd, 'w') as f: f.write(temp)
 
     #$$ def make

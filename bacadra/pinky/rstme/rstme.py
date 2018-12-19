@@ -93,7 +93,8 @@ class rstme:
 
         if clear:
             self.clear_file(path=path)
-        self.save(mode=mode, path=path)
+        if len(self.buffer) > 0:
+            self.save(mode=mode, path=path)
 
         self.clear_buffer()
 

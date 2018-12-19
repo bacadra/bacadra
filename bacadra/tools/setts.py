@@ -42,15 +42,22 @@ class settsmeta(type):
         return '\n'.join(data) if len(data) > 0 else 'There are no overwritten atributes :-)'
 
     #$$ def test
-    def test(self, name, value=None):
+    def test(self, name, value=None, subname=None):
         '''
         Methods provide interface to get local variable of settings. It does not change class atribute, only return as inherited.
         '''
 
-        if value is None:
-            return eval(f'self.{name}')
-        else:
-            return eval(f'self._{name}_')(value)
+        if subname is None:
+            if value is None:
+                return eval(f'self.{name}')
+            else:
+                return eval(f'self._{name}_')(value)
+
+        elif subname is not None:
+            if value is None:
+                return eval(f'self.{name}')[subname]
+            else:
+                return (eval(f'self._{name}_')({subname:value}))[subname]
 
     #$$ def set
     def set(self, **kwargs):

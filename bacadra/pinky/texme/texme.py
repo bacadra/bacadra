@@ -353,7 +353,7 @@ class texme:
 
 #$$$ ____________ atribute label ___________________________________________ #
 
-        _label = {'h':False, 'p':True}
+        _label = {'h':False, 'p':True, 'f':False}
 
         @property
         def label(self):
@@ -367,7 +367,7 @@ class texme:
             elif type(value) is dict:
                 ndict = self._label.copy()
                 for key,val in value.items():
-                    if key in ['h', 'p']:
+                    if key in self._label:
                         ndict.update({key:val})
                 return ndict
             else:
@@ -1021,7 +1021,7 @@ class texme:
         # use global settings
         inherit = self.setts.test('inherit', inherit)
         echo    = self.setts.test('echo'   , echo)
-        rx      = self.setts.test('rx', rx)['xt']
+        rx      = self.setts.test('rx'     , rx, 'xt')
 
         # if page is typed
         if page:
@@ -1060,8 +1060,8 @@ class texme:
         # use global settings
         inherit = self.setts.test('inherit', inherit)
         echo    = self.setts.test('echo'   , echo)
-        label   = self.setts.test('label'  , label)['h']
-        rx      = self.setts.test('rx', rx)['ht']
+        label   = self.setts.test('label'  , label, 'h')
+        rx      = self.setts.test('rx'     , rx,    'ht')
         minitoc = self.setts.test('minitoc', minitoc)
 
         # if page is typed
@@ -1169,9 +1169,9 @@ class texme:
         # use global settings
         inherit   = self.setts.test('inherit', inherit)
         echo      = self.setts.test('echo'   , echo)
-        label     = self.setts.test('label'  , label)['p']
-        rx        = self.setts.test('rx', rxc)['pc']
-        float     = self.setts.test('float'  , float)['p']
+        label     = self.setts.test('label'  , label, 'p')
+        rx        = self.setts.test('rx'     , rxc, 'pc')
+        float     = self.setts.test('float'  , float, 'p')
         pic_root  = self.setts.test('pic_root', pic_root)
         pic_error = self.setts.test('pic_error', pic_error)
 
@@ -1368,8 +1368,8 @@ class texme:
         # use global settings
         inherit   = self.setts.test('inherit', inherit)
         echo      = self.setts.test('echo'   , echo)
-        rxe       = self.setts.test('rx', rxe)['me']
-        rxt       = self.setts.test('rx', rxt)['mt']
+        rxe       = self.setts.test('rx'     , rxe, 'me')
+        rxt       = self.setts.test('rx'     , rxt, 'mt')
 
         if mode in ['t*', 't+', 't']:
             if 'm' in echo:
@@ -1463,8 +1463,8 @@ class texme:
         inherit   = self.setts.test('inherit', inherit)
         echo      = self.setts.test('echo'   , echo)
         float     = self.setts.test('float'  , float)['t']
-        rxd       = self.setts.test('rx', rxc)['tc']
-        rxd       = self.setts.test('rx', rxd)['td']
+        rxd       = self.setts.test('rx'     , rxc, 'tc')
+        rxd       = self.setts.test('rx'     , rxd, 'td')
 
         # if page is typed
         if page:
@@ -1541,8 +1541,8 @@ class texme:
         # use global settings
         inherit   = self.setts.test('inherit', inherit)
         echo      = self.setts.test('echo'   , echo)
-        rxe       = self.setts.test('rx', rxe)['ce']
-        rxc       = self.setts.test('rx', rxc)['cc']
+        rxe       = self.setts.test('rx'     , rxe, 'ce')
+        rxc       = self.setts.test('rx'     , rxc, 'cc')
 
         # if page is typed
         if page:
@@ -1623,8 +1623,8 @@ class texme:
         # use global settings
         inherit   = self.setts.test('inherit', inherit)
         echo      = self.setts.test('echo'   , echo)
-        label     = self.setts.test('label'  , label)['p']
-        rxe       = self.setts.test('rx', rxe)['fe']
+        label     = self.setts.test('label'  , {'f':label})['f']
+        rxe       = self.setts.test('rx', {'fe':rxe})['fe']
 
         if language:
             var2 = ',language={' + language + '}'
@@ -1675,8 +1675,8 @@ class texme:
         inherit   = self.setts.test('inherit', inherit)
         echo      = self.setts.test('echo'   , echo)
         width     = self.setts.test('item_1c_width' , width)
-        rxe       = self.setts.test('rx', rxe)['ie']
-        rxt       = self.setts.test('rx', rxt)['it']
+        rxe       = self.setts.test('rx'     , rxe, 'ie')
+        rxt       = self.setts.test('rx'     , rxt, 'it')
 
         # if page is typed
         if page:
