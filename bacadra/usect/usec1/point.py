@@ -12,7 +12,7 @@ Team members developing this package:
 
 #$ class point
 class point:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.core = core
 

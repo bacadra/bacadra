@@ -23,67 +23,11 @@ from IPython.display import Image, Latex, HTML
 from IPython.display import display as ipdisplay
 
 from ... import tools
+from ...tools import setts
 
 from . import verrs
 from .regme import regme
 
-
-#$ ____ metaclass settsmeta ________________________________________________ #
-
-class settsmeta(type):
-    #$$ def --setattr--
-    def __setattr__(self, name, value):
-        '''
-        Method do not allow create new variable in class. It is provide more control over user correctly or spell-checker.
-        '''
-
-        if not hasattr(self, name) and inspect.stack()[1][3] != '__init__':
-            raise AttributeError(f"Creating new attributes <{name}> is not allowed!")
-        super(settsmeta, self).__setattr__(name, value)
-
-    #$$ def --repr--
-    def __repr__(self):
-        '''
-        Print only not "private" atributes and methods.
-        '''
-
-        data = []
-        for key,val in self.__dict__.items():
-            if (key[0] == '_' and key[1] != '_' and key[-2:0] != '__' and key not in ['_scope']):
-                if type(val) is str: val = '"' + str(val) + '"'
-                data.append('> {:10s} : {}'.format(key[1:], val))
-
-        return '\n'.join(data)
-
-
-
-
-#$ ____ class settsparent __________________________________________________ #
-
-class settsparent:
-    #$$ def --setattr--
-    def __setattr__(self, name, value):
-        '''
-        Method do not allow create new variable in class. It is provide more control over user correctly or spell-checker.
-        '''
-
-        if not hasattr(self, name) and inspect.stack()[1][3] != '__init__':
-            raise AttributeError(f"Creating new attributes <{name}> is not allowed!")
-        super(settsparent, self).__setattr__(name, value)
-
-    #$$ def --repr--
-    def __repr__(self):
-        '''
-        Print only overwritten parameters and only not "private" atributes and methods.
-        '''
-
-        data = []
-        for key,val in self.__dict__.items():
-            if (key[0] == '_' and key[1] != '_' and key[-2:0] != '__' and key not in ['_scope']):
-                if type(val) is str: val = '"' + str(val) + '"'
-                data.append('> {:10s} : {}'.format(key[1:], val))
-
-        return '\n'.join(data) if len(data) > 0 else 'There are no overwritten atributes :-) '
 
 #$ ____ class texme ________________________________________________________ #
 
@@ -91,14 +35,16 @@ class texme:
 
 #$$ ________ magic methods _________________________________________________ #
 
-#$$$ ____________ def --init-- _____________________________________________ #
+#$$$ ____________ def __init__ _____________________________________________ #
 
     def __init__(self, core=None, **kwargs):
         self.core = core
 
         # other argument will be send to setts class
         # if kwarg do not exists in setts, then setts raise error
-        self.setts = self.setts(self, **kwargs)
+        self.setts = self.setts('setts',(),{})
+        self.setts.othe = self
+        self.setts.__run_init__(**kwargs)
 
         # list with generated and ready-to-insert code
         self.buffer = []
@@ -106,7 +52,7 @@ class texme:
         # hidden atribute with last used generate method
         self.__last_type = None
 
-#$$$ ____________ def --setattr ____________________________________________ #
+#$$$ ____________ def __setattr__ __________________________________________ #
 
     def __setattr__(self, name, value):
         '''
@@ -120,30 +66,18 @@ class texme:
 
 #$$ ________ class setts ___________________________________________________ #
 
-    class setts(settsparent, metaclass=settsmeta):
+    class setts(setts.settsmeta):
         '''
         class provide set of atributes which working as settings. additionaly provide testing and printing methods.
         '''
 
-        def __init__(self, othe, **kwargs):
-            self.__othe__ = othe
+        othe = None
 
+        def __run_init__(self, **kwargs):
             # loop over items send from texme class
             for key,val in kwargs.items():
                 exec(f'self.{key}={val}')
 
-#$$$ ____________ def test _________________________________________________ #
-
-        def test(self, name, value=None):
-            '''
-            Methods provide interface to get local variable of settings. It does not change class atribute, only return as inherited.
-            '''
-
-            if value is None:
-                return eval(f'self.{name}')
-            else:
-                if type(value) is str: value = '"' + str(value) + '"'
-                return eval(f'self.{name}_({value})')
 
 
 #$$$ ____________ atribute force-copy ______________________________________ #
@@ -300,9 +234,9 @@ class texme:
 
             spec.loader.exec_module(external)
 
-            self.exe = external.exe(self.__othe__)
+            self.othe.ext = external.ext(self.othe)
 
-        exe = None
+
 
 
 
@@ -314,7 +248,7 @@ class texme:
         def echo(self):
             return self._echo
 
-        def echo_(self, value):
+        def _echo_(self, value):
             if value == True:
                 return 'hmp'
 
@@ -342,7 +276,7 @@ class texme:
             User can type value as True then will be set "hmp" configuration or False then no output will be produced.
             '''
 
-            self._echo = self.echo_(value)
+            self._echo = self._echo_(value)
 
 
 #$$$ ____________ atribute scope ___________________________________________ #
@@ -353,9 +287,9 @@ class texme:
 
         @property
         def scope(self):
-            if self._scope == {} and self.__othe__.core:
+            if self._scope == {} and self.othe.core:
                 # if user use texme as part of bacadra project and do not set texme.setts.scope then use project.mdata.setts
-                return self.__othe__.core.mdata.setts.get('scope')
+                return self.othe.core.mdata.setts.get('scope')
             else:
                 return self._scope
 
@@ -375,7 +309,7 @@ class texme:
         def inherit(self):
                 return self._inherit
 
-        def inherit_(self, value):
+        def _inherit_(self, value):
             if type(value) is not bool:
                 raise ValueError('Type of "value" must be bool!')
 
@@ -387,7 +321,7 @@ class texme:
             If true then code is returned, if false code is added to buffer.
             '''
 
-            self._inherit = self.inherit_(value)
+            self._inherit = self._inherit_(value)
 
 
 
@@ -399,7 +333,7 @@ class texme:
         def active(self):
                 return self._active
 
-        def active_(self, value):
+        def _active_(self, value):
             if type(value) is not bool:
                 raise ValueError('Type of "value" must be bool!')
 
@@ -411,7 +345,7 @@ class texme:
             User can deactive all methods, then methods will exit at the begging.
             '''
 
-            self._active = self.active_(value)
+            self._active = self._active_(value)
 
 
 
@@ -425,7 +359,7 @@ class texme:
         def label(self):
                 return self._label
 
-        def label_(self, value):
+        def _label_(self, value):
             if value == True:
                 return {'h':True, 'p':True}
             elif value == False:
@@ -446,7 +380,7 @@ class texme:
             label is dict with dew substitute labels types.
             '''
 
-            self._label = self.label_(value)
+            self._label = self._label_(value)
 
 
 
@@ -460,7 +394,7 @@ class texme:
         def rx(self):
                 return self._rx
 
-        def rx_(self, value):
+        def _rx_(self, value):
 
             ndict = self._rx.copy()
 
@@ -491,7 +425,7 @@ class texme:
             '''
             '''
 
-            self._rx = self.rx_(value)
+            self._rx = self._rx_(value)
 
 
 
@@ -504,7 +438,7 @@ class texme:
         def float(self):
                 return self._float
 
-        def float_(self, value):
+        def _float_(self, value):
 
             ndict = self._float.copy()
 
@@ -529,7 +463,7 @@ class texme:
             '''
             '''
 
-            self._float = self.float_(value)
+            self._float = self._float_(value)
 
 
 
@@ -541,7 +475,7 @@ class texme:
         def minitoc(self):
                 return self._minitoc
 
-        def minitoc_(self, value):
+        def _minitoc_(self, value):
             if type(value) is not bool:
                 raise ValueError('Type of "value" must be bool!')
 
@@ -552,11 +486,11 @@ class texme:
             '''
             '''
 
-            self._minitoc = self.minitoc_(value)
+            self._minitoc = self._minitoc_(value)
 
 
 
-#$$$ ____________ atribute pic-root_________________________________________ #
+#$$$ ____________ atribute pic-root ________________________________________ #
 
         _pic_root = r'.'
 
@@ -564,7 +498,7 @@ class texme:
         def pic_root(self):
                 return self._pic_root
 
-        def pic_root_(self, value):
+        def _pic_root_(self, value):
             '''
             '''
 
@@ -579,7 +513,7 @@ class texme:
             '''
             '''
 
-            self._pic_root = self.pic_root_(value)
+            self._pic_root = self._pic_root_(value)
 
 
 #$$$ ____________ atribute pic-error _______________________________________ #
@@ -590,7 +524,7 @@ class texme:
         def pic_error(self):
                 return self._pic_error
 
-        def pic_error_(self, value):
+        def _pic_error_(self, value):
             '''
             '''
 
@@ -605,19 +539,19 @@ class texme:
             '''
             '''
 
-            self._pic_error = self.pic_error_(value)
+            self._pic_error = self._pic_error_(value)
 
 
 
-#$$$ ____________ atribute pic-display-width _______________________________ #
+#$$$ ____________ atribute pic_diswidth ___________________________________ #
 
-        _pic_display_width = 600
+        _pic_diswidth = 600
 
         @property
-        def pic_display_width(self):
-                return self._pic_display_width
+        def pic_diswidth(self):
+                return self._pic_diswidth
 
-        def pic_display_width_(self, value):
+        def _pic_diswidth_(self, value):
             '''
             '''
 
@@ -627,15 +561,15 @@ class texme:
             return value
 
 
-        @pic_display_width.setter
-        def pic_display_width(self, value):
+        @pic_diswidth.setter
+        def pic_diswidth(self, value):
             '''
             '''
 
-            self._pic_display_width = self.pic_display_width_(value)
+            self._pic_diswidth = self._pic_diswidth_(value)
 
 
-#$$$ ____________ atribute head-lvl-inc ____________________________________ #
+#$$$ ____________ atribute head_lvl_inc ____________________________________ #
 
         _head_lvl_inc = 0
 
@@ -643,7 +577,7 @@ class texme:
         def head_lvl_inc(self):
                 return self._head_lvl_inc
 
-        def head_lvl_inc_(self, value):
+        def _head_lvl_inc_(self, value):
             '''
             '''
 
@@ -658,7 +592,7 @@ class texme:
             '''
             '''
 
-            self._head_lvl_inc = self.head_lvl_inc_(value)
+            self._head_lvl_inc = self._head_lvl_inc_(value)
 
 
 
@@ -670,7 +604,7 @@ class texme:
         def item_1c_width(self):
                 return self._item_1c_width
 
-        def item_1c_width_(self, value):
+        def _item_1c_width_(self, value):
             '''
             '''
 
@@ -685,7 +619,7 @@ class texme:
             '''
             '''
 
-            self._item_1c_width = self.item_1c_width_(value)
+            self._item_1c_width = self._item_1c_width_(value)
 
 
 
@@ -709,9 +643,15 @@ class texme:
 
 
 
+#$$ ________ class setts ___________________________________________________ #
+
+    class setts(setts, metaclass=setts):
+        pass
+
+
 #$$ ________ process methods _______________________________________________ #
 
-#$$$ ____________ def --call-- _____________________________________________ #
+#$$$ ____________ def __call__ _____________________________________________ #
 
     # TODO: im not sure is it needed in new style, should be checked in future
 
@@ -772,7 +712,7 @@ class texme:
         self.buffer = []
 
 
-#$$$ ____________ def -bibliography_update ________________________________ #
+#$$$ ____________ def _bibliography_update ________________________________ #
 
     def _bibliography_update(self):
         '''
@@ -785,7 +725,7 @@ class texme:
 
 
 
-#$$$ ____________ def -copy-template ______________________________________ #
+#$$$ ____________ def _copy-template ______________________________________ #
 
     def _copy_template(self):
         '''
@@ -827,7 +767,7 @@ class texme:
 
 
 
-#$$$ ____________ def -dictonary ___________________________________________ #
+#$$$ ____________ def _dictonary ___________________________________________ #
 
     def _dictonary(self):
         '''
@@ -866,7 +806,7 @@ class texme:
         return sdict
 
 
-#$$$ ____________ def -substitution_via ______________________________________ #
+#$$$ ____________ def _substitution_via ______________________________________ #
 
     def _substitution_via(self, ndict, mode):
         '''
@@ -1063,7 +1003,9 @@ class texme:
             echo      = echo,
         )
 
+#$$$ ____________ def ext __________________________________________________ #
 
+    ext = None
 
 #$$$ ____________ def text _________________________________________________ #
 
@@ -1381,7 +1323,7 @@ class texme:
 
         if 'p' in echo:
             ipdisplay(Image(
-                pathA, width=self.setts.pic_display_width
+                pathA, width=self.setts.pic_diswidth
             ))
 
         return self.add(
@@ -1883,152 +1825,3 @@ class texme:
             echo      = echo,
         )
     i = item
-
-
-
-    # #$$$ def item2
-    # def item2(self, text=None, equation=None, mode='i*', mline=False, lalign=None, label=None, width=None, lvl=1, postfix=None, aligment=None, rx=None, rxe=None, vspace1='-9.5mm', vspace2='-8mm', prefix='*', add_space=False, exe=False, inherit=None, echo=None,
-    # e=None, # shortcut for equation
-    # x=None, # shortcut for text
-    # m=None, # shortcut for mode
-    # ):
-    #     '''
-    #     '''
-    #
-    #     if not self.active:
-    #         return
-    #
-    #     # use global settings
-    #     if inherit        is None: inherit       = self._inherit
-    #     if echo           is None: echo          = self._echo
-    #     if width          is None: width         = self._i_width
-    #     if postfix        is None: postfix       = self._i_postfix
-    #     if rx        is None: rx       = self._i_rx
-    #     if rxe    is None: rxe   = self._i_rxe
-    #
-    #     if e: equation = e
-    #     if x: text = x
-    #     if m: mode = m
-    #
-    #
-    #     if prefix in ['|','']:
-    #         lvl = prefix*lvl
-    #         pre = ''
-    #
-    #     elif prefix in ['-']:
-    #         lvl = 'q{3mm}'
-    #         pre = '$-$&'
-    #
-    #     elif prefix in ['*']:
-    #         lvl = 'q{3mm}'
-    #         pre = r'\textbullet &'
-    #
-    #     if self.__last_type == 'i':
-    #         tex = '\\vspace*{-10pt}\n'
-    #     else:
-    #         tex = ''
-    #
-    #     if text and equation and mode in ['i*', 't*', 't+', False, 't'] and not mline:
-    #         if aligment: pass
-    #         else:
-    #             aligment = lvl+'q{{width}mm} L'
-    #         tex += (
-    #             "\\begin{tabularx}{\\textwidth}{{aligment}}\n"
-    #             f"{pre}""{text}&%\n"
-    #             "{equation}\n"
-    #             "\\end{tabularx}"
-    #             )
-    #
-    #     elif text and equation and mline:
-    #         if aligment is not None: pass
-    #         else:
-    #             aligment = lvl+'L'
-    #
-    #         if lalign is not None: pass
-    #         else: lalign = False
-    #
-    #         tex += (
-    #             "\\begin{tabularx}{\\textwidth}{{aligment}}\n"
-    #             f"{pre}""{text}%\n"
-    #             "{lalign}"
-    #             "{equation}\n"
-    #             "\\vspace*{{vspace2}}\n"
-    #             "\\end{tabularx}"
-    #             )
-    #
-    #
-    #     elif text and equation:
-    #         if aligment: pass
-    #         else:
-    #             aligment = lvl+'q{{width}mm} L'
-    #
-    #         if lalign is not None: pass
-    #         else: lalign = True
-    #
-    #         tex += (
-    #             "\\begin{tabularx}{\\textwidth}{{aligment}}\n"
-    #             f"{pre}""{text}&%\n"
-    #             "\\vspace*{{vspace1}}\n"
-    #             "{lalign}"
-    #             "{equation}\n"
-    #             "\\vspace*{{vspace2}}\n"
-    #             "\\end{tabularx}"
-    #             )
-    #
-    #     elif text and mline==True:
-    #         if aligment: pass
-    #         else:
-    #             aligment = lvl+'L'
-    #
-    #         tex += (
-    #             "\\begin{tabularx}{\\textwidth}{{aligment}}\n"
-    #             f"{pre}""{text}%"
-    #             )
-    #
-    #     elif equation and mline==True:
-    #         aligment = ''
-    #         if lalign is not None: pass
-    #         else: lalign = False
-    #
-    #         tex += (
-    #             "{lalign}"
-    #             "{equation}\n"
-    #             "\\vspace*{{vspace2}}\n"
-    #             "\\end{tabularx}"
-    #             )
-    #
-    #
-    #     if equation and mode is not 't':
-    #         equation = self.math(
-    #             mode        = mode,
-    #             equation    = equation,
-    #             label       = label,
-    #             rxe = rxe,
-    #             inherit     = True,
-    #             exe         = exe)
-    #
-    #     elif mode is 't':
-    #         equation = regme(equation, self.setts.scope).package(rx)
-    #
-    #     ndict = {
-    #         '{text}': (regme(text, self.setts.scope).package(rx) + postfix if text is not None else ''),
-    #         '{equation}': equation,
-    #         '{aligment}': aligment.replace('{width}',str(width)),
-    #         '{vspace1}': vspace1,
-    #         '{vspace2}': vspace2,
-    #         '{lalign}': ('\\mathleft\n' if lalign else ''),
-    #     }
-    #
-    #     tex = tools.translate(tex, ndict)
-    #
-    #     self.__last_type = 'i'
-    #
-    #     return self.add(
-    #         submodule = 'i',
-    #         code      = tex,
-    #         inherit   = inherit,
-    #         echo      = echo,
-    #     )
-    # i2 = item2
-    #
-    #

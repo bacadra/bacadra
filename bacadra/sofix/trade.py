@@ -22,7 +22,7 @@ from ..cunit import cunit
 class trade:
     sbase = sbase()
 
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, cdb='c_main.cdb', name='x_main.dat', active=True):
         self.active    = active
         self.cdb       = cdb
@@ -89,7 +89,8 @@ class trade:
         with open(path1, 'w') as f: f.write(data1)
         with open(path2, 'w') as f: f.write(data2)
 
-        temp = '''
+        if len(data0>0) or len(data1>0) or len(data2>0):
+            temp = '''
 $ --------- set defines ----------------------------------------------------- $
 #include "{data0}"
 
@@ -111,6 +112,9 @@ end
             'data0':os.path.splitext(self.name)[0]+'.$d0',
             'data1':os.path.splitext(self.name)[0]+'.$d1',
             'data2':os.path.splitext(self.name)[0]+'.$d2'})
+        else:
+            temp = ''
+            
         with open(pathd, 'w') as f: f.write(temp)
 
     #$$ def make

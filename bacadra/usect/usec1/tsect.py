@@ -17,7 +17,7 @@ from . import value
 #$ ____ class tsect ________________________________________________________ #
 
 class tsect:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.core = core
         self._value = value.value(core=core)

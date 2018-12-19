@@ -3,7 +3,7 @@ from . import dxcad
 
 #$ class index
 class index:
-    #$$ --init--
+    #$$ __init__
     def __init__(self, core):
         self.dxcad = dxcad.dxcad(core=core)
 

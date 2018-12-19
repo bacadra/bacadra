@@ -1,6 +1,6 @@
 
 class soile:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.core = core
 
@@ -41,7 +41,7 @@ class soile:
 # #$ ____ class borep ________________________________________________________ #
 #
 # class borep:
-#     #$$ def --init--
+#     #$$ def __init__
 #     def __init__(self, core):
 #         self.dbase = dbase
 #         self.pinky = pinky

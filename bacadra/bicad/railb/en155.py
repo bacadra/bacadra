@@ -23,7 +23,7 @@ from ... import sofix
 
 #$ class dfact
 class dfact:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self):
         self.data = None
 
@@ -129,7 +129,7 @@ class dfact:
 
 #$ class en155
 class en155:
-    #$$ --init--
+    #$$ __init__
     def __init__(self, core=None):
         self.core = core
 

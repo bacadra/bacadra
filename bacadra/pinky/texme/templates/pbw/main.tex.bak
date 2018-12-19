@@ -178,8 +178,7 @@
 
   \rhead{\small %<head_line_0>% \\
   \medskip
-  %<head_line_1>% \\
-  %<head_line_2>%
+  %<head_line_1>%
   \smallskip}
   \cfoot{\small %<author>%}
   \fancyfoot[R]{\footnotesize{Strona \thepage\ z \pageref{LastPage}}}

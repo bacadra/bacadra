@@ -12,7 +12,7 @@ Team members developing this package:
 
 #$ class index
 class rootx:
-    #$$ --init--
+    #$$ __init__
     def __init__(self):
         pass
 

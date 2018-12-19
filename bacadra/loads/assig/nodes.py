@@ -14,7 +14,7 @@ Team members developing this package:
 #$ ____ class nodes ________________________________________________________ #
 
 class nodes:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.core = core
 

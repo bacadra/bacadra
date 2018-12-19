@@ -18,7 +18,7 @@ import subprocess
 rootdir = os.path.dirname(os.path.realpath(__file__))
 
 class catalog:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core, value):
         self.core = core
         self._value = value

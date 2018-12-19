@@ -7,7 +7,7 @@ from ...cunit.system.math import sqrt,ln,exp
 from ...cunit.system.ce   import MPa
 
 class steea:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.core = core
 
@@ -20,11 +20,11 @@ class steea:
     # parametry ogolne
     id=None, ρ_o=cunit(7850, {'kg':1, 'm':-3}), E_1=None, v_1=0.30, G_1=None, t_e=cunit(12*10**-6, {'°C':-1}), ttl=None, orm=False,
 
-    grade=None, max_t=None,
+    grade=None, t_max=None,
     f_yk=None, f_uk =None, E_a=None, ε_yk=None, ε_uk=None, γ_M0=None, γ_M1=None, γ_M2=None, γ_M3=None, γ_M4=None, γ_M5=None, γ_M6=None):
 
         if grade:
-            pbase.set(grade=grade, max_t=max_t, f_yk=f_yk)
+            pbase.set(grade=grade, t_max=t_max, f_yk=f_yk)
 
             f_yk      = pbase.get(f_yk      , 'f_yk'      )
             f_uk      = pbase.get(f_uk      , 'f_uk'      )
@@ -57,7 +57,7 @@ class steea:
         cols,data  = self.core.dbase.parse(
             id     = id,
             grade = grade,
-            max_t  = max_t,
+            t_max  = t_max,
             f_yk   = f_yk,
             f_uk   = f_uk,
             E_a    = E_a,

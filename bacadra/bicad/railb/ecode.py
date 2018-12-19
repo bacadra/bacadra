@@ -26,7 +26,7 @@ cu = cunit(1, {})
 
 #$ class ecode
 class ecode:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core=None):
         self.core = core
 

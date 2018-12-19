@@ -10,6 +10,7 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
+
 import os
 import importlib
 
@@ -19,7 +20,7 @@ rootdir = os.path.dirname(os.path.realpath(__file__))
 
 
 class sprof:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.core = core
         self._value = value.value(core=core)

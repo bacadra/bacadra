@@ -1,7 +1,7 @@
 import numpy as np
 
 class staqr:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core, prog, lcase):
         self.core = core
         self.prog = prog

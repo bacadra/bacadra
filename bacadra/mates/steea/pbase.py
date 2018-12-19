@@ -6,6 +6,7 @@ from ...cunit import cunit
 m   = cunit(1, 'm')
 mm  = cunit(1, 'mm')
 MPa = cunit(1, 'MPa')
+GPa = cunit(1, 'GPa')
 
 
 class pbase:

@@ -15,7 +15,7 @@ Team members developing this package:
 #$ ____ class value ________________________________________________________ #
 
 class value:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.core = core
 
@@ -70,7 +70,6 @@ class value:
             cols  = cols,
             data  = data,
         )
-
 
     def _fill_prop(self, **kwargs):
         m_g  = kwargs['m_g']

@@ -22,7 +22,7 @@ from . import cjkwrap
 
 #$ class rstme
 class rstme:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core=None, path=None):
         self.core = core
 

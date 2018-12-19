@@ -1,6 +1,6 @@
 #$ class index
 class index:
-    #$$ --init--
+    #$$ __init__
     def __init__(self, core):
         pass
 

@@ -25,7 +25,7 @@ class dbase:
     Manage database SQLite3
     '''
 
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self):
         self.path        = ':memory:' # can be ":memory:"
         self.timeout     = 0.1        # None = lock will not interupt auto

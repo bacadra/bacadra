@@ -59,3 +59,6 @@ class project(rootx):
 
         from . import bicad
         self.bicad = bicad.index(core=core)
+
+        from . import bapps
+        self.bapps = bapps.index(core=core)

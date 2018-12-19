@@ -11,7 +11,7 @@ Team members developing this package:
 '''
 
 class umate:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.core = core
 

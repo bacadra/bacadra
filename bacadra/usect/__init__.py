@@ -14,7 +14,7 @@ from ..tools.rootx import rootx
 
 #$ class index
 class index(rootx):
-    #$$ --init--
+    #$$ __init__
     def __init__(self, core):
         from . import usec1
         from . import usec2

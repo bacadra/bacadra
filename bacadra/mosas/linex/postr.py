@@ -3,7 +3,7 @@ import numpy as np
 from .. import eleme
 
 class postr:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core, prog, lcase):
         self.core = core
         self.prog = prog

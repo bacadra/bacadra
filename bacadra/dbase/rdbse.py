@@ -265,7 +265,7 @@ class rdbse:
     code += '[grade] TEXT,'
 
     # max thickness
-    code += '[max_t] REAL,'
+    code += '[t_max] REAL,'
 
     # yield strength
     code += '[f_yk] REAL,'

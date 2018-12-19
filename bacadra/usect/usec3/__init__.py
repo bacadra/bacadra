@@ -14,6 +14,6 @@ from ...tools.rootx import rootx
 
 #$ class index
 class index(rootx):
-    #$$ --init--
+    #$$ __init__
     def __init__(self, core):
         pass

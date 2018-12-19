@@ -20,7 +20,7 @@ from .. import geomf
 #$ ____ class dxcad ________________________________________________________ #
 
 class dxcad:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.core = core
 

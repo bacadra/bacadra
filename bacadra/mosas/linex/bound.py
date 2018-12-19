@@ -3,7 +3,7 @@ import numpy as np
 from . import verrs
 
 class bound:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core, prog):
         self.core = core
         self.prog = prog

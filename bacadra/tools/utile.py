@@ -15,7 +15,7 @@ import uuid
 
 #$ class utile
 class utile:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core=None):
         if core is None:
             from ..pinky import index

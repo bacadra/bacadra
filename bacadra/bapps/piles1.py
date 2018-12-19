@@ -9,7 +9,7 @@ from ..cunit.cmath import *
 #$ ____ class main _________________________________________________________ #
 
 class main:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.dbase = dbase
         self.pinky = pinky
@@ -23,7 +23,7 @@ class pnb83:
     '''
     PN-B-02482 1983
     '''
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.dbase = dbase
         self.pinky = pinky

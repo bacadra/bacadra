@@ -63,7 +63,7 @@ regme_textstyle5 = regex.compile(r'\\(?:mm|tm)'+bm)
 
 
 class regme:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, text='', dict={}):
         self.text = text
         self.math_mode = False

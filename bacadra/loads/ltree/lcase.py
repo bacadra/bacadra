@@ -13,7 +13,7 @@ Team members developing this package:
 #$ ____ class lcase ________________________________________________________ #
 
 class lcase:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.core = core
 

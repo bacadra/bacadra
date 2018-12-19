@@ -3,7 +3,7 @@ import numpy as np
 from .. import eleme
 
 class stiff:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core, prog):
         self.core = core
         self.prog = prog # needed: _K, K11, K12, K21, K22, _ldof, _sdof

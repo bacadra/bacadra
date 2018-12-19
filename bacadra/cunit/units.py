@@ -5,6 +5,7 @@
 import math
 
 import numpy as np
+import sympy as sp
 
 from .ndict import ndict
 
@@ -14,7 +15,9 @@ from . import nprec
 #$ ____ metaclass cunitmeta ________________________________________________ #
 
 class cunitmeta(type):
+
 #$$ ________ def system ____________________________________________________ #
+
     @property
     def system(cls):
         return cls._system
@@ -25,12 +28,15 @@ class cunitmeta(type):
         cls._system = value
 
 #$$ ________ def create-system _____________________________________________ #
+
     def create_system(cls, name={}):
         eval('cls.base_'+name+'='+str(name))
 
 #$ ____ class crange _______________________________________________________ #
+
 class crange:
-    #$$ def --init--
+
+    #$$ def __init__
     def __init__(self, unit=1, val1=None, val2=None, val3=None):
         if type(val1) is cunit: val1 = int(val1.d(unit))
         if type(val2) is cunit: val2 = int(val2.d(unit))
@@ -45,7 +51,7 @@ class crange:
 
         self.value = [cunit(val, unit) for val in data]
 
-    #$$ def --iter--
+    #$$ def __iter__
     def __iter__(self):
         return (x for x in self.value)
 
@@ -143,7 +149,7 @@ class cunit(object, metaclass=cunitmeta):
     _system = 'ce'
 
 
-#$$ ________ def --init-- __________________________________________________ #
+#$$ ________ def __init__ __________________________________________________ #
 
     def __init__(self, value=1, units=None):
         '''
@@ -164,7 +170,7 @@ class cunit(object, metaclass=cunitmeta):
             self._units = units
 
 
-#$$ ________ def -get ______________________________________________________ #
+#$$ ________ def _get ______________________________________________________ #
 
     def _get(self, units):
         '''
@@ -449,7 +455,7 @@ class cunit(object, metaclass=cunitmeta):
     crange = crange
 
 #$$ ________ magic behaviour _______________________________________________ #
-#$$$ ____________ def --add-- / --radd-- / --iadd-- / --pos-- ______________ #
+#$$$ ____________ def __add__ / __radd__ / __iadd__ / __pos__ ______________ #
 
     def __add__(self, othe):
         '''
@@ -519,7 +525,7 @@ class cunit(object, metaclass=cunitmeta):
         return self
 
 
-#$$$ ____________ def --sub-- / --rsub-- / --isub-- / --neg-- ______________ #
+#$$$ ____________ def __sub__ / __rsub__ / __isub__ / __neg__ ______________ #
 
     def __sub__(self, othe):
         '''
@@ -637,7 +643,7 @@ class cunit(object, metaclass=cunitmeta):
 
 
 
-#$$$ ____________ def --pow-- / --rpow-- / --ipow-- ________________________ #
+#$$$ ____________ def __pow__ / __rpow__ / __ipow__ ________________________ #
 
     def __pow__(self, othe):
         '''
@@ -676,7 +682,7 @@ class cunit(object, metaclass=cunitmeta):
         return self.__pow__(othe)
 
 
-#$$$ ____________ def --mul-- / --rmul-- / --imul-- ________________________ #
+#$$$ ____________ def __mul__ / __rmul__ / __imul__ ________________________ #
 
     def __mul__(self, othe):
         '''
@@ -696,7 +702,6 @@ class cunit(object, metaclass=cunitmeta):
             # note: we do not need to check compability units, we can multiply any two units
             s = self.primary()
             o = othe.primary()
-
 
             # return new cunit, with multipled value and summed units
             return cunit(s._value * o._value, ndict.dsum(s._units, o._units))
@@ -730,7 +735,7 @@ class cunit(object, metaclass=cunitmeta):
 
 
 
-#$$$ ____________ def --truediv-- / --rtruediv-- / --itruediv-- ____________ #
+#$$$ ____________ def __truediv__ / __rtruediv__ / __itruediv__ ____________ #
 
     def __truediv__(self, othe):
         '''
@@ -812,7 +817,7 @@ class cunit(object, metaclass=cunitmeta):
 
 
 
-#$$$ ____________ def --round-- ____________________________________________ #
+#$$$ ____________ def __round__ ____________________________________________ #
 
     def __round__(self, acc=0):
         '''
@@ -820,7 +825,7 @@ class cunit(object, metaclass=cunitmeta):
         '''
         return cunit(round(self._value, acc), self._units)
 
-#$$$ ____________ def --ceil-- _____________________________________________ #
+#$$$ ____________ def __ceil__ _____________________________________________ #
 
     def __ceil__(self):
         '''
@@ -828,7 +833,7 @@ class cunit(object, metaclass=cunitmeta):
         '''
         return cunit(math.ceil(self._value), self._units)
 
-#$$$ ____________ def --trunc-- ____________________________________________ #
+#$$$ ____________ def __trunc__ ____________________________________________ #
 
     def __trunc__(self):
         '''
@@ -836,7 +841,7 @@ class cunit(object, metaclass=cunitmeta):
         '''
         return cunit(math.trunc(self._value), self._units)
 
-#$$$ ____________ def --nstyle-- ___________________________________________ #
+#$$$ ____________ def __nstyle__ ___________________________________________ #
 
     def __nstyle__(self):
         '''
@@ -847,7 +852,7 @@ class cunit(object, metaclass=cunitmeta):
         value = self._value
 
         # if self value type is numeric type then round and sign value
-        if type(value) in [int, float, np.float64]:
+        if type(value) in [int, float, np.float64, sp.Expr]:
 
             value = nprec.to_precision(
                 value       = value,
@@ -863,33 +868,13 @@ class cunit(object, metaclass=cunitmeta):
         else:
             value = str(value)
 
-            # # significant numbers
-            # if acc[1]:
-            #     # TODO: verify how numbers are rounded, ceil, floor or what?
-            #     if value != 0:
-            #         value = round(value, -int(math.floor(math.log10(abs(value)))) + (acc[1]-1))
-            #
-            # if int(value) == value:
-            #     value = int(value)
-            #
-            # # decimal places
-            # if acc[0]:
-            #     if trail is False:
-            #         value = round(value, acc[0])
-            #
-            #         # loop over units and round unit's power
-            #         for key,val in self._units.items():
-            #             self._units[key] = round(val, acc[0])
-            #     elif trail is True:
-            #         value = '{:.{prec}f}'.format(self._value, prec=acc[0])
-
 
         # return new units, with acc deci and prec
         return cunit(value, self._units)
 
 
 
-#$$$ ____________ def --repr-- _____________________________________________ #
+#$$$ ____________ def __repr__ _____________________________________________ #
 
     def __repr__(self):
         '''
@@ -1051,7 +1036,7 @@ class cunit(object, metaclass=cunitmeta):
 
 
 
-#$$$ ____________ def --lt-- / --le-- ______________________________________ #
+#$$$ ____________ def __lt__ / __le__ ______________________________________ #
 
     def __lt__(self, othe):
         '''
@@ -1133,7 +1118,7 @@ class cunit(object, metaclass=cunitmeta):
             verrs.fCunitUndefinedOperationError('__le__', self, othe)
 
 
-#$$$ ____________ def --gt-- / --ge-- ______________________________________ #
+#$$$ ____________ def __gt__ / __ge__ ______________________________________ #
 
     def __gt__(self, othe):
         '''
@@ -1149,7 +1134,7 @@ class cunit(object, metaclass=cunitmeta):
         return cunit.__le__(-self,-othe)
 
 
-#$$$ ____________ def --eq-- / --ne-- ______________________________________ #
+#$$$ ____________ def __eq__ / __ne__ ______________________________________ #
 
     def __eq__(self, othe):
         '''
@@ -1240,7 +1225,7 @@ class cunit(object, metaclass=cunitmeta):
 
 
 
-#$$$ ____________ def --is-- / is-not ______________________________________ #
+#$$$ ____________ def __is__ / is-not ______________________________________ #
 
     def __is__(self, othe):
         '''
@@ -1255,7 +1240,7 @@ class cunit(object, metaclass=cunitmeta):
         '''
         return self.__ne__(self, othe)
 
-#$$$ ____________ def --and-- / --rand-- ___________________________________ #
+#$$$ ____________ def __and__ / __rand__ ___________________________________ #
 
     def __and__(self, othe):
         '''
@@ -1274,7 +1259,7 @@ class cunit(object, metaclass=cunitmeta):
         return self.__and__(self, othe)
 
 
-#$$$ ____________ def --xor-- / --rxor-- ___________________________________ #
+#$$$ ____________ def __xor__ / __rxor__ ___________________________________ #
 
 
     def __xor__(self, othe):
@@ -1294,7 +1279,7 @@ class cunit(object, metaclass=cunitmeta):
         return self.__xor__(self, othe)
 
 
-#$$$ ____________ def --abs-- / --mod-- ____________________________________ #
+#$$$ ____________ def __abs__ / __mod__ ____________________________________ #
 
     def __abs__(self):
         '''
@@ -1309,7 +1294,7 @@ class cunit(object, metaclass=cunitmeta):
         return cunit(self._value % val, self._units)
 
 
-#$$$ ____________ def --float-- / --int-- __________________________________ #
+#$$$ ____________ def __float__ / __int__ __________________________________ #
 
     def __float__(self):
         '''
@@ -1325,7 +1310,7 @@ class cunit(object, metaclass=cunitmeta):
         return int(self._value)
 
 
-#$$$ ____________ def --bool-- _____________________________________________ #
+#$$$ ____________ def __bool__ _____________________________________________ #
 
     def __bool__(self):
         return bool(self._value)

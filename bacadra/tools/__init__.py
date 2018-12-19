@@ -4,7 +4,7 @@ from .utile import utile
 
 #$ class index
 class index(rootx):
-    #$$ --init--
+    #$$ __init__
     def __init__(self, core):
         self.core = core
         self.sub_init('utile', True)

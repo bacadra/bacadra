@@ -4,7 +4,7 @@ from . import beams
 
 #$ class index
 class index:
-    #$$ --init--
+    #$$ __init__
     def __init__(self, core):
         self.nodes = nodes.nodes(core=core)
         self.truss = truss.truss(core=core)
@@ -31,7 +31,7 @@ class index:
 #
 # #$ main
 # class main():
-#     #$$ --init--
+#     #$$ __init__
 #     def __init__(self, dbase, pinky):
 #         self.sett = sett(dbase, pinky)
 #         self.node = node(dbase, pinky)
@@ -42,7 +42,7 @@ class index:
 #
 # #$ sett
 # class sett():
-#     #$$ --init--
+#     #$$ __init__
 #     def __init__(self, dbase):
 #         self.dbase = dbase
 #
@@ -59,7 +59,7 @@ class index:
 #
 # #$ node
 # class node():
-#     #$$ --init--
+#     #$$ __init__
 #     def __init__(self, dbase, pinky):
 #         self.dbase = dbase
 #         self.pinky = pinky
@@ -220,18 +220,18 @@ class index:
     #
 # #$ trus
 # class trus():
-#     #$$ --init--
+#     #$$ __init__
 #     def __init__(self, dbase):
 #         self.dbase = dbase
 #
 # #$ beam
 # class beam():
-#     #$$ --init--
+#     #$$ __init__
 #     def __init__(self, dbase):
 #         self.dbase = dbase
 #
 # #$ quad
 # class quad():
-#     #$$ --init--
+#     #$$ __init__
 #     def __init__(self, dbase):
 #         self.dbase = dbase

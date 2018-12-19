@@ -13,7 +13,7 @@ np.set_printoptions(suppress=True)
 #$ ____ class linex ________________________________________________________ #
 
 class linex:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.core = core
 

@@ -20,7 +20,7 @@ from .texme.texme import texme
 
 #$ class index
 class index(rootx):
-    #$$ --init--
+    #$$ __init__
     def __init__(self, dbase, mdata):
 
         class core:

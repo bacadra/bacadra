@@ -15,7 +15,7 @@ from . import value
 from ...cunit import cunit
 
 class thinw:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.core = core
         self._value = value.value(core=core)

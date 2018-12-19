@@ -5,7 +5,6 @@ class template:
             'author'         : None,
             'head_line_0'    : None,
             'head_line_1'    : None,
-            'head_line_2'    : None,
             'foot_line_left' : None,
             'logo_path'      : None,
             'bib_path'       : None,
@@ -45,14 +44,6 @@ class template:
 
         self.base_keys['head_line_1'] = val
 
-    def head_line_2(self, val):
-        if val == None:
-            val = r'%'
-
-        elif type(val) == str:
-            val = r'\scriptsize ' + val
-
-        self.base_keys['head_line_2'] = val
 
     def foot_line_left(self, val):
         if val == None:
@@ -100,6 +91,8 @@ class template:
 
                     subtitle = r'Obiekt mostowy przeznaczony dla ruchu kolejowego \\ \textbf{' + val['LK'] + '}'
 
+                    self.head_line_1(r'Obiekt mostowy przeznaczony dla ruchu kolejowego \\ \scriptsize \textbf{' + val['LK'] + '}')
+
                 elif val['type'] == 'road':
 
                     subtitle = r'Obiekt mostowy przeznaczony dla ruchu drogowego \\ \textbf{' + val['DK'] + '}'
@@ -119,7 +112,7 @@ class template:
             		{\rule{\linewidth}{0.5mm}}           \\ [0.5cm]
 
             		\Large \textbf{\uppercase{%
-                    Obliczenia \\ statyczno-wytrzymaŁościowe
+                    OBLICZENIA \\ STATYCZNO-WYTRZYMAŁOŚCIOWE
                     }}
 
             		{\rule{\linewidth}{0.5mm}}           \\ [0.5cm]
@@ -144,7 +137,7 @@ class template:
 
         self.base_keys['title_page'] = out
 
-class exe:
+class ext:
     def __init__(self, othe):
         self.othe = othe
 

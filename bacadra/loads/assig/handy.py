@@ -2,7 +2,7 @@
 #$ ____ class handy ________________________________________________________ #
 
 class handy:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.core = core
 

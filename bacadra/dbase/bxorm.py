@@ -47,7 +47,7 @@ class bcdr_mates_steea(bcdr_mates):
 
             [T1].[id],
             [T1].[grade],
-            [T1].[max_t],
+            [T1].[t_max],
             [T1].[f_yk],
             [T1].[f_uk],
             [T1].[E_a],
@@ -73,7 +73,7 @@ class bcdr_mates_steea(bcdr_mates):
 
         i =0; self.id    = data[i]
         i+=1; self.grade = data[i]
-        i+=1; self.max_t = data[i] * c_length
+        i+=1; self.t_max = data[i] * c_length
         i+=1; self.f_yk  = data[i] * c_pressu
         i+=1; self.f_uk  = data[i] * c_pressu
         i+=1; self.E_a   = data[i] * c_pressu

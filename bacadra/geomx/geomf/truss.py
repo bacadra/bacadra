@@ -20,7 +20,7 @@ Team members developing this package:
 #$ ____ class truss ________________________________________________________ #
 
 class truss:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.core = core
 

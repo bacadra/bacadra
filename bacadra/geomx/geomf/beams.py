@@ -18,7 +18,7 @@ from ...cunit import cunit
 #$$ ________ class beams ___________________________________________________ #
 
 class beams:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.core = core
         self._nodes = nodes.nodes(core=core)

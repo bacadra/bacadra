@@ -2,7 +2,7 @@ from .pbase  import pbase
 from ...cunit import cunit
 
 class conce:
-    #$$ def --init--
+    #$$ def __init__
     def __init__(self, core):
         self.core = core
 
