@@ -1206,7 +1206,7 @@ class texme:
             if pic_error:
                 verrs.pathError(path)
             else:
-                print('Path does not exists. Picture error flag is False.')
+                print('Path does not exists. Picture error flag is False.\n<'+path+'>')
                 return
 
         # create absoule path

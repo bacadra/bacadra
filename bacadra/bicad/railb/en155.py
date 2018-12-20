@@ -222,7 +222,7 @@ class en155:
 
 
             if caption is None:
-                caption = 'Prędkości dopuszczalne dla modeli ruchu kolejowego cite{pnen15528}'
+                caption = 'Prędkości dopuszczalne dla modeli ruchu kolejowego \\cite{pnen15528}'
 
             return self.core.pinky.texme.t(
                     cols     = r'|e{4cm}|C|C|C|C|C|C|C|C|C|',

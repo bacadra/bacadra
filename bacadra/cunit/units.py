@@ -496,8 +496,9 @@ class cunit(object, metaclass=cunitmeta):
             return self
 
         # if self units is empty, again, just return self without unit
-        elif self._units=={}:
-            return cunit(self._value + othe, {})
+        elif self._units in [{}, {'%':1}]:
+            val = self._value if self._units == {} else self._value / 100
+            return cunit(val + othe, {})
 
         # else raise error
         else:
@@ -566,8 +567,9 @@ class cunit(object, metaclass=cunitmeta):
             return self
 
         # if self units is empty, again, just return self without unit
-        elif self._units=={}:
-                return cunit(self._value - othe, {})
+        elif self._units in [{}, {'%':1}]:
+            val = self._value if self._units == {} else self._value / 100
+            return cunit(val - othe, {})
 
         # else raise error
         else:
@@ -613,8 +615,9 @@ class cunit(object, metaclass=cunitmeta):
             return -self
 
         # if self units is empty
-        elif self._units=={}:
-                return cunit(othe - self._value, {})
+        elif self._units in [{}, {'%':1}]:
+            val = self._value if self._units == {} else self._value / 100
+            return cunit(othe - val, {})
 
         # else raise error
         else:
@@ -1069,8 +1072,9 @@ class cunit(object, metaclass=cunitmeta):
             return self._value < 0
 
         # if self units is empty, again, just return self without unit
-        elif self._units=={}:
-            return self._value < othe
+        elif self._units in [{}, {'%':1}]:
+            val = self._value if self._units == {} else self._value / 100
+            return val < othe
 
         # else raise error
         else:
@@ -1110,8 +1114,9 @@ class cunit(object, metaclass=cunitmeta):
             return self._value <= 0
 
         # if self units is empty, again, just return self without unit
-        elif self._units=={}:
-            return self._value <= othe
+        elif self._units in [{}, {'%':1}]:
+            val = self._value if self._units == {} else self._value / 100
+            return val <= othe
 
         # else raise error
         else:
@@ -1167,8 +1172,9 @@ class cunit(object, metaclass=cunitmeta):
             return self._value == 0
 
         # if self units is empty, again, just return self without unit
-        elif self._units=={}:
-            return self._value == othe
+        elif self._units in [{}, {'%':1}]:
+            val = self._value if self._units == {} else self._value / 100
+            return val == othe
 
         # treat bool and None types
         elif othe in [True, False, None]:
@@ -1212,8 +1218,9 @@ class cunit(object, metaclass=cunitmeta):
             return self._value != 0
 
         # if self units is empty, again, just return self without unit
-        elif self._units=={}:
-            return self._value != othe
+        elif self._units in [{}, {'%':1}]:
+            val = self._value if self._units == {} else self._value / 100
+            return val != othe
 
         # treat bool and None types
         elif othe in [True, False, None]:
