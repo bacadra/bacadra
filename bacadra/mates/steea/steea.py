@@ -80,16 +80,16 @@ class steea:
         )
 
         if orm:
-            return self.orm(where=f'id={id}')
+            return self.orm(where=f'id="{id}"')
 
     #$$ def orm
     def orm(self, id=None, where=None):
-        from ...dbase.bxorm import bcdr_mates_steea
+        from ...dbase.bxorm import bxorm_mates_steea
 
         if id and not where:
             where = f'id="{id}"'
 
-        return bcdr_mates_steea(
+        return bxorm_mates_steea(
             dbase = self.core.dbase,
             where = where,
         )

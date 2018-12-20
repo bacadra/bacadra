@@ -1,6 +1,6 @@
 '''
 ------------------------------------------------------------------------------
-BCDR += ***** general and special (mate)rial(s) *****
+BCDR += ***** (b)acadra (datas) *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
@@ -10,17 +10,15 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
-from ..tools.rootx import rootx
+class bdata:
+    #$$ def __item__
+    def __init__(self, ndict):
+        self.__dict__.update(ndict)
 
-from .cmemb import cmemb
-from .smemb import smemb
-from .asect import asect
-from .fdeck import fdeck
+    #$$ def __repr__
+    def __repr__(self):
+        data = []
+        for key,val in self.__dict__.items():
+            data.append('> {:14s} : {}'.format(key, val))
 
-#$ class index
-class index(rootx):
-    #$$ __init__
-    def __init__(self, core):
-
-        from . import asect
-        self.asect = asect(core=core)
+        return '\n'.join(data)

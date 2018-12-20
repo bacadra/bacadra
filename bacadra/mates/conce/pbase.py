@@ -2,8 +2,10 @@ import math
 
 from . import verrs
 
-from ...cunit.system.ce import MPa
+from ...cunit import cunit
 
+MPa = cunit(1, 'MPa')
+GPa = cunit(1, 'GPa')
 
 class pbase:
     def __init__(self):
@@ -63,7 +65,7 @@ class pbase:
         f_cm = f_ck + 8*MPa
 
         # secant stiffness module
-        E_cm = (22*(0.1*f_cm.drop('MPa'))**0.3)*MPa
+        E_cm = (22*(0.1*f_cm.drop('MPa'))**0.3)*GPa
 
         # first plastic compresive strain
         ε_c1 = min(0.7*(f_cm.drop('MPa'))**0.31, 2.8)/1000

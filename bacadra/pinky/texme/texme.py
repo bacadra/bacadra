@@ -993,6 +993,9 @@ class texme:
         elif mode in ['vs', 'vspace']:
             code = r'\vspace*{'+val1+'}'
 
+        elif mode in ['newline', 'nl']:
+            code = r'\newline'
+
         else:
             raise ValueError('Unknow mode')
 
@@ -1024,8 +1027,10 @@ class texme:
         rx      = self.setts.test('rx'     , rx, 'xt')
 
         # if page is typed
-        if page:
+        if type(page) in [str]:
             self.page(page)
+        elif type(page) in [tuple]:
+            self.page(page[0])
 
         # if scope is extended, becarfull, it overwrite
         if scope:
@@ -1065,8 +1070,10 @@ class texme:
         minitoc = self.setts.test('minitoc', minitoc)
 
         # if page is typed
-        if page:
+        if type(page) in [str]:
             self.page(page)
+        elif type(page) in [tuple]:
+            self.page(page[0])
 
         # if scope is extended, becarfull, it overwrite
         if scope:
@@ -1145,6 +1152,8 @@ class texme:
 
             ipdisplay(HTML(source.strip()))
 
+        if type(page) in [tuple]:
+            self.page(page[1])
 
         return self.add(
             submodule = 'h' + str(lvl),
@@ -1176,8 +1185,10 @@ class texme:
         pic_error = self.setts.test('pic_error', pic_error)
 
         # if page is typed
-        if page:
+        if type(page) in [str]:
             self.page(page)
+        elif type(page) in [tuple]:
+            self.page(page[0])
 
         # if scope is extended, becarfull, it overwrite
         if scope:
@@ -1326,6 +1337,9 @@ class texme:
                 pathA, width=self.setts.pic_diswidth
             ))
 
+        if type(page) in [tuple]:
+            self.page(page[1])
+
         return self.add(
             submodule = _name1,
             code      = code,
@@ -1347,8 +1361,10 @@ class texme:
             return
 
         # if page is typed
-        if page:
+        if type(page) in [str]:
             self.page(page)
+        elif type(page) in [tuple]:
+            self.page(page[0])
 
         # if scope is extended, becarfull, it overwrite
         if scope:
@@ -1438,6 +1454,9 @@ class texme:
                 '$'+regme(equation, self.setts.scope).package(99)+'$'
             ))
 
+        if type(page) in [tuple]:
+            self.page(page[1])
+
         return self.add(
             submodule = 'm',
             code      = code,
@@ -1467,8 +1486,10 @@ class texme:
         rxd       = self.setts.test('rx'     , rxd, 'td')
 
         # if page is typed
-        if page:
+        if type(page) in [str]:
             self.page(page)
+        elif type(page) in [tuple]:
+            self.page(page[0])
 
         # if scope is extended, becarfull, it overwrite
         if scope:
@@ -1519,6 +1540,9 @@ class texme:
         elif float == 'H':
             tex = '\\begin{table}[H]\n' + tex + '\n\\end{table}'
 
+        if type(page) in [tuple]:
+            self.page(page[1])
+
         return self.add(
             submodule = 't',
             code      = tex,
@@ -1545,8 +1569,10 @@ class texme:
         rxc       = self.setts.test('rx'     , rxc, 'cc')
 
         # if page is typed
-        if page:
+        if type(page) in [str]:
             self.page(page)
+        elif type(page) in [tuple]:
+            self.page(page[0])
 
         # if scope is extended, becarfull, it overwrite
         if scope:
@@ -1601,6 +1627,8 @@ class texme:
 
             _name1='c-text'
 
+        if type(page) in [tuple]:
+            self.page(page[1])
 
         return self.add(
             submodule = _name1,
@@ -1612,7 +1640,7 @@ class texme:
 
 
 
-    def file(self, path, caption=None, label=None, first_line=0, last_line=1e10, absolute_path=False, language='Python', rxe=0, inherit=None, echo=None):
+    def file(self, path, caption=None, label=None, first_line=0, last_line=1e10, absolute_path=False, language='Python', rxe=0, inherit=None, echo=None, page=None, scope=None):
         '''
         '''
 
@@ -1623,8 +1651,18 @@ class texme:
         # use global settings
         inherit   = self.setts.test('inherit', inherit)
         echo      = self.setts.test('echo'   , echo)
-        label     = self.setts.test('label'  , {'f':label})['f']
-        rxe       = self.setts.test('rx', {'fe':rxe})['fe']
+        label     = self.setts.test('label'  , label, 'f')
+        rxe       = self.setts.test('rx'     , rxe, 'fe')
+
+        # if page is typed
+        if type(page) in [str]:
+            self.page(page)
+        elif type(page) in [tuple]:
+            self.page(page[0])
+
+        # if scope is extended, becarfull, it overwrite
+        if scope:
+            self.setts._scope.update(scope)
 
         if language:
             var2 = ',language={' + language + '}'
@@ -1650,6 +1688,9 @@ class texme:
         tex = tex.replace('%4', last_line)
         tex = tex.replace('%5', var2)
         tex = tex.replace('%6', path.replace('\\', '/'))
+
+        if type(page) in [tuple]:
+            self.page(page[1])
 
         return self.add(
             submodule = 'f',
@@ -1679,8 +1720,10 @@ class texme:
         rxt       = self.setts.test('rx'     , rxt, 'it')
 
         # if page is typed
-        if page:
+        if type(page) in [str]:
             self.page(page)
+        elif type(page) in [tuple]:
+            self.page(page[0])
 
         # if scope is extended, becarfull, it overwrite
         if scope:
@@ -1815,6 +1858,9 @@ class texme:
             '{flush_math}': flush_math,
             '{equation}'  : equation,
         })
+
+        if type(page) in [tuple]:
+            self.page(page[1])
 
         self.__last_type = 'i'
 

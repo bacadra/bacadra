@@ -13,7 +13,7 @@ class conce:
     #$$ def add
     def add(self,
     # parametry ogolne
-    id=None, ρ_o=25*cunit('kN')/(cunit('m'))**3, E_1=None, v_1=0.20, G_1=None, t_e=10**-5, ttl=None,
+    id=None, ρ_o=cunit(2500, 'kg m**-3'), E_1=None, v_1=0.20, G_1=None, t_e=10**-5, ttl=None, orm=False,
 
     # parametry betonu
     grade=None,
@@ -70,6 +70,7 @@ class conce:
             n_c       = n_c,
             ε_c3      = ε_c3,
             ε_cu3     = ε_cu3,
+            γ_M       = γ_M,
         )
 
         # add data for concrete material
@@ -78,6 +79,9 @@ class conce:
             cols  = cols,
             data  = data,
         )
+
+        if orm:
+            return self.orm(where=f'id="{id}"')
 
     def get(self, id):
         cols = '[id],[grade],[f_ck],[f_ck_cube],[f_cm],[f_ctm],[f_ctk_005],[f_ctk_095],[E_cm],[ε_c1],[ε_cu1],[ε_c2],[ε_cu2],[n_c],[ε_c3],[ε_cu3]'
@@ -92,3 +96,14 @@ class conce:
 
         return output
 
+    #$$ def orm
+    def orm(self, id=None, where=None):
+        from ...dbase.bxorm import bxorm_mates_conce
+
+        if id and not where:
+            where = f'id="{id}"'
+
+        return bxorm_mates_conce(
+            dbase = self.core.dbase,
+            where = where,
+        )

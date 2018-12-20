@@ -126,7 +126,7 @@ class ecode:
 
 
     @staticmethod
-    def vibration_limit(n_0, L_T, name):
+    def vibration_limit(n_0, L_T, name, echo=False):
 
         def n_0_up(L_T):
             return 94.76*(L_T/m)**(-0.748) * Hz
@@ -176,6 +176,9 @@ class ecode:
             plt.plot(L, fn_0_low, linewidth=3.0, label='linia')
             plt.plot([L_T], [n_0], 'ro')
             fig_sett(name)
+
+            if not echo in [True, 'p']:
+                plt.close()
 
 
         fig(n_0, name)

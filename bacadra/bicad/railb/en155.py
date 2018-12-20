@@ -88,7 +88,7 @@ class dfact:
             return {'speed':self.speed.s('km hr**-1') , 'φ_dyn':self.φ_dyn}
 
     #$$ def plot
-    def plot(self, name=None):
+    def plot(self, name=None, echo=False):
         mpl.style.use('default')
 
         # style settings
@@ -114,6 +114,9 @@ class dfact:
 
         if name:
             plt.savefig(name, dpi = 300)
+
+        if not echo in [True, 'p']:
+            plt.close()
 
     #$$ def sofi
     def sofi(self, var='PHI_15528', cdb=None, name='x_impact-factor-15528.dat', active=True, make=True, sofix=None):

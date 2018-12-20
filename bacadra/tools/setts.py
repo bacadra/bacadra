@@ -34,7 +34,7 @@ class settsmeta(type):
 
         data = []
         for key in dir(self):
-            if (key[0] == '_' and key[1] != '_' and key[-2:0] != '__' and key not in ['_scope']):
+            if (key[0] == '_' and key[1] != '_' and key[-1] != '_' and key not in ['_scope', '_scope_']):
                 val = eval('self.' + key)
                 if type(val) is str: val = '"' + str(val) + '"'
                 data.append('> {:14s} : {}'.format(key[1:], val))
@@ -67,4 +67,3 @@ class settsmeta(type):
 
         for key,val in kwargs.items():
             setattr(eval('self'), key, val)
-

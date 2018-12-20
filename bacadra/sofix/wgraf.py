@@ -196,16 +196,19 @@ class wgraf:
 
 
     @staticmethod
-    def run_mass(output, cdb, wdata, delete=True, active=True, watermark=True):
+    def run_mass(output, cdb, wdata, sproj=None, delete=True, active=True, watermark=True):
 
         if active:
             i=0
-            for cdb in cdb:
-                i+=1; print(str(i)+'. Q:', str(cdb[1])+', "'+cdb[0]+'"')
+            for cdbi in cdb:
+                i+=1; print(str(i)+'. Q:', str(cdbi[1])+', "'+cdbi[0]+'"')
 
-                output_path = os.path.join(output, os.path.basename(cdb[0]))
+                if sproj:
+                    path = os.path.join(sproj, cdbi[0])
 
-                wgraf.run(cdb=cdb[0], wdata=wdata, delete=delete, output=output_path, active=cdb[1], watermark=watermark)
+                output_path = os.path.join(output, os.path.basename(cdbi[0]))
 
-            print('Operation Wingraf-convert-mass complete!')
+                wgraf.run(cdb=path, wdata=wdata, delete=delete, output=output_path, active=cdbi[1], watermark=watermark)
+
+            print('Operation <Wingraf-convert-mass> complete!')
 

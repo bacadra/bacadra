@@ -17,6 +17,7 @@ from . import sofix
 from . import tools
 from . import bapps
 from . import bicad
+from . import dbase
 
 # project
 from .project import project
