@@ -201,6 +201,10 @@ class wgraf:
         if active:
             i=0
             for cdbi in cdb:
+
+                if type(cdbi)!=tuple or len(cdbi)!=2:
+                    raise ValueError('Len of cdb line must be equal to 2\nTip: first parameter describe name (or path), second is active bool')
+
                 i+=1; print(str(i)+'. Q:', str(cdbi[1])+', "'+cdbi[0]+'"')
 
                 if sproj:

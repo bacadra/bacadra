@@ -36,7 +36,7 @@ regme_unit1 = re.compile(str_begin + str_unit + str_end)
 str_begin = r'( |[0-9]|\n|~|\+|\-|\%|\@|=|\*|\(|\)|{|}|\$|\:)[ ]*'
 regme_unit2 = re.compile(str_begin + str_unit + str_end)
 
-str_begin = r'( |[0-9]|\n|~|\+|\-|\%|\@|=|\*|\(|\)|{|}|\$|\:)[ ]*'
+str_begin = r'( |[0-9]|\n|~|\+|\-|\%|\@|=|\*|\(|\)|}|\$|\:)[ ]*'
 str_function = r'(arccos|arcsin|arctan|arg|cos|cosh|cot|coth|csc|deg|det|dim|exp|inf|lim|log|max|ln|min|sin|sinh|sup|tan|tanh|if|abs)'
 str_end = r'(~*)([a-zA-Z0-9α-ωΑ-Ω\~\(\\\)]*)'
 regme_function1 = re.compile(str_begin + str_function + str_end)
@@ -53,7 +53,7 @@ regme_sbrac4 = re.compile(r':\\right\)')
 
 bm = r'\{([^\{\}]*+(?:\{(?1)\}[^\{\}]*)*+)\}'
 regme_textstyle1 = regex.compile(r'\\(?:mn)'+bm)
-regme_textstyle2 = regex.compile(r'\\(?:mt)'+bm)
+regme_textstyle2 = regex.compile(r'\\(?:mt|trm)'+bm)
 regme_textstyle3 = regex.compile(r'\\(?:mi|i)'+bm)
 regme_textstyle4 = regex.compile(r'\\(?:mb|b)'+bm)
 regme_textstyle5 = regex.compile(r'\\(?:mm|tm)'+bm)
@@ -263,8 +263,13 @@ class regme:
     #$$ def rmfunction
     def rmfunction(self):
         def root(text):
-            # for i in range(3):
-            text = regme_function1.sub(r'\1\\textrm{\2}\3\4',text)
+            text_old = text
+            while True:
+                text = regme_function1.sub(r'\1\\textrm{\2}\3\4',text_old)
+                if text_old==text:
+                    break
+                else:
+                    text_old = text
             return text
 
         if self.math_mode:  self.text = self.math_inline(root)
@@ -273,13 +278,11 @@ class regme:
     #$$ def math-fraction
     def math_fraction(self):
         def root(text):
-            textOld = text
             while True:
+                text_old = text
                 text = regme_mfrac.sub(r'\\cfrac{\1}{\2}', text)
-                if textOld==text:
+                if text_old==text:
                     break
-                else:
-                    textOld = text
             text = regme_mfrac2.sub(r'\\cfrac{\1}{\2}', text)
             return text
 
@@ -374,7 +377,7 @@ class regme:
     def package(self, mode=1):
         if mode==0:
             pass
-            
+
         elif mode==1:
             self.math_mode = False
             self.eval()

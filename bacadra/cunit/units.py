@@ -18,6 +18,8 @@ class cunitmeta(type):
 
 #$$ ________ def system ____________________________________________________ #
 
+    _system = None
+
     @property
     def system(cls):
         return cls._system
@@ -26,6 +28,7 @@ class cunitmeta(type):
     def system(cls, value):
         cls.base = eval('cls.base_'+value)
         cls._system = value
+
 
 #$$ ________ def create-system _____________________________________________ #
 
@@ -60,8 +63,9 @@ class crange:
 
 class cunit(object, metaclass=cunitmeta):
 
+    # TODO: add acc type checks, it must be list, not tuple!
     # accuracy of printed value
-    acc = (None,None)
+    acc = [None,None]
 
     # exponent round point
     eacc = 5
@@ -146,7 +150,7 @@ class cunit(object, metaclass=cunitmeta):
         'Pa'  : (0.001,         {'m':-2, 'kN':1}            ),
     }
 
-    _system = 'ce'
+    # _system = 'ce'
 
 
 #$$ ________ def __init__ __________________________________________________ #
@@ -156,18 +160,45 @@ class cunit(object, metaclass=cunitmeta):
         Called class return cunit object. It have two arguments: value and units. The value can be numeric type data, while units accept only dictonary and string.
         '''
 
-        # if user input units as string, then convert it to dictonary type
-        if type(units) == str:
-            # call to convert methods
-            units = ndict.str2dict(units)
+
 
         # if value's type is string, then try to get unit definition from base_{x}.
         if type(value)==str and units==None:
             self._get(value)
+
+        # else set up atributes for value and units as user input
         else:
-            # else set up atributes for value and units as user input
+            # !!!remember!!!
+            # do not check here if units exists in system.base
+            # 1. time, 2. convinient, 3. if you want create in place variable use cc methods
+
+            # if user input units as string, then convert it to dictonary type
+            if type(units) == str:
+                # call to convert methods
+                units = ndict.str2dict(units)
+
             self._value = value
             self._units = units
+
+
+    @classmethod
+    def cc(self, value, units):
+        '''
+        Create cunit in place without convert it. It also check if all key in units exists in base attribute.
+
+        If it often used in texme math methods, wher variable is not defined in python system, but should be printed in report.
+        eg. texme.m('a=@cc(15, "MPa")@'))
+        '''
+
+        if type(units) == str:
+            # call to convert methods
+            units = ndict.str2dict(units)
+
+        for key,val in units.items():
+            if not key in cunit.base:
+                verrs.f1CunitSystemError(cunit.system, units)
+
+        return cunit(value, units)
 
 
 #$$ ________ def _get ______________________________________________________ #
@@ -191,7 +222,7 @@ class cunit(object, metaclass=cunitmeta):
                 self._units = base_value[1]
         # if unit does not exist in base system, then raise error
         except:
-            verrs.f1CunitSystemError(self._system, units)
+            verrs.f1CunitSystemError(cunit.system, units)
 
 
 #$$ ________ def add _______________________________________________________ #
@@ -368,7 +399,7 @@ class cunit(object, metaclass=cunitmeta):
     d = drop
 
 
-#$$ ________ def drop-external _____________________________________________ #
+#$$ ________ def drop_external _____________________________________________ #
 
     @staticmethod
     def drop_external(self, units=None):
@@ -411,30 +442,71 @@ class cunit(object, metaclass=cunitmeta):
 
 #$$ ________ def show ______________________________________________________ #
 
-    def show(self, units=None, acc=None, style=None, fcover=False, post=True, trail=None, nnot=None):
+    def show(self,
+        # log names
+        units=None, acc=None, style=None, fcover=False, trail=None, nnot=None,
+
+        # short names
+        u=None, a=None, ad=None, ai=None, s=None, f=None, t=None, n=None):
         '''
         Change self only to print, like acc, style or units.
+        units  - print as new units, it must be valid in current system
+        acc    - accuracy of results cunit, [0]- decimal, [1]- precision
+        style  - style of printed results
+        fcover - new units must full replace old one,
+        trail  - show trailing zero
+        nnot   - notations of value in printed results
         '''
+
+        # convert short name to long name
+        if u  and not units : units  = u
+        if a  and not acc   : acc    = a
+        if (acc is None) and (ad or ai):
+            acc = [None, None]
+            if ad: acc[0] = ad
+            if ai: acc[1] = ai
+        if s  and not style : style  = s
+        if f  and not fcover: fcover = f
+        if t  and not trail : trail  = t
+        if n  and not nnot  : nnot   = n
+
+        # create copy of self
         othe = self.copy()
+
+        # convert units and fcover checks
         if units: othe.convert(
             units=units, fcover=fcover, inplace=True)
+
+        # change acc
         if acc  : othe.acc   = acc
+
+        # change style
         if style: othe.style = style
+
+        # change trail settings
         if trail: othe.trail = trail
+
+        # change notations settings
         if nnot : othe.nnot  = nnot
         return othe
     s = show
 
+
+#$$ ________ def __call__ __________________________________________________ #
+
+    __call__ = show
+
+
 #$$ ________ def show-external _____________________________________________ #
 
     @staticmethod
-    def show_external(self, units=None, acc=None, style=None, fcover=False, post=True, trail=None, nnot=None):
+    def show_external(self, units=None, acc=None, style=None, fcover=False, trail=None, nnot=None):
 
         if type(self) in [list, np.ndarray]:
-            return [cunit.show_external(obj, units, acc, style, fcover, post, trail, nnot) for obj in self]
+            return [cunit.show_external(obj, units, acc, style, fcover, trail, nnot) for obj in self]
 
         elif type(self) is cunit:
-            return cunit.show(self, units, acc, style, fcover, post, trail, nnot)
+            return cunit.show(self, units, acc, style, fcover, trail, nnot)
 
         else:
             return self
@@ -444,6 +516,10 @@ class cunit(object, metaclass=cunitmeta):
 #$$ ________ def units _____________________________________________________ #
 
     def units(self):
+        '''
+        Return cunit with actual units and value equal to 1.
+        '''
+
         return cunit(1, self._units)
     u = units
 

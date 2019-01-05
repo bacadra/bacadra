@@ -229,7 +229,7 @@ class en155:
                     stretchV = 1.3,
                     label    = label,
                     caption  = caption,
-                    inherit  = inherit,
+                    inherit  = True,
                     data     = fr'''
                 \hline
                 Model obciążenia &

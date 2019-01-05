@@ -653,6 +653,11 @@
 \NewDocumentCommand{\equref}{o m}{%
     \IfNoValueTF{#1}{(\ref{equ:#2})}{\hyperref[equ:#2]{#1}}}
 
+
+%### ____________ date settings ____________________________________________ %
+
+%<day_inc>%
+
 %# ____ document ___________________________________________________________ %
 
 \begin{document}

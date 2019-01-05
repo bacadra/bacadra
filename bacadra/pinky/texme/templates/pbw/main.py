@@ -4,6 +4,7 @@ class template:
         self.base_keys = {
             'author'         : None,
             'head_line_0'    : None,
+            'day_inc'        : None,
             'head_line_1'    : None,
             'foot_line_left' : None,
             'logo_path'      : None,
@@ -26,6 +27,19 @@ class template:
             val = ''
 
         self.base_keys['author'] = val
+
+
+    def day_inc(self, val):
+        if val == None:
+            val = ''
+
+        elif type(val) is int:
+            val = r'\advance\day by ' + str(val)
+
+        else:
+            raise ValueError('Type of val must be val or None')
+
+        self.base_keys['day_inc'] = val
 
 
     def head_line_0(self, val):
@@ -144,3 +158,5 @@ class ext:
     # only for test purpose
     def item_head(self, tex):
         self.othe.add(tex)
+
+

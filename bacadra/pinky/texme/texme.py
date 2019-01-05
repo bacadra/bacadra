@@ -19,7 +19,7 @@ import shutil
 import subprocess
 import importlib.util
 
-from IPython.display import Image, Latex, HTML
+from IPython.display import Image, Latex, HTML, Markdown
 from IPython.display import display as ipdisplay
 
 from ... import tools
@@ -234,7 +234,7 @@ class texme:
 
             spec.loader.exec_module(external)
 
-            self.othe.ext = external.ext(self.othe)
+            # self.othe.ext = external.ext(self.othe)
 
 
 
@@ -248,7 +248,8 @@ class texme:
         def echo(self):
             return self._echo
 
-        def _echo_(self, value):
+        @staticmethod
+        def _echo_(value):
             if value == True:
                 return 'hmp'
 
@@ -293,12 +294,15 @@ class texme:
             else:
                 return self._scope
 
-        @scope.setter
-        def scope(self, value):
+        @staticmethod
+        def _scope_(value):
             if type(value) is not dict:
                 raise ValueError('Type of "value" must be dictonary!')
+            return value
 
-            self._scope = value
+        @scope.setter
+        def scope(self, value):
+            self._scope = self._scope_(value)
 
 
 #$$$ ____________ atribute inherit _________________________________________ #
@@ -498,7 +502,8 @@ class texme:
         def pic_root(self):
                 return self._pic_root
 
-        def _pic_root_(self, value):
+        @staticmethod
+        def _pic_root_(value):
             '''
             '''
 
@@ -524,7 +529,8 @@ class texme:
         def pic_error(self):
                 return self._pic_error
 
-        def _pic_error_(self, value):
+        @staticmethod
+        def _pic_error_(value):
             '''
             '''
 
@@ -577,7 +583,8 @@ class texme:
         def head_lvl_inc(self):
                 return self._head_lvl_inc
 
-        def _head_lvl_inc_(self, value):
+        @staticmethod
+        def _head_lvl_inc_(value):
             '''
             '''
 
@@ -608,10 +615,12 @@ class texme:
             '''
             '''
 
-            if type(value) is not int:
-                raise ValueError('Type of "value" must be int!')
-
-            return value
+            if value==True:
+                return 70
+            elif type(value) in [int]:
+                return value
+            else:
+                raise ValueError('Type of "value" must be int or True!')
 
 
         @item_1c_width.setter
@@ -1194,6 +1203,7 @@ class texme:
         if scope:
             self.setts._scope.update(scope)
 
+        # path = path.replace('/','\\')
 
         # save inputed path
         user_path = path
@@ -1220,6 +1230,9 @@ class texme:
         else:
             path = os.path.relpath(path, self.setts.path).replace('\\', '/')
 
+        # print('abs:',pathA,'\nloc:',path, '\nsetts.path:',self.setts.path)
+        # TODO: multifile dont work, change concept of inherited texme...
+
         # if creat
         if grey_scale:
             path = os.path.splitext(pathA)[0] + '_grey' + os.path.splitext(pathA)[1]
@@ -1245,6 +1258,11 @@ class texme:
                 code = '\\begin{center}\n'
             elif float is 'H':
                 code = '\\begin{figure}[H]\n\\centering{'
+            elif float is 'anpb':
+                code = self.page('anpb-b', inherit=True)
+                code += '\\begin{center}\n'
+            else:
+                raise ValueError('Unknow float mode')
 
             code += tools.translate( '\\includegraphics[{1}width={2}\\linewidth,height={3}\\textheight,keepaspectratio]{{0}}\n',
                 {'{0}': path,
@@ -1274,12 +1292,17 @@ class texme:
                     code += '\\figlab{{0}}\n'.replace('{0}', label)
 
                 elif label == True:
-                    code += '\\figlab{{0}}\n'.replace('{0}', 'fig:'+user_path.replace('\\', '').replace('/', ''))
+                    code += '\\figlab{{0}}\n'.replace('{0}', user_path.replace('\\', '').replace('/', ''))
 
             if float is False:
                 code += '\\end{center}'
+            elif float is 'anpb':
+                code += '}\\end{center}'
+                code += self.page('anpb-e', inherit=True)
             else:
                 code += '}\\end{figure}'
+
+
 
             _name1='pic-fig'
 
@@ -1307,10 +1330,65 @@ class texme:
 
         elif mode=='tab':
             pass
+
+            if float is True:
+                code = '\\begin{table}\n\\centering{'
+            elif float is False:
+                code = '\\begin{center}\n'
+            elif float is 'H':
+                code = '\\begin{figure}[H]\n\\centering{'
+            elif float is 'anpb':
+                code = self.page('anpb-b', inherit=True)
+                code += '\\begin{center}\n'
+            else:
+                raise ValueError('Unknow float mode')
+
+            if caption:
+                caption = regme(caption, self.setts.scope).package(rx)
+
+                if caption2:
+                    cap2='['+regme(
+                        caption2,self.setts.scope).package(rx)+']'
+                else:
+                    cap2 = ''
+
+                code += tools.translate('\\caption{float}{1}{{0}}\n',
+                    {
+                        '{0}'    : caption,
+                        '{1}'    : cap2,
+                        '{float}': ('of{table}' if not float else '')
+                    })
+
+                if type(label) is str:
+                    code += '\\tablab{{0}}\n'.replace('{0}', label)
+
+                elif label == True:
+                    code += '\\tablab{{0}}\n'.replace('{0}', user_path.replace('\\', '').replace('/', ''))
+
+            code += tools.translate( '\\includegraphics[{1}width={2}\\linewidth,height={3}\\textheight,keepaspectratio]{{0}}\n',
+                {'{0}': path,
+                 '{1}': frame,
+                 '{2}': str(width_factor),
+                 '{3}': str(height_factor)})
+
+            if float is False:
+                code += '\\end{center}'
+            elif float is 'anpb':
+                code += '}\\end{center}'
+                code += self.page('anpb-e', inherit=True)
+            else:
+                code += '}\\end{figure}'
+
+            _name1='img-tab'
+
+
+
 #                 if float:
 #                     code = '\\begin{table}\n\\centering{'
 #                 else:
 #                     code = '\\begin{table}[H]\n\\centering{'
+
+
 #                 if caption:
 #                     caption = RegME(caption).package(captionX)
 #                     code += '\\caption%2{%1}\n'.replace('%1', caption)
@@ -1325,7 +1403,6 @@ class texme:
 #                 code += '\\includegraphics[%2width=\\linewidth,height=0.90\\textheight,keepaspectratio]{%1}\n}\\end{table}'.replace(
 #                     '%1', path).replace('%2', frame)
 #
-#                 _name1='img-tab'
 
         else:
             pass
@@ -1388,12 +1465,14 @@ class texme:
         rxt       = self.setts.test('rx'     , rxt, 'mt')
 
         if mode in ['t*', 't+', 't']:
+            code = regme(equation, self.setts.scope).package(rxt)
+
             if 'm' in echo:
-                ipdisplay(HTML(equation))
+                ipdisplay(Markdown(code))
 
             return self.add(
                 submodule = 'm',
-                code      = regme(equation, self.setts.scope).package(rxt),
+                code      = code,
                 inherit   = inherit,
                 echo      = echo,
             )
@@ -1703,7 +1782,7 @@ class texme:
 
 #$$$ ____________ def item _________________________________________________ #
 
-    def item(self, text=None, equation=None, mode='i', lmath=None, label=None, width=None, level=1, prefix='*', postfix=':', rxt=None, rxe=None, exe=False, col_type='q', inherit=None, echo=None, page=None, scope=None):
+    def item(self, text=None, equation=None, mode='i', lmath=None, label=None, width=None, level=1, prefix='*', postfix=':', rxt=None, rxe=None, exe=False, col_l=None, col_r=None, inherit=None, echo=None, page=None, scope=None):
         '''
         Column type must can defined explicit size in length dimension (like p{50mm} (or q,w,e).
         '''
@@ -1773,10 +1852,14 @@ class texme:
         if text and equation:
             if mode in ['i*', 't*', 'g*', 'm*', 'i', 't', 'g', 'm']:
 
+                if col_l is None: col_l = 'q'
+                if col_r is None: col_r = 'L'
+
                 # create column pattern
-                columns = tools.translate('{{pcols}{col_type}{{width}}L}', {
+                columns = tools.translate('{{pcols}{col_l}{{width}}{col_r}}', {
                     '{pcols}'   : pcols,
-                    '{col_type}': col_type,
+                    '{col_l}'   : col_l,
+                    '{col_r}'   : col_r,
                     '{width}'   : str(width)+'mm',
                 })
 
@@ -1792,10 +1875,15 @@ class texme:
                 glue = '\n' + r'\newline' + '\n\n'
 
             else:
-                # create column pattern
-                columns = '{{pcols}L}'.replace('{pcols}', pcols)
 
-                # tex = self.page('anpb-b', inherit=True)
+                if col_l is None: col_l = 'L'
+
+                # create column pattern
+                columns = tools.translate('{{pcols}{col_l}}',{
+                    '{pcols}'   : pcols,
+                    '{col_l}'   : col_l,
+                })
+
 
                 if not prefix in ['|']:
                     tex = (
@@ -1823,8 +1911,13 @@ class texme:
 
         elif text:
 
+            if col_l is None: col_l = 'L'
+
             # create column pattern
-            columns = '{{pcols}L}'.replace('{pcols}', pcols)
+            columns = tools.translate('{{pcols}{col_l}}',{
+                '{pcols}'   : pcols,
+                '{col_l}'   : col_l,
+            })
 
             tex = (
                 r"{space_bt}"

@@ -2,6 +2,7 @@
 from ..units import cunit # przypisanie klasy do zmiennej, mniej pisania
 cunit.system = 'ce'
 cu   = cunit(1,{})
+cc   = cunit.cc
 kN   = cunit('kN')
 m    = cunit('m')
 rad  = cunit('rad')

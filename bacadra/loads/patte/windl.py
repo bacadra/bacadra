@@ -53,14 +53,14 @@ class windl:
                 if A_sea <= 300:
                     return 0.30*kPa
                 else:
-                    0.30*(1+0.0006*(A_sea-300))**2 *kPa
+                    return 0.30*(1+0.0006*(A_sea-300))**2 *kPa
             elif WZ=='2':
                 return 0.42*kPa
             elif WZ=='3':
                 if A_sea <= 300:
                     return 0.30*kPa
                 else:
-                    0.30*(1+0.0006*(A_sea-300))**2 * (20000-A_sea)/(20000+A_sea) *kPa
+                    return 0.30*(1+0.0006*(A_sea-300))**2 * (20000-A_sea)/(20000+A_sea) *kPa
 
         def c_f_y(bpd):
             # bpd = b/d

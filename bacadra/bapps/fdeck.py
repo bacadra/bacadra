@@ -151,3 +151,91 @@ class fdeck:
             'I_y_el' : I_y_el  * m**4,
             'm_g'    : A_s*m**2 * 7850*kg/m**3 + A_c*m**2 * 2500*kg/m**3,
         })
+
+
+
+
+    def prop_high_hs(self, f_cd, f_yd, b_c, h_c, b_f, t_f, t_w, h, h_s):
+        '''
+        ***** materials *****
+         f_cd --  concrete design compressive strength
+         f_yd --  steel design strength
+
+        ***** cross-section dimensions*****
+         b_c  --  concrete width
+         h_c  --  concrete height
+         b_f  --  steel flange width
+         t_f  --  steel flange thickness
+         t_w  --  steel web thickness
+         h    --  steel total height
+         h_s  --  wysokosc nadbetonu
+        '''
+
+        z = symbol('z')
+
+        # drop units
+        b_c  = b_c.d('m')
+        h_c  = h_c.d('m')
+        b_f  = b_f.d('m')
+        t_f  = t_f.d('m')
+        t_w  = t_w.d('m')
+        h    = h.d('m')
+        h_s  = h_s.d('m')
+        f_cd = f_cd.d('kPa')
+        f_yd = f_yd.d('kPa')
+
+
+        # web height
+        h_w = h - 2*t_f
+
+        # steel area
+        A_s = b_f*t_f*2 + h_w*t_w
+
+        # concrete area
+        A_c = b_c*h_c - A_s
+
+        A = A_s + A_c
+
+        # concrete strengh factor
+        temp = 0.85
+
+        #$ ____ plastic ____________________________________________________________ #
+
+        # axial force of upper side
+        N_upp = b_c*z*f_cd*temp
+
+        # axial force of bottom side
+        N_low = (b_f*t_f*2 + (h_w)*t_w)*f_yd
+
+        # solved height
+        z_pl_0 = float(solve(N_upp - N_low, z)[0])
+
+        # plastic moment
+        M_pl_Rd = (
+            - (b_c*z_pl_0*f_cd*temp) * (z_pl_0*0.5) +
+            + (b_f*t_f*2 + (h_w)*t_w)*f_yd * (h_s-z_pl_0+0.5*h)
+        )
+
+        # check compability
+        z_pl = z_pl_0
+
+        ε = 0.1
+        if not 1-ε <= (N_low)/(N_upp.subs({'z':z_pl_0})) <= 1+ε:
+            raise ValueError('Non equal axis forces of upper and lower sides')
+
+        if not 0 <= z_pl < h_s:
+            print(z_pl)
+            raise ValueError('Compressive zone below upper side of upper flange')
+
+        V_pl_Rd = h_w*t_w*f_yd/sqrt(3)
+
+
+        return bdata({
+            'A'      : A       * m**2,
+            'A_s'    : A_s     * m**2,
+            'A_c'    : A_c     * m**2,
+            'z_pl'   : z_pl    * m,
+            'V_pl_Rd': V_pl_Rd * kN,
+            'M_pl_Rd': M_pl_Rd * kNm,
+            'm_g'    : A_s*m**2 * 7850*kg/m**3 + A_c*m**2 * 2500*kg/m**3,
+        })
