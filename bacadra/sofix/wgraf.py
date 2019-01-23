@@ -4,7 +4,7 @@ BCDR += ***** (w)in(graf) postexe *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
-Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
     - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
@@ -20,9 +20,12 @@ from . import verrs
 class wgraf:
     sbase = sbase()
 
-    size     = {'h':'2023x1296+289+289',
+    size     = {
+                'h':'2023x1296+289+289',
                 'v':'2023x2668+289+289',
-                's':'2139x1266+229+242'}
+                's':'2139x1266+229+242', # 18.00 x 10.50 [cm]
+                'a':'2139x1000+229+242', # 18.00 x  8.50 [cm]
+                }
 
     def __init__(self, cdb, wdata, delete=True, output='.', active=False, watermark=True):
         self.active = active
@@ -205,7 +208,9 @@ class wgraf:
                 if type(cdbi)!=tuple or len(cdbi)!=2:
                     raise ValueError('Len of cdb line must be equal to 2\nTip: first parameter describe name (or path), second is active bool')
 
-                i+=1; print(str(i)+'. Q:', str(cdbi[1])+', "'+cdbi[0]+'"')
+                i+=1; print(
+                    '{:<3s}'.format(str(i)+'.')+' Q:',
+                    '{:5s}'.format(str(cdbi[1]))+', "'+cdbi[0]+'"')
 
                 if sproj:
                     path = os.path.join(sproj, cdbi[0])

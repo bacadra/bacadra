@@ -4,7 +4,7 @@ bxorm += ***** (b)acadra   (x)    (o)riented (r)elational (m)apped *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
-Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
     - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------

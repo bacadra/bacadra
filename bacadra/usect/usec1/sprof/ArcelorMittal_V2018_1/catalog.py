@@ -5,7 +5,7 @@ BCDR += ***** ArcerolMittal_V2018_1 (catalog) *****
 http://sections.arcelormittal.com/products-services/products-ranges.html
 
 ------------------------------------------------------------------------------
-Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
     - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------

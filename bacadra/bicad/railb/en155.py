@@ -4,7 +4,7 @@ BCDR += ***** eurocode (en) (155)28 *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
-Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
     - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ class dfact:
         mpl.style.use('default')
 
         # style settings
-        plt.figure(figsize=(7, 3))
+        plt.figure(figsize=(7, 4))
         upper = max([math.ceil(max(self.φ_dyn)*2)/2, 2])
         plt.axis([0,200,1,upper])
         plt.grid(True, axis='both') #axis=['x','y','both']
@@ -113,7 +113,7 @@ class dfact:
         plt.plot(self.speed, self.φ_dyn, linewidth=3.0, label='linia')
 
         if name:
-            plt.savefig(name, dpi = 300)
+            plt.savefig(name, dpi = 320)
 
         if not echo in [True, 'p']:
             plt.close()

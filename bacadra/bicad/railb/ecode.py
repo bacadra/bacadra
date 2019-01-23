@@ -4,7 +4,7 @@ BCDR += ***** (e)uro(code) EN 1990+A2 & EN 1991-2 *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
-Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
     - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------

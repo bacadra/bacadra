@@ -4,7 +4,7 @@ BCDR += ***** create La(TeX) (m)assive (e)nvelope *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
-Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
     - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
@@ -285,14 +285,21 @@ class texme:
         # TODO: turn off it to printng, to long...
 
         _scope = {}
+        scopb = {}
 
         @property
         def scope(self):
             if self._scope == {} and self.othe.core:
                 # if user use texme as part of bacadra project and do not set texme.setts.scope then use project.mdata.setts
-                return self.othe.core.mdata.setts.get('scope')
+                if not self.scopb:
+                    return self.othe.core.mdata.setts.get('scope')
+                else:
+                    return {**self.othe.core.mdata.setts.get('scope'), **self.scopb}
             else:
-                return self._scope
+                if not self.scopb:
+                    return self._scope
+                else:
+                    return {**self._scope, **self.scopb}
 
         @staticmethod
         def _scope_(value):
@@ -1004,6 +1011,9 @@ class texme:
 
         elif mode in ['newline', 'nl']:
             code = r'\newline'
+
+        elif mode in [None]:
+            return
 
         else:
             raise ValueError('Unknow mode')
@@ -1850,7 +1860,7 @@ class texme:
 
         # here, if block 3 options: t&e, t, e
         if text and equation:
-            if mode in ['i*', 't*', 'g*', 'm*', 'i', 't', 'g', 'm']:
+            if mode in ['i*', 't*', 'i', 't']:
 
                 if col_l is None: col_l = 'q'
                 if col_r is None: col_r = 'L'
@@ -1928,18 +1938,18 @@ class texme:
 
             glue = ''
 
+        if equation:
+            equation = self.math(
+                mode        = mode,
+                equation    = equation,
+                label       = label,
+                rxe         = rxe,
+                rxt         = rxt,
+                inherit     = True,
+                exe         = exe)
 
-        equation = self.math(
-            mode        = mode,
-            equation    = equation,
-            label       = label,
-            rxe         = rxe,
-            rxt         = rxt,
-            inherit     = True,
-            exe         = exe)
-
-        if type(equation)==list:
-            equation = glue.join(equation)
+            if type(equation)==list:
+                equation = glue.join(equation)
 
 
         tex = tools.translate(tex, {

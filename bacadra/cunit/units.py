@@ -461,10 +461,10 @@ class cunit(object, metaclass=cunitmeta):
         # convert short name to long name
         if u  and not units : units  = u
         if a  and not acc   : acc    = a
-        if (acc is None) and (ad or ai):
+        if (acc is None) and ((ad is not None) or (ai is not None)):
             acc = [None, None]
-            if ad: acc[0] = ad
-            if ai: acc[1] = ai
+            if ad is not None: acc[0] = ad
+            if ai is not None: acc[1] = ai
         if s  and not style : style  = s
         if f  and not fcover: fcover = f
         if t  and not trail : trail  = t

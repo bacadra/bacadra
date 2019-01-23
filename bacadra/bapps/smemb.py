@@ -4,7 +4,7 @@ BCDR += ***** (s)teel (memb)ers *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
-Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra/bacadra>
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
     - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ class smemb:
 
 
     @staticmethod
-    def stability_datas(α_imp, γ_M1, α_cr, val_Rk, val_Ek, σ_x_Rk):
+    def stability_datas(α_imp, γ_M1, val_Rk, val_Ek=1, σ_x_Rk=None, val_cr=None, α_cr=None):
 
         if   α_imp=='a0': α_imp = 0.13
         elif α_imp=='a' : α_imp = 0.21
@@ -53,7 +53,8 @@ class smemb:
         λ_op = smemb.slederness(
             α_cr   = α_cr,
             val_Rk = val_Rk,
-            val_Ek = val_Ek
+            val_Ek = val_Ek,
+            val_cr = val_cr,
         )
 
         # coefficient
@@ -64,6 +65,7 @@ class smemb:
 
         # returned dictonary
         return {
+            'val_cr': val_cr,
             'α_imp': α_imp,
             'α_ult': val_Rk/val_Ek,
             'λ_op' : λ_op,

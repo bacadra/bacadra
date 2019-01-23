@@ -140,7 +140,7 @@ class steea:
         m_y = (sum(ln(x_i.d('MPa')) for x_i in x))*MPa / n
 
         # współczynnik obliczeniowy przypisany kwantylowi wartości charakterystycznej
-        s_y = max(0.1*MPa, sqrt(1/(n-1) * sum([(ln(x_i.d('MPa'))*MPa - m_y)**2 for x_i in x])))
+        s_y = max(V_x_min*MPa, sqrt(1/(n-1) * sum([(ln(x_i.d('MPa'))*MPa - m_y)**2 for x_i in x])))
 
 
         # D7.2 Oszacowanie wartości charakterystycznych
@@ -157,4 +157,5 @@ class steea:
             'f_k'     : f_k.s('MPa'),
             'f_d'     : f_d.s('MPa'),
             'γ_m'     : f_k / f_d,
+            'V_x_min' : V_x_min,
         }
