@@ -6,19 +6,21 @@
 ------------------------------------------------------------------------------
 Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
-    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
 
-# single instance packages
-from .cunit import cunit
-from . import pinky
-from . import sofix
-from . import tools
-from . import bapps
-from . import bicad
-from . import dbase
+from .cunit.cunit import cunit
 
-# project
 from .project import project
+
+class tools:
+
+    from .tools.verre import verrs
+
+    from .tools import fpack
+
+    from .tools import vpatt
+
+from . import solve
 

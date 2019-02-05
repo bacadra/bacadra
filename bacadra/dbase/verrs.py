@@ -1,43 +1,52 @@
 '''
 ------------------------------------------------------------------------------
-BCDR += ***** (v)arious (err)or(s) *****
+***** (v)arious (err)or(s) *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
 Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
-    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
 
+from ..tools.verre  import BCDR_ERRS,BCDR_WARN,BCDR_INFO
 
-class DatabaseError(Exception):
+#$ ____ errors _____________________________________________________________ #
+
+class BCDR_dbase_ERROR(BCDR_ERRS):
     pass
 
-def openDatabaseError():
-    raise DatabaseError('Connection to database is not established.\nTip1: Open database with .connect(path=.., clear=True/False) method in dbase module.\nTip2: Database can be opened in memory, then just type path=":memory:".')
+def BCDR_dbase_ERROR_General(code, text):
+    BCDR_dbase_ERROR(code, text)
 
-class ParseError(Exception):
-    '''
-    General parser exception.
-    '''
+def BCDR_dbase_ERROR_Open_Database():
+    BCDR_dbase_ERROR('e0101',
+        'Connection to database is not established.\n'
+        'Tip: Open database with .connect(path=.., clear=True/False) method in dbase module.\n'
+        'Tip: Database can be opened in memory, then just type path=":memory:".'
+    )
+
+def BCDR_dbase_ERROR_Parse_Type(allow_type):
+    BCDR_dbase_ERROR('e0011',
+        'Variable type is not allowed! Parse process requires correct type.\n'
+        f'Tip: Correct type <{allow_type}>'
+    )
+
+#$ ____ warnings ___________________________________________________________ #
+
+class BCDR_dbase_WARN(BCDR_WARN):
     pass
 
-def f1ParseErorr(mode):
-    '''
-    Function raise error with info, that parse_mode is unrecocnized. Look at parse module for list of current parsing modes.
-    '''
-    raise ParseError(f'Unrecognized parse mode <{mode}>. Look at parse chapter for more informations.')
+def BCDR_dbase_WARN_Already_Closed():
+    BCDR_dbase_WARN('w0121',
+        'Databse already closed. Nothing to save.\n'
+        'Tip: You can not add new data as long as database connection is close'
+        )
 
+#$ ____ infos ______________________________________________________________ #
 
-class ParseMultiError(Exception):
-    '''
-    Exception for multiparser.
-    '''
+class BCDR_dbase_INFO(BCDR_INFO):
     pass
 
-def f1ParseMultiError(l1, l2, row):
-    '''
-    Data length is not equal to col length, please fix it!
-    '''
-    raise ParseMultiError(f'Data list length <{l1}> is not equal to col list length <{l2}>, please fix the row <{row}>')
+

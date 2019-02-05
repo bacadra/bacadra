@@ -511,7 +511,7 @@
 % \counterwithin*{lstlisting}{subsection}
 }
 
-\lstset{
+\lstdefinestyle{bcdr1}{
     frame             = single,
     backgroundcolor   = \color{white},
     language          = Python,
@@ -558,6 +558,11 @@
                         {Ś}{{\' S}}1
                         {ł}{{\l}}1
                         {Ł}{{\L}}1
+}
+
+\lstdefinestyle{bcdr2}{
+    style             = bcdr1,
+    frame             = none,
 }
 
 %## ________ other2 ________________________________________________________ %

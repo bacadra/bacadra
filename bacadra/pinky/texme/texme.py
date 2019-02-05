@@ -1,15 +1,14 @@
 '''
 ------------------------------------------------------------------------------
-BCDR += ***** create La(TeX) (m)assive (e)nvelope *****
+***** create La(TeX) (m)assive (e)nvelope *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
 Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
-    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
-
 
 #$ ____ import _____________________________________________________________ #
 
@@ -19,210 +18,167 @@ import shutil
 import subprocess
 import importlib.util
 
-from IPython.display import Image, Latex, HTML, Markdown
-from IPython.display import display as ipdisplay
+from IPython.display import Image, Latex, HTML, Markdown,display
 
-from ... import tools
-from ...tools import setts
+from ...tools.fpack import translate
+from ...tools.setts import settsmeta
 
 from . import verrs
 from .regme import regme
 
+#$ ____ class setts ________________________________________________________ #
 
-#$ ____ class texme ________________________________________________________ #
+class setts(settsmeta):
 
-class texme:
+    _self = None # here will be placed self instance
 
-#$$ ________ magic methods _________________________________________________ #
 
-#$$$ ____________ def __init__ _____________________________________________ #
+#$$ ________ def force_copy ________________________________________________ #
 
-    def __init__(self, core=None, **kwargs):
-        self.core = core
 
-        # other argument will be send to setts class
-        # if kwarg do not exists in setts, then setts raise error
-        self.setts = self.setts('setts',(),{})
-        self.setts.othe = self
-        self.setts.__run_init__(**kwargs)
+    __force_copy = False
 
-        # list with generated and ready-to-insert code
-        self.buffer = []
+    @property
+    def force_copy(self):
+        return self.__force_copy
 
-        # hidden atribute with last used generate method
-        self.__last_type = None
-
-#$$$ ____________ def __setattr__ __________________________________________ #
-
-    def __setattr__(self, name, value):
+    @force_copy.setter
+    def force_copy(self, value):
         '''
-        Method do not allow create new variable in class. It is provide more control over user correctly or spell-checker.
+        Force update of template, if true new files will be copy indepened of existsing .tex.bak file.
         '''
 
-        if not hasattr(self, name) and inspect.stack()[1][3] != '__init__':
-            raise AttributeError(f"Creating new attributes <{name}> is not allowed!")
-        super(texme, self).__setattr__(name, value)
+        if type(value) is not bool:
+            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'bool')
+
+        if self.__save__: self.__force_copy = value
+        else:             self.__temp__ = value
 
 
-#$$ ________ class setts ___________________________________________________ #
+#$$ ________ def path ______________________________________________________ #
 
-    class setts(setts.settsmeta):
+    __path = r'.\tex'
+
+    @property
+    def path(self):
+        return self.__path
+
+    @path.setter
+    def path(self, value):
         '''
-        class provide set of atributes which working as settings. additionaly provide testing and printing methods.
+        Output path related to actual state of kernel. In mostly case it refer to input file. The existing of folder will be checked during template coping.
         '''
 
-        othe = None
+        if type(value) is not str:
+            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'str')
 
-        def __run_init__(self, **kwargs):
-            # loop over items send from texme class
-            for key,val in kwargs.items():
-                exec(f'self.{key}={val}')
-
+        if self.__save__: self.__path   = value
+        else:             self.__temp__ = value
 
 
-#$$$ ____________ atribute force-copy ______________________________________ #
+#$$ ________ def inpath ____________________________________________________ #
 
-        _force_copy = False
+    __inpath = None
 
-        @property
-        def force_copy(self):
-                return self._force_copy
+    @property
+    def inpath(self):
+            return self.__inpath
 
-        @force_copy.setter
-        def force_copy(self, value):
-            '''
-            Force update of template, if true new files will be copy indepened of existsing .tex.bak file.
-            '''
+    @inpath.setter
+    def inpath(self, value):
+        '''
+        Input path of tex base folder with init .tex.bak document. Path should be set to basename of this file!
 
-            if type(value) is not bool:
-                raise ValueError('Type of "value" must be bool!')
+        Value can be str value (=simply inpath set) or tuple2 (=inpath, inname)
+        '''
 
-            self._force_copy = value
+        # TODO: inpath is not checked if tuple inserted, rewrite it later
 
+        if not type(value) in [str, tuple]:
+            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'str,tuple')
 
-
-
-#$$$ ____________ atribute path ____________________________________________ #
-
-        _path = r'.\tex'
-
-        @property
-        def path(self):
-                return self._path
-
-        @path.setter
-        def path(self, value):
-            '''
-            Output path related to actual state of kernel. In mostly case it refer to input file. The existing of folder will be checked during template coping.
-            '''
-
-            if type(value) is not str:
-                raise ValueError('Type of "value" must be str!')
-
-            self._path = value
-
-
-
-#$$$ ____________ atribute inpath __________________________________________ #
-
-        _inpath = None
-
-        @property
-        def inpath(self):
-                return self._inpath
-
-        @inpath.setter
-        def inpath(self, value):
-            '''
-            Input path of tex base folder with init .tex.bak document. Path should be set to basename of this file!
-
-            Value can be str value (=simply inpath set) or tuple2 (=inpath, inname)
-            '''
-
-            # TODO: inpath is not checked if tuple inserted, rewrite it later
-
-            if not type(value) in [str, tuple]:
-                raise ValueError('Type of "value" must be str or tuple2!')
-
+        if self.__save__:
             if type(value) == str:
-                self._inpath = value
+                self.__inpath = value
 
             elif type(value) == tuple:
-                self._inpath = value[0]
+                self.__inpath = value[0]
                 self.inname = value[1]
 
 
+#$$ ________ def inname ____________________________________________________ #
 
-#$$$ ____________ atribute inname __________________________________________ #
+    __inname = 'main.tex'
 
-        _inname = 'main.tex'
+    @property
+    def inname(self):
+            return self.__inname
 
-        @property
-        def inname(self):
-                return self._inname
+    @inname.setter
+    def inname(self, value):
+        '''
+        File of main tex document in inpath folder.
+        '''
 
-        @inname.setter
-        def inname(self, value):
-            '''
-            File of main tex document in inpath folder.
-            '''
+        if type(value) is not str:
+            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'str')
 
-            if type(value) is not str:
-                raise ValueError('Type of "value" must be str!')
-
-                self._inname = value
-
-
+        if self.__save__: self.__inname = value
+        else:             self.__temp__ = value
 
 
-#$$$ ____________ atribute cave ____________________________________________ #
+#$$ ________ def cave ______________________________________________________ #
 
-        _cave = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), 'templates')
+    __cave = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), 'templates')
 
-        @property
-        def cave(self):
-                return self._cave
+    @property
+    def cave(self):
+            return self.__cave
 
-        @cave.setter
-        def cave(self, value):
-            '''
-            Atribute provide path to folder with templates. As defualt it refere to folder inside pinky.texme module call "templates".
-            '''
+    @cave.setter
+    def cave(self, value):
+        '''
+        Atribute provide path to folder with templates. As defualt it refere to folder inside pinky.texme module call "templates".
+        '''
 
-            if type(value) is not str:
-                raise ValueError('Type of "value" must be str!')
+        if type(value) is not str:
+            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'bool')
 
-            self._cave = value
+        if self.__save__: self.__cave   = value
+        else:             self.__temp__ = value
 
 
 
-#$$$ ____________ atribute template ________________________________________ #
+#$$ ________ def template __________________________________________________ #
 
-        _template = None
+    __template = None # name of template
+    ext = None # here will be placed external module
 
-        @property
-        def template(self):
-                return self._template
+    @property
+    def template(self):
+            return self.__template
 
-        @template.setter
-        def template(self, value):
-            '''
-            '''
+    @template.setter
+    def template(self, value):
+        '''
+        '''
 
-            if type(value) is not str:
-                raise ValueError('Type of "value" must be str!')
+        if type(value) is not str:
+            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'str')
 
-            path = os.path.join(self.cave, value)
+        path = os.path.join(self.cave, value)
 
-            # if template does not exists, then return error
-            if not os.path.exists(path) or not os.path.isdir(path):
-                verrs.pathTemplateError(path, self.cave)
+        # if template does not exists, then return error
+        if not os.path.exists(path) or not os.path.isdir(path):
+            verrs.pathTemplateError(path, self.cave)
 
-            self._template = value
+
+        if self.__save__:
+
+            self.__template = value
 
             self.inpath = path, 'main.tex'
-
 
             # load external methods depend on template
 
@@ -234,493 +190,593 @@ class texme:
 
             spec.loader.exec_module(external)
 
-            # self.othe.ext = external.ext(self.othe)
+            self.ext = external.ext(self._self)
+
+        else:
+            self.__temp__ = value
+
+
+#$$ ________ def echo ______________________________________________________ #
+
+    __echo = 'hmptc'
+
+    @property
+    def echo(self):
+        return self.__echo
+
+    @echo.setter
+    def echo(self, value):
+        '''
+        Atribute <echo> set the output of base methods in texme class. It provide letters interface "hmpt" which can turn on/off
+
+        > "h" -- colorful html header,
+        > "m" -- rendered latex math equation,
+        > "p" -- rendered picture with constant width,
+        > "t" -- rendered tables (don't work yet),
+        > "c" -- code cell (don't work yet),
+        > "+" -- plain tex code which will be included into tex document.
+
+        User can type value as True then will be set "hmptc" configuration or False then no output will be produced.
+        '''
+
+        if value == True:
+            value = 'hmptc'
+
+        elif value == False:
+            value = ''
+
+        else:
+
+            for letter in value:
+                if not letter in ['h','m','p','t','c','+']:
+                    verrs.BCDR_pinky_texme_ERROR_String_Selector(
+                    letter, 'hmptc+,True,False'
+                    )
+
+        if self.__save__: self.__echo   = value
+        else:             self.__temp__ = value
 
 
 
 
+#$$ ________ def ssel ______________________________________________________ #
 
-#$$$ ____________ atribute echo ____________________________________________ #
+    __ssel  = 0   # select scope bank
 
-        _echo = 'hmp'
+    # @property
+    # def ssel(self):
+    #     return self.__ssel
+    #
+    # @ssel.scope
+    # def ssel(self, id):
+    #     '''
+    #     Selector of scope variable. 0-9.
+    #     '''
+    #
+    #     if type(id) not in [int,bool]:
+    #         verrs.BCDR_pinky_texme_ERROR_Type_Check(type(id), 'int,bool')
+    #
+    #     if id==True:
+    #         id = 0
+    #
+    #     if self.__save__: self.__ssel = id
+    #     else:             self.__temp__ = id
 
-        @property
-        def echo(self):
-            return self._echo
 
-        @staticmethod
-        def _echo_(value):
-            if value == True:
-                return 'hmp'
+#$$ ________ def scope _____________________________________________________ #
 
-            elif value == False:
-                return ''
+    _scope = [{}]*10 # turn off it to printng, to long...
+    __ssel  = None # select scope bank
 
+    @property
+    def scope(self):
+        if self.__ssel==None and self._self and self._self.core:
+            return self._self.core.setts.scope
+        elif self.__ssel==None:
+            return self._scope[0]
+        else:
+            return self._scope[self.__ssel]
+
+    @scope.setter
+    def scope(self, value):
+        '''
+        There is 11 slots for scope dictonary.
+
+        None -- load external scope from project class, but only if it exists
+                if it is imposible to get external git, then return dict 0
+        0    -- base dictonary, can be selected by value=True
+        1..9 -- other scopes
+
+        to change dictonary <var> = n, {..}; where n is dictonary name
+        if {..} is empty, then dict will be only changed, but not replace
+        if {..} is not empty, then slot will be replaced with new one dict
+        '''
+
+        # simple given dict
+        if type(value)==dict:
+
+            id = self.__ssel
+
+            # if scope is external, then save under slot 0, but print warn
+            if id==None:
+                verrs.BCDR_pinky_texme_WARN_Scope_External()
+                id = 0
+
+            if self.__save__: self._scope[id] = value
+            else:             self.__temp__ = value
+
+        # if given as number,dict
+        elif type(value)==tuple:
+            id,value = value
+
+            if self.__save__:
+                self.__ssel = id
+                verrs.BCDR_pinky_texme_INFO_Scope(id)
+                if value:
+                    self._scope[id] = value
             else:
-
-                for letter in value:
-                    if not letter in ['h','m','p','t']:
-                        raise ValueError('Undefined driver, you can use only mix of "hmpt" letters or True/False.')
-
-                return value
-
-        @echo.setter
-        def echo(self, value):
-            '''
-            Atribute <echo> set the output of base methods in texme class. It provide letters interface "hmpt" which can turn on/off
-
-            > "h" -- colorful html header,
-            > "m" -- rendered latex math equation,
-            > "p" -- rendered picture with constant width,
-            > "t" -- plain tex code which will be included into tex document.
-
-            User can type value as True then will be set "hmp" configuration or False then no output will be produced.
-            '''
-
-            self._echo = self._echo_(value)
-
-
-#$$$ ____________ atribute scope ___________________________________________ #
-
-        # TODO: turn off it to printng, to long...
-
-        _scope = {}
-        scopb = {}
-
-        @property
-        def scope(self):
-            if self._scope == {} and self.othe.core:
-                # if user use texme as part of bacadra project and do not set texme.setts.scope then use project.mdata.setts
-                if not self.scopb:
-                    return self.othe.core.mdata.setts.get('scope')
+                if value:
+                    self.__temp__ = value
                 else:
-                    return {**self.othe.core.mdata.setts.get('scope'), **self.scopb}
-            else:
-                if not self.scopb:
-                    return self._scope
+                    self.__temp__ = self._scope[id]
+
+        elif value==True:
+            self.__ssel = None
+            verrs.BCDR_pinky_texme_INFO_Scope('None')
+
+
+
+
+#$$ ________ def inherit ___________________________________________________ #
+
+    __inherit = False
+
+    @property
+    def inherit(self):
+        return self.__inherit
+
+    @inherit.setter
+    def inherit(self, value):
+        '''
+        If true then code is returned, if false code is added to buffer.
+        '''
+
+        if type(value) is not bool:
+            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'bool')
+
+        if self.__save__: self.__inherit = value
+        else:             self.__temp__ = value
+
+
+
+#$$ ________ def active ____________________________________________________ #
+
+    __active = True
+
+    @property
+    def active(self):
+            return self.__active
+
+    @active.setter
+    def active(self, value):
+        '''
+        User can deactive all methods, then methods will exit at the begging.
+        '''
+
+        if type(value) is not bool:
+            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'bool')
+
+        if self.__save__: self.__active = value
+        else:             self.__temp__ = value
+
+
+#$$ ________ def label _____________________________________________________ #
+
+    __label = {'h':False, 'p':True, 'f':False, 'c':False}
+
+    @property
+    def label(self):
+            return self.__label
+
+    @label.setter
+    def label(self, value):
+        '''
+        label is dict with dew substitute labels types.
+        h -- header
+        p -- picture
+        f -- file
+        c -- code
+        '''
+
+        if value == True:
+            ndict = {'h':True, 'p':True, 'f':True}
+        elif value == False:
+            ndict = {'h':False, 'p':False, 'f':True}
+        elif type(value) is dict:
+            ndict = self.__label.copy()
+            for key,val in value.items():
+                if key in self.__label:
+                    ndict.update({key:val})
                 else:
-                    return {**self._scope, **self.scopb}
+                    verrs.BCDR_pinky_texme_ERROR_Invalid_Key(
+                    key, self.__rx
+                    )
+        else:
+            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'bool,dict')
 
-        @staticmethod
-        def _scope_(value):
-            if type(value) is not dict:
-                raise ValueError('Type of "value" must be dictonary!')
-            return value
+        if self.__save__: self.__label  = ndict
+        else:             self.__temp__ = ndict
 
-        @scope.setter
-        def scope(self, value):
-            self._scope = self._scope_(value)
 
 
-#$$$ ____________ atribute inherit _________________________________________ #
+#$$ ________ def rx ________________________________________________________ #
 
-        _inherit = False
+    __rx = {'xt':1, 'ht':1, 'pc':1, 'me':11, 'mt':1, 'td':1, 'tc':1, 'ce':0, 'cc':1, 'fe':0, 'ie':11, 'it':1}
 
-        @property
-        def inherit(self):
-                return self._inherit
+    @property
+    def rx(self):
+        return self.__rx
 
-        def _inherit_(self, value):
-            if type(value) is not bool:
-                raise ValueError('Type of "value" must be bool!')
+    @rx.setter
+    def rx(self, value):
+        '''
+        "ce" -- code-code
+        "cc" -- code-caption
+        '''
 
-            return value
+        ndict = self.__rx.copy()
 
-        @inherit.setter
-        def inherit(self, value):
-            '''
-            If true then code is returned, if false code is added to buffer.
-            '''
+        if type(value) is dict:
+            for key,val in value.items():
 
-            self._inherit = self._inherit_(value)
+                if type(val) is not int:
+                    verrs.BCDR_pinky_texme_ERROR_Type_Check(type(val), 'int')
 
+                elif key in self.__rx:
+                    ndict.update({key:val})
 
+                else:
+                    verrs.BCDR_pinky_texme_ERROR_Invalid_Key(
+                        key, self.__rx
+                    )
 
-#$$$ ____________ atribute active __________________________________________ #
-
-        _active = True
-
-        @property
-        def active(self):
-                return self._active
-
-        def _active_(self, value):
-            if type(value) is not bool:
-                raise ValueError('Type of "value" must be bool!')
-
-            return value
-
-        @active.setter
-        def active(self, value):
-            '''
-            User can deactive all methods, then methods will exit at the begging.
-            '''
-
-            self._active = self._active_(value)
-
-
-
-
-
-#$$$ ____________ atribute label ___________________________________________ #
-
-        _label = {'h':False, 'p':True, 'f':False}
-
-        @property
-        def label(self):
-                return self._label
-
-        def _label_(self, value):
-            if value == True:
-                return {'h':True, 'p':True}
-            elif value == False:
-                return {'h':False, 'p':False}
-            elif type(value) is dict:
-                ndict = self._label.copy()
-                for key,val in value.items():
-                    if key in self._label:
-                        ndict.update({key:val})
-                return ndict
-            else:
-                raise ValueError('Type of "value" must be bool or dict!')
-
-
-        @label.setter
-        def label(self, value):
-            '''
-            label is dict with dew substitute labels types.
-            '''
-
-            self._label = self._label_(value)
-
-
-
-
-
-#$$$ ____________ atribute rx ______________________________________________ #
-
-        _rx = {'xt':1, 'ht':1, 'pc':1, 'me':11, 'mt':1, 'td':1, 'tc':1, 'ce':0, 'cc':1, 'fe':0, 'ie':11, 'it':1}
-
-        @property
-        def rx(self):
-                return self._rx
-
-        def _rx_(self, value):
-
-            ndict = self._rx.copy()
-
-            if type(value) is dict:
-                for key,val in value.items():
-
-                    if type(val) is not int:
-                        raise ValueError('Type of "value" must be int!')
-
-                    elif key in self._rx:
-                        ndict.update({key:val})
-
-                    else:
-                        raise ValueError(f'Invalid key! \nTip: {self._rx}')
-
-            else:
-                if type(value) is not int:
-                    raise ValueError('Type of "value" must be int!')
-
-                for key in ndict.keys():
-                    ndict[key] = value
-
-            return ndict
-
-
-        @rx.setter
-        def rx(self, value):
-            '''
-            '''
-
-            self._rx = self._rx_(value)
-
-
-
-
-#$$$ ____________ atribute float ___________________________________________ #
-
-        _float = {'p':False, 't':False}
-
-        @property
-        def float(self):
-                return self._float
-
-        def _float_(self, value):
-
-            ndict = self._float.copy()
-
-            if type(value) is dict:
-                for key,val in value.items():
-
-                    if key in self._float:
-                        ndict.update({key:val})
-
-                    else:
-                        raise ValueError(f'Invalid key! \nTip: {self._float}')
-
-            else:
-                for key in ndict.keys():
-                    ndict[key] = value
-
-            return ndict
-
-
-        @float.setter
-        def float(self, value):
-            '''
-            '''
-
-            self._float = self._float_(value)
-
-
-
-#$$$ ____________ atribute minitoc __________________________________________ #
-
-        _minitoc = False
-
-        @property
-        def minitoc(self):
-                return self._minitoc
-
-        def _minitoc_(self, value):
-            if type(value) is not bool:
-                raise ValueError('Type of "value" must be bool!')
-
-            return value
-
-        @minitoc.setter
-        def minitoc(self, value):
-            '''
-            '''
-
-            self._minitoc = self._minitoc_(value)
-
-
-
-#$$$ ____________ atribute pic-root ________________________________________ #
-
-        _pic_root = r'.'
-
-        @property
-        def pic_root(self):
-                return self._pic_root
-
-        @staticmethod
-        def _pic_root_(value):
-            '''
-            '''
-
-            if type(value) is not str:
-                raise ValueError('Type of "value" must be str!')
-
-            return value
-
-
-        @pic_root.setter
-        def pic_root(self, value):
-            '''
-            '''
-
-            self._pic_root = self._pic_root_(value)
-
-
-#$$$ ____________ atribute pic-error _______________________________________ #
-
-        _pic_error = r'.'
-
-        @property
-        def pic_error(self):
-                return self._pic_error
-
-        @staticmethod
-        def _pic_error_(value):
-            '''
-            '''
-
-            if type(value) is not bool:
-                raise ValueError('Type of "value" must be bool!')
-
-            return value
-
-
-        @pic_error.setter
-        def pic_error(self, value):
-            '''
-            '''
-
-            self._pic_error = self._pic_error_(value)
-
-
-
-#$$$ ____________ atribute pic_diswidth ___________________________________ #
-
-        _pic_diswidth = 600
-
-        @property
-        def pic_diswidth(self):
-                return self._pic_diswidth
-
-        def _pic_diswidth_(self, value):
-            '''
-            '''
-
+        else:
             if type(value) is not int:
-                raise ValueError('Type of "value" must be int!')
+                verrs.BCDR_pinky_texme_ERROR_Type_Check(type(val), 'int')
 
+            for key in ndict.keys():
+                ndict[key] = value
+
+        if self.__save__: self.__rx     = ndict
+        else:             self.__temp__ = ndict
+
+
+#$$ ________ def float _____________________________________________________ #
+
+    __float = {'p':False, 't':False}
+
+    @property
+    def float(self):
+            return self.__float
+
+    @float.setter
+    def float(self, value):
+        '''
+        '''
+
+        ndict = self.__float.copy()
+
+        if type(value) is dict:
+            for key,val in value.items():
+
+                if key in self.__float:
+                    ndict.update({key:val})
+
+                else:
+                    verrs.BCDR_pinky_texme_ERROR_Invalid_Key(
+                        key, self.__float
+                    )
+        else:
+            for key in ndict.keys():
+                ndict[key] = value
+
+        if self.__save__: self.__float  = ndict
+        else:             self.__temp__ = ndict
+
+
+#$$ ________ def minitoc ___________________________________________________ #
+
+    __minitoc = False
+
+    @property
+    def minitoc(self):
+            return self.__minitoc
+
+    @minitoc.setter
+    def minitoc(self, value):
+        '''
+        '''
+
+        if type(value) is not bool:
+            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'bool')
+
+        if self.__save__: self.__minitoc = value
+        else:             self.__temp__ = value
+
+#$$ ________ def pic_root __________________________________________________ #
+
+    __pic_root = r'.'
+
+    @property
+    def pic_root(self):
+            return self.__pic_root
+
+    @pic_root.setter
+    def pic_root(self, value):
+        '''
+        '''
+
+        if type(value) is not str:
+            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'str')
+
+        if self.__save__: self.__pic_root = value
+        else:             self.__temp__ = value
+
+
+# #$$ ________ def pic_errror ________________________________________________ #
+#
+#     __pic_error = r'.'
+#
+#     @property
+#     def pic_error(self):
+#             return self._pic_error
+#
+#     @pic_error.setter
+#     def pic_error(self, value):
+#         '''
+#         '''
+#
+#         if type(value) is not bool:
+#             verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'bool')
+#
+#
+#         if self.__save__: self.__pic_error = value
+#         else:             self.__temp__ = value
+
+
+#$$ ________ def pic_diswidth ______________________________________________ #
+
+    __pic_diswidth = 600
+
+    @property
+    def pic_diswidth(self):
+            return self.__pic_diswidth
+
+    @pic_diswidth.setter
+    def pic_diswidth(self, value):
+        '''
+        '''
+
+        if type(value) is not int:
+            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'int')
+
+        if self.__save__: self.__pic_diswidth = value
+        else:             self.__temp__ = value
+
+
+#$$ ________ def head_lvl_inc ______________________________________________ #
+
+    __head_lvl_inc = 0
+
+    @property
+    def head_lvl_inc(self):
+            return self.__head_lvl_inc
+
+    @head_lvl_inc.setter
+    def head_lvl_inc(self, value):
+        '''
+        '''
+
+        if type(value) is not int:
+            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'int')
+
+        if self.__save__: self.__head_lvl_inc = value
+        else:             self.__temp__ = value
+
+
+
+#$$ ________ def item_1c_width _____________________________________________ #
+
+    __item_1c_width = 70
+
+    @property
+    def item_1c_width(self):
+            return self.__item_1c_width
+
+    @item_1c_width.setter
+    def item_1c_width(self, value):
+        '''
+        '''
+
+        if value==True:
+            return 70
+        elif type(value) in [int]:
             return value
+        else:
+            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'int,True')
+
+        if self.__save__: self.__item_1c_width = value
+        else:             self.__temp__ = value
 
 
-        @pic_diswidth.setter
-        def pic_diswidth(self, value):
-            '''
-            '''
+#$$ ________ def keys __________________________________________________ #
 
-            self._pic_diswidth = self._pic_diswidth_(value)
+    __keys = {}
 
+    @property
+    def keys(self):
+            return self.__keys
 
-#$$$ ____________ atribute head_lvl_inc ____________________________________ #
+    @keys.setter
+    def keys(self, value):
+        '''
+        '''
 
-        _head_lvl_inc = 0
+        if type(value) is not dict:
+            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'dict')
 
-        @property
-        def head_lvl_inc(self):
-                return self._head_lvl_inc
-
-        @staticmethod
-        def _head_lvl_inc_(value):
-            '''
-            '''
-
-            if type(value) is not int:
-                raise ValueError('Type of "value" must be int!')
-
-            return value
-
-
-        @head_lvl_inc.setter
-        def head_lvl_inc(self, value):
-            '''
-            '''
-
-            self._head_lvl_inc = self._head_lvl_inc_(value)
+        if self.__save__: self.__keys   = value
+        else:             self.__temp__ = value
 
 
 
-#$$$ ____________ atribute item_1c_width _______________________________ #
+#$$ ________ def lststyle ________________________________________________ #
 
-        _item_1c_width = 70
+    __lststyle = 'bcdr1'
 
-        @property
-        def item_1c_width(self):
-                return self._item_1c_width
+    @property
+    def lststyle(self):
+            return self.__lststyle
 
-        def _item_1c_width_(self, value):
-            '''
-            '''
+    @lststyle.setter
+    def lststyle(self, value):
+        '''
+        '''
 
-            if value==True:
-                return 70
-            elif type(value) in [int]:
-                return value
+        if type(value) is not str:
+            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'str')
+
+        if self.__save__: self.__lststyle = value
+        else:             self.__temp__ = value
+
+
+
+#$$ ________ def mbuff _____________________________________________________ #
+
+    __mbuff = None
+
+    @property
+    def mbuff(self):
+        return self.__mbuff
+
+    @mbuff.setter
+    def mbuff(self, value):
+        '''
+        '''
+
+        kwargs={}
+        if type(value)==tuple:
+            value,kwargs=value
+
+        if type(value)!=str:
+            value=None
+
+
+        if self.__save__:
+
+            if type(value)==str:
+                if type(self._self.buffer)!=dict:
+                    self._self.buffer = {}
+
+                if value not in self._self.buffer:
+                    self._self.buffer.update(
+                        {value:texme(core=self._self,**kwargs)})
+                    # print('new submodule',value)
+
             else:
-                raise ValueError('Type of "value" must be int or True!')
+                if type(self._self.buffer)!=list:
+                    self._self.buffer=[]
+                else:
+                    pass
+
+            self.__mbuff = value
+
+        else:
+            self.__temp__ = value
 
 
-        @item_1c_width.setter
-        def item_1c_width(self, value):
-            '''
-            '''
+#$ ____ class texme ________________________________________________________ #
 
-            self._item_1c_width = self._item_1c_width_(value)
+class texme:
 
-
-
-#$$$ ____________ atribute keys ________________________________________ #
-
-        _keys = {}
-
-        @property
-        def keys(self):
-                return self._keys
-
-        @keys.setter
-        def keys(self, value):
-            '''
-            '''
-
-            if type(value) is not dict:
-                raise ValueError('Type of "value" must be dict!')
-
-            self._keys =  value
+    # class setts
+    setts = setts('setts', (setts,), {})
 
 
+#$$ ________ def __init __ _________________________________________________ #
 
-#$$ ________ class setts ___________________________________________________ #
+    def __init__(self, core=None, **kwargs):
 
-    class setts(setts, metaclass=setts):
-        pass
+        self.core = core
+
+        # object setts
+        self.setts = self.setts('setts',(),{'_self':self})
+
+        # list with generated and ready-to-insert code
+        self.buffer = []
+
+        # hidden atribute with last used generate method
+        self.__last_type = None
+
+        for key,val in kwargs.items():
+            setattr(self.setts, key, val)
 
 
 #$$ ________ process methods _______________________________________________ #
 
-#$$$ ____________ def __call__ _____________________________________________ #
-
-    # TODO: im not sure is it needed in new style, should be checked in future
-
-    # def __call__(self, **kwargs):
-    #     '''
-    #     Explicit init function. It is needed, when texme is called trough project class.
-    #     '''
-    #
-    #     for key,val in kwargs.items():
-    #         if key in texme.__dict__:
-    #             setattr(self, key, val)
-    #         else:
-    #             raise ValueError(f'Undefined parameter <{key}>.')
-    #     return self
-
-
 #$$$ ____________ def add __________________________________________________ #
 
-    def add(self, code, inherit=None, submodule=None, echo='', presymbol='', postsymbol='\n%'):
+    def add(self, code, inherit=None, submodule=None, echo=None, presymbol='', postsymbol='\n%'):
         '''
         Append code to buffer. Method offer adding symbol at the end of statment, inherit base if-block and print block. It is add clear code into buffer (with additional pre- and post- symbol, but only if inherit is False, more, never in echo).
         '''
 
         # get default parametrs by test if None
         # do not test it in every generate method!!!
-        inherit = self.setts.test('inherit', inherit)
+        inherit = self.setts.check_loc('inherit', inherit)
 
         # base on iherit methods then return or add code
         if inherit is True:
             return code
+
         elif inherit is False:
             self.__last_type = submodule
-            self.buffer += [presymbol + code + postsymbol]
+            if self.setts.mbuff:
+                self.buffer[self.setts.mbuff].buffer += [presymbol + code + postsymbol]
+            else:
+                self.buffer += [presymbol + code + postsymbol]
 
         # depend on setting echo in "t" print code or not
         # do not test it in every generate method!!!
-        self.msg(submodule=submodule, code=code, echo=echo)
-
-
-#$$$ ____________ def msg __________________________________________________ #
-
-    def msg(self, submodule, code, echo):
-        '''
-        Print generated code in prefered style, like text, markdown or tex.
-        '''
-
-        if 't' in echo:
+        if '+' in self.setts.check_loc('echo', echo):
             print(f'[pinky.texme.{submodule}]\n{code}')
 
 
-#$$$ ____________ def clear-buffer _________________________________________ #
+#$$$ ____________ def join _________________________________________________ #
 
-    def clear_buffer(self):
+    def join(self, data, mbuff=None):
+        if self.setts.mbuff:
+            if mbuff==None: mbuff=self.setts.mbuff
+
+            if type(data)==list:
+                self.buffer[mbuff].buffer += data
+            elif type(data)==texme:
+                self.buffer[mbuff].buffer += data.buffer
+            else:
+                raise ValueError
+
+        else:
+            if type(data)==list:
+                self.buffer += data
+            elif type(data)==texme:
+                self.buffer += data.buffer
+            else:
+                raise ValueError()
+
+
+#$$$ ____________ def clear _________________________________________ #
+
+    def clear(self):
         '''
         Clear buffer.
         '''
@@ -728,9 +784,9 @@ class texme:
         self.buffer = []
 
 
-#$$$ ____________ def _bibliography_update ________________________________ #
+#$$$ ____________ def bib_update ___________________________________________ #
 
-    def _bibliography_update(self):
+    def bib_update(self):
         '''
         Update biblography files in depend templates. It run bat script which provide copy methods.
         It should be run only before template copy, if user return calculation on already copied - then no updating prefered.
@@ -740,8 +796,7 @@ class texme:
         os.system(os.path.join(basepath, r'templates\bibme.bat'))
 
 
-
-#$$$ ____________ def _copy-template ______________________________________ #
+#$$$ ____________ def _copy_template ______________________________________ #
 
     def _copy_template(self):
         '''
@@ -749,7 +804,10 @@ class texme:
         '''
 
         if self.setts.inpath is None:
-            raise ValueError('Please input inpath project')
+            verrs.BCDR_pinky_texme_ERROR_General(
+                'e0624', 'Atribute "inpath" do not set!\n'
+                'Tip: type .setts.inpath = ...'
+            )
 
         # if force copy is True or folder does not exists
         if self.setts.force_copy or not os.path.exists(self.setts.path):
@@ -761,7 +819,7 @@ class texme:
                 shutil.rmtree(self.setts.path)
 
             # then update bibliography by central data
-            self._bibliography_update()
+            self.bib_update()
 
             # at least copy dir from input to output
             shutil.copytree(self.setts.inpath, self.setts.path)
@@ -780,8 +838,6 @@ class texme:
             if not os.path.exists(path + '.bak'):
                 pathT = os.path.join(self.setts.inpath, self.setts.inname + '.bak')
                 shutil.copyfile(pathT, path)
-
-
 
 #$$$ ____________ def _dictonary ___________________________________________ #
 
@@ -839,8 +895,7 @@ class texme:
         with open(path2, encoding='utf-8') as infile, open(path1, mode, encoding='utf-8') as outfile:
             # copy line by line
             for line in infile:
-                outfile.write(tools.translate(line, ndict))
-
+                outfile.write(translate(line, ndict))
 
     # TODO: latex run methods should be rewrite, bib dont work corretly etc
 
@@ -903,7 +958,7 @@ class texme:
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.test('active', active):
+        if not self.setts.check_loc('active', active):
             return
 
         # prepare template to replace blocks
@@ -915,13 +970,14 @@ class texme:
 
 #$$$ ____________ def push _________________________________________________ #
 
-    def push(self):
+    def push(self, active=None):
         '''
-        Push method is connection of save and clear_buffer methods.
+        Push method is connection of save and clear methods.
         '''
 
-        self.save()
-        self.clear_buffer()
+        if len(self.buffer) > 0:
+            self.save(active=active)
+        self.clear()
 
 
 #$$$ ____________ def make _________________________________________________ #
@@ -955,7 +1011,6 @@ class texme:
 
 #$$ ________ generate methods ______________________________________________ #
 
-
 #$$$ ____________ def page _________________________________________________ #
 
     def page(self, mode, val1=None, inherit=None, echo=None):
@@ -969,12 +1024,7 @@ class texme:
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.test('active'):
-            return
-
-        # use global settings
-        inherit = self.setts.test('inherit', inherit)
-        echo    = self.setts.test('echo'   , echo)
+        if not self.setts.check_loc('active'): return
 
         if mode in ['cpage', 'cp', 'clearpage']:
             '''
@@ -1016,7 +1066,10 @@ class texme:
             return
 
         else:
-            raise ValueError('Unknow mode')
+            verrs.BCDR_pinky_texme_ERROR_General(
+                'e0625', 'Unknow mode of page method!\n'
+                'Tip: look into manual...'
+            )
 
         return self.add(
             submodule = 'page',
@@ -1025,9 +1078,6 @@ class texme:
             echo      = echo,
         )
 
-#$$$ ____________ def ext __________________________________________________ #
-
-    ext = None
 
 #$$$ ____________ def text _________________________________________________ #
 
@@ -1037,13 +1087,11 @@ class texme:
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.test('active'):
-            return
+        if not self.setts.check_loc('active'): return
 
         # use global settings
-        inherit = self.setts.test('inherit', inherit)
-        echo    = self.setts.test('echo'   , echo)
-        rx      = self.setts.test('rx'     , rx, 'xt')
+        scope = self.setts.check_loc('scope', scope)
+        rx = self.setts.check_loc('rx', rx, 'xt')
 
         # if page is typed
         if type(page) in [str]:
@@ -1051,12 +1099,8 @@ class texme:
         elif type(page) in [tuple]:
             self.page(page[0])
 
-        # if scope is extended, becarfull, it overwrite
-        if scope:
-            self.setts._scope.update(scope)
-
         # use filter regme
-        code = regme(text, self.setts.scope).package(rx)
+        code = regme(text, scope, rx)
 
         # strip begind and end of text
         if strip:
@@ -1078,15 +1122,14 @@ class texme:
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.test('active'):
-            return
+        if not self.setts.check_loc('active'): return
 
         # use global settings
-        inherit = self.setts.test('inherit', inherit)
-        echo    = self.setts.test('echo'   , echo)
-        label   = self.setts.test('label'  , label, 'h')
-        rx      = self.setts.test('rx'     , rx,    'ht')
-        minitoc = self.setts.test('minitoc', minitoc)
+        scope = self.setts.check_loc('scope', scope)
+        echo    = self.setts.check_loc('echo'   , echo)
+        label   = self.setts.check_loc('label'  , label, 'h')
+        rx      = self.setts.check_loc('rx'     , rx,    'ht')
+        minitoc = self.setts.check_loc('minitoc', minitoc)
 
         # if page is typed
         if type(page) in [str]:
@@ -1094,12 +1137,8 @@ class texme:
         elif type(page) in [tuple]:
             self.page(page[0])
 
-        # if scope is extended, becarfull, it overwrite
-        if scope:
-            self.setts._scope.update(scope)
-
         # use filter regme
-        text = regme(text, self.setts.scope).package(rx)
+        text = regme(text, scope, rx)
 
         if label is True:
             firstletters = ''.join([i[0].lower() for i in text.split()])
@@ -1117,37 +1156,39 @@ class texme:
             without_number = ''
 
 
-        if lvl+self.setts.head_lvl_inc == -1:
+        nlvl = lvl+self.setts.head_lvl_inc
+
+        if nlvl == -1:
             tex = '\\part' + without_number + '%2{%1} ' + lab
             if minitoc:
                 tex += '\n\\minitoc'
 
-        elif lvl+self.setts.head_lvl_inc == 0:
+        elif nlvl == 0:
             tex = '\\chapter' + without_number + '%2{%1} ' + lab
             if minitoc:
                 tex += '\n\\minitoc'
 
-        elif lvl+self.setts.head_lvl_inc == 1:
+        elif nlvl == 1:
             tex = '\\section' + without_number + '%2{%1} ' + lab
 
-        elif lvl+self.setts.head_lvl_inc == 2:
+        elif nlvl == 2:
             tex = '\\subsection' + without_number + '%2{%1} ' + lab
 
-        elif lvl+self.setts.head_lvl_inc == 3:
+        elif nlvl == 3:
             tex = '\\subsubsection' + without_number + '%2{%1} ' + lab
 
-        elif lvl+self.setts.head_lvl_inc == 4:
+        elif nlvl == 4:
             tex = '\\paragraph' + without_number + '%2{%1} ' + lab
 
-        elif lvl+self.setts.head_lvl_inc == 5:
+        elif nlvl == 5:
             tex = '\\subparagraph' + without_number + '%2{%1} ' + lab
 
         else:
-            raise ValueError('The header level must be between <-1,5>, now lvl += alvle = '+str(lvl+self.alvl))
-
+            verrs.BCDR_pinky_texme_ERROR_Header_Level(
+                nlvl,self.setts.head_lvl_inc)
 
         if text2:
-            text2 = '[' + regme(text2, self.setts.scope).package(rx) + ']'
+            text2 = '[' + regme(text2, scope, rx) + ']'
         else:
             text2 = ''
 
@@ -1155,21 +1196,17 @@ class texme:
         code = code.replace('%2', text2)
 
         if 'h' in echo:
-            lvlnow = lvl+self.setts.head_lvl_inc+1
 
-            if   lvlnow==1: color = "255,127,80"
-            elif lvlnow==2: color = "165,127,80"
-            elif lvlnow==3: color = "125,127,80"
-            elif lvlnow==4: color = "125,177,80"
-            else          : color = "255,255,255"
+            if   lvl==1: color = "255,127,80"
+            elif lvl==2: color = "165,127,80"
+            elif lvl==3: color = "125,127,80"
+            elif lvl==4: color = "125,177,80"
+            else       : color = "255,255,255"
 
             source = "<h{2} style='color: rgb({0})'>{1}</h1>".format(
-                color,
-                text,
-                lvlnow,
-            )
+                color,text,lvl)
 
-            ipdisplay(HTML(source.strip()))
+            display(HTML(source.strip()))
 
         if type(page) in [tuple]:
             self.page(page[1])
@@ -1186,32 +1223,26 @@ class texme:
 
 #$$$ ____________ def pic __________________________________________________ #
 
-    def pic(self, path, caption=False, label=None, float=False, abs_path=False, frame=True, grey_scale=False, caption2=False, rxc=None, width_factor=1, height_factor=0.9, mode='fig', pic_root=None, pic_error=None, inherit=None, echo=None, page=None, scope=None):
+    def pic(self, path, caption=False, label=None, float=None, abs_path=False, frame=True, grey_scale=False, caption2=False, rxc=None, width_factor=1, height_factor=0.9, mode='fig', pic_root=None, pic_error=True, inherit=None, echo=None, page=None, scope=None):
         '''
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.test('active'):
-            return
+        if not self.setts.check_loc('active'): return
 
         # use global settings
-        inherit   = self.setts.test('inherit', inherit)
-        echo      = self.setts.test('echo'   , echo)
-        label     = self.setts.test('label'  , label, 'p')
-        rx        = self.setts.test('rx'     , rxc, 'pc')
-        float     = self.setts.test('float'  , float, 'p')
-        pic_root  = self.setts.test('pic_root', pic_root)
-        pic_error = self.setts.test('pic_error', pic_error)
+        scope = self.setts.check_loc('scope', scope)
+        echo      = self.setts.check_loc('echo', echo)
+        label     = self.setts.check_loc('label', label,'p')
+        rx        = self.setts.check_loc('rx', rxc, 'pc')
+        float     = self.setts.check_loc('float', float,'p')
+        pic_root  = self.setts.check_loc('pic_root',pic_root)
 
         # if page is typed
         if type(page) in [str]:
             self.page(page)
         elif type(page) in [tuple]:
             self.page(page[0])
-
-        # if scope is extended, becarfull, it overwrite
-        if scope:
-            self.setts._scope.update(scope)
 
         # path = path.replace('/','\\')
 
@@ -1224,10 +1255,11 @@ class texme:
         # first check if file is exists
         if not os.path.exists(path):
             if pic_error:
-                verrs.pathError(path)
+                verrs.BCDR_pinky_texme_ERROR_Path_Error(path)
+                verrs.BCDR_pinky_texme_WARN_Path_Error(path)
             else:
-                print('Path does not exists. Picture error flag is False.\n<'+path+'>')
-                return
+                verrs.BCDR_pinky_texme_WARN_Path_Error(path)
+            return
 
         # create absoule path
         pathA = os.path.abspath(path).replace('\\', '/')
@@ -1272,25 +1304,27 @@ class texme:
                 code = self.page('anpb-b', inherit=True)
                 code += '\\begin{center}\n'
             else:
-                raise ValueError('Unknow float mode')
+                verrs.BCDR_pinky_texme_ERROR_General(
+                    'e0626', 'Unknow float mode'
+                )
 
-            code += tools.translate( '\\includegraphics[{1}width={2}\\linewidth,height={3}\\textheight,keepaspectratio]{{0}}\n',
+            code += translate( '\\includegraphics[{1}width={2}\\linewidth,height={3}\\textheight,keepaspectratio]{{0}}\n',
                 {'{0}': path,
                  '{1}': frame,
                  '{2}': str(width_factor),
                  '{3}': str(height_factor)})
 
             if caption:
-                caption = regme(caption, self.setts.scope).package(rx)
+                caption = regme(caption, scope, rx)
 
                 if caption2:
                     cap2='['+regme(
-                        caption2,self.setts.scope).package(rx)+']'
+                        caption2,scope, rx)+']'
                 else:
                     cap2 = ''
 
 
-                code += tools.translate('\\caption{float}{1}{{0}}\n',
+                code += translate('\\caption{float}{1}{{0}}\n',
                     {
                         '{0}'    : caption,
                         '{1}'    : cap2,
@@ -1319,7 +1353,7 @@ class texme:
         elif mode=='lst':
             pass
 #                 if caption:
-#                     caption = RegME(caption).package(captionX)
+#                     caption = RegME(caption, captionX)
 #                     caption = 'caption={%1}'.replace('%1', caption)
 #                     if type(label) is str:
 #                         caption += ',label={%1},'.replace('%1', label)
@@ -1335,7 +1369,7 @@ class texme:
 # \\begin{minipage}{\\linewidth}\n\\begin{lstlisting}[%capescapeinside=||, frame=none, numbers=none, xleftmargin=0pt,xrightmargin=0pt]
 # |\\includegraphics[%framewidth=\\linewidth]{%path}|
 # \\end{lstlisting}\n\\end{minipage}'''
-#                 code = tools.translate(code, ndict)
+#                 code = translate(code, ndict)
 #                 _name1='img-lst'
 
         elif mode=='tab':
@@ -1351,18 +1385,20 @@ class texme:
                 code = self.page('anpb-b', inherit=True)
                 code += '\\begin{center}\n'
             else:
-                raise ValueError('Unknow float mode')
+                verrs.BCDR_pinky_texme_ERROR_General(
+                    'e0626', 'Unknow float mode'
+                )
 
             if caption:
-                caption = regme(caption, self.setts.scope).package(rx)
+                caption = regme(caption, scope, rx)
 
                 if caption2:
                     cap2='['+regme(
-                        caption2,self.setts.scope).package(rx)+']'
+                        caption2,scope, rx)+']'
                 else:
                     cap2 = ''
 
-                code += tools.translate('\\caption{float}{1}{{0}}\n',
+                code += translate('\\caption{float}{1}{{0}}\n',
                     {
                         '{0}'    : caption,
                         '{1}'    : cap2,
@@ -1375,7 +1411,7 @@ class texme:
                 elif label == True:
                     code += '\\tablab{{0}}\n'.replace('{0}', user_path.replace('\\', '').replace('/', ''))
 
-            code += tools.translate( '\\includegraphics[{1}width={2}\\linewidth,height={3}\\textheight,keepaspectratio]{{0}}\n',
+            code += translate( '\\includegraphics[{1}width={2}\\linewidth,height={3}\\textheight,keepaspectratio]{{0}}\n',
                 {'{0}': path,
                  '{1}': frame,
                  '{2}': str(width_factor),
@@ -1400,7 +1436,7 @@ class texme:
 
 
 #                 if caption:
-#                     caption = RegME(caption).package(captionX)
+#                     caption = RegME(caption, captionX)
 #                     code += '\\caption%2{%1}\n'.replace('%1', caption)
 #                     if caption2:
 #                         code = code.replace('%2', '['+ caption2 +']')
@@ -1420,7 +1456,7 @@ class texme:
 
 
         if 'p' in echo:
-            ipdisplay(Image(
+            display(Image(
                 pathA, width=self.setts.pic_diswidth
             ))
 
@@ -1438,14 +1474,13 @@ class texme:
 
 #$$$ ____________ def math _________________________________________________ #
 
-    def math(self, equation, mode='i', label=None, rxe=None, rxt=None, exe=False, inherit=None, strip=True, echo=None, page=None, scope=None):
+    def math(self, equation, mode='i', label=None, rxe=None, rxt=None, exe=False, strip=True, inherit=None, echo=None, page=None, scope=None):
         '''
         Please remember about problem with equation block - there is fault working labels. To fix it use gather instead equation block. \\leavemode should fix it, but it is not tested yet.
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.test('active'):
-            return
+        if not self.setts.check_loc('active'): return
 
         # if page is typed
         if type(page) in [str]:
@@ -1453,9 +1488,11 @@ class texme:
         elif type(page) in [tuple]:
             self.page(page[0])
 
-        # if scope is extended, becarfull, it overwrite
-        if scope:
-            self.setts._scope.update(scope)
+        # use global settings
+        scope = self.setts.check_loc('scope', scope)
+        echo      = self.setts.check_loc('echo'   , echo)
+        rxe       = self.setts.check_loc('rx'     , rxe, 'me')
+        rxt       = self.setts.check_loc('rx'     , rxt, 'mt')
 
         # if given is list, then return self looped
         if type(equation)==list:
@@ -1468,17 +1505,11 @@ class texme:
             equation = equation.strip()
 
 
-        # use global settings
-        inherit   = self.setts.test('inherit', inherit)
-        echo      = self.setts.test('echo'   , echo)
-        rxe       = self.setts.test('rx'     , rxe, 'me')
-        rxt       = self.setts.test('rx'     , rxt, 'mt')
-
         if mode in ['t*', 't+', 't']:
-            code = regme(equation, self.setts.scope).package(rxt)
+            code = regme(equation, scope, rxt)
 
             if 'm' in echo:
-                ipdisplay(Markdown(code))
+                display(Markdown(code))
 
             return self.add(
                 submodule = 'm',
@@ -1487,10 +1518,10 @@ class texme:
                 echo      = echo,
             )
 
-        equation = regme(equation, self.setts.scope).package(rxe)
+        equation = regme(equation, scope, rxe)
 
         if exe:
-            exec(equation, self.setts.scope)
+            exec(equation, scope)
 
         if label:
             lab = '\\equlab{' + label + '}'
@@ -1539,8 +1570,8 @@ class texme:
                 '\n' + equation + '\n\\end{gather*}'
 
         if 'm' in echo:
-            ipdisplay(Latex(
-                '$'+regme(equation, self.setts.scope).package(99)+'$'
+            display(Latex(
+                '$'+regme(equation, scope, 99)+'$'
             ))
 
         if type(page) in [tuple]:
@@ -1558,21 +1589,19 @@ class texme:
 
 #$$$ ____________ def tab __________________________________________________ #
 
-    #$$$ def tab
     def tab(self, cols, data, options='\\textwidth', caption=None, label=None, float=False, header=None, stretchV=1.5, rxc=None, rxd=None, inherit=None, echo=None, page=None, scope=None):
         '''
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.test('active'):
-            return
+        if not self.setts.check_loc('active'): return
 
         # use global settings
-        inherit   = self.setts.test('inherit', inherit)
-        echo      = self.setts.test('echo'   , echo)
-        float     = self.setts.test('float'  , float)['t']
-        rxd       = self.setts.test('rx'     , rxc, 'tc')
-        rxd       = self.setts.test('rx'     , rxd, 'td')
+        scope = self.setts.check_loc('scope', scope)
+        echo      = self.setts.check_loc('echo'   , echo)
+        float     = self.setts.check_loc('float'  , float)['t']
+        rxd       = self.setts.check_loc('rx'     , rxc, 'tc')
+        rxd       = self.setts.check_loc('rx'     , rxd, 'td')
 
         # if page is typed
         if type(page) in [str]:
@@ -1580,24 +1609,20 @@ class texme:
         elif type(page) in [tuple]:
             self.page(page[0])
 
-        # if scope is extended, becarfull, it overwrite
-        if scope:
-            self.setts._scope.update(scope)
-
         if caption:
             if label:
                 label = '\\tablab{'+label+'}'
             else:
                 label = ''
             caption = '\\caption{' + \
-                regme(caption, self.setts.scope).package(rxc) + '}'+ label +'\\\\'
+                regme(caption, scope, rxc) + '}'+ label +'\\\\'
         else:
             caption = ''
 
 
         if header:
             header = '\\hline\n' + \
-                regme(header, self.setts.scope).package(rxd) + \
+                regme(header, scope, rxd) + \
                 '\n\\\\\\hline\\hline\\hline\\hline\n\\endhead'
         elif not float:
             header = '\\endhead'
@@ -1619,8 +1644,8 @@ class texme:
                  '%StV': str(stretchV),
                  '%Lab': label,
                  '%Hea': header,
-                 '%Dat': regme(data, self.setts.scope).package(rxd)}
-        tex = tools.translate(tex, ndict)
+                 '%Dat': regme(data, scope, rxd)}
+        tex = translate(tex, ndict)
 
         if float == True:
             tex = '\\begin{table}\n' + tex + '\n\\end{table}'
@@ -1643,30 +1668,27 @@ class texme:
 
 #$$$ ____________ def code _________________________________________________ #
 
-    def code(self, code, caption='', label='', language='python', rxe=None, rxc=None, mathescape=True, inherit=None, echo=None, page=None, scope=None):
+    def code(self, code, caption='', label='', style=None, language=None, rxe=None, rxc=None, strip=True, mathescape=True, inherit=None, echo=None, page=None, scope=None, rst=False):
         '''
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.test('active'):
-            return
+        if not self.setts.check_loc('active'): return
 
         # use global settings
-        inherit   = self.setts.test('inherit', inherit)
-        echo      = self.setts.test('echo'   , echo)
-        rxe       = self.setts.test('rx'     , rxe, 'ce')
-        rxc       = self.setts.test('rx'     , rxc, 'cc')
+        scope = self.setts.check_loc('scope', scope)
+        echo = self.setts.check_loc('echo',echo)
+        label = self.setts.check_loc('label',label,'c')
+        rxe = self.setts.check_loc('rx', rxe,'ce')
+        rxc = self.setts.check_loc('rx', rxc,'cc')
+        style = self.setts.check_loc(
+            'lststyle', style if rst==False else 'bcdr_rst_tables')
 
         # if page is typed
         if type(page) in [str]:
             self.page(page)
         elif type(page) in [tuple]:
             self.page(page[0])
-
-        # if scope is extended, becarfull, it overwrite
-        if scope:
-            self.setts._scope.update(scope)
-
 
         if mathescape:
             var1 = ', mathescape'
@@ -1678,14 +1700,26 @@ class texme:
         else:
             var2 = ''
 
+        if style:
+            style = ',style={' + style + '}'
+        else:
+            style = ''
+
+        caption = regme(caption, scope, rxc)
+
+
+
         if code == True:
             self._temp = [inspect.currentframe().f_back.f_lineno]
 
-            tex = '\\begin{lstlisting}[caption={%1},label={%2}%3%4]'
-            tex = tex.replace('%1', caption)
-            tex = tex.replace('%2', label)
-            tex = tex.replace('%4', var1)
-            tex = tex.replace('%3', var2)
+            tex = translate('\\begin{lstlisting}[caption={%1}%2%3%5%4]'
+                ,{
+                    '%1': caption,
+                    '%2': ',label={'+label+'},' if label else '',
+                    '%4': var1,
+                    '%3': var2,
+                    '%5': style,
+                })
 
             _name1='c-open'
 
@@ -1703,14 +1737,20 @@ class texme:
 
         elif type(code) == str:
 
-            tex = '\\begin{lstlisting}[caption={%1},label={%2}%3%4]'
-            caption = regme(caption, self.setts.scope).package(rxc)
-            tex = tex.replace('%1', caption)
-            tex = tex.replace('%2', label)
-            tex = tex.replace('%4', var1)
-            tex = tex.replace('%3', var2)
+            tex = translate('\\begin{lstlisting}[caption={%1}%2%3%5%4]'
+                ,{
+                    '%1': caption,
+                    '%2': ',label={'+label+'},' if label else '',
+                    '%4': var1,
+                    '%3': var2,
+                    '%5': style,
+                })
 
-            code = regme(code, self.setts.scope).package(rxe)
+            code = regme(code, scope, rxe)
+
+            if strip:
+                code = code.strip()
+
             tex += '\n' + code + '\n'
             tex += '\\end{lstlisting}'
 
@@ -1734,24 +1774,18 @@ class texme:
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.test('active'):
-            return
+        if not self.setts.check_loc('active'): return
 
         # use global settings
-        inherit   = self.setts.test('inherit', inherit)
-        echo      = self.setts.test('echo'   , echo)
-        label     = self.setts.test('label'  , label, 'f')
-        rxe       = self.setts.test('rx'     , rxe, 'fe')
+        scope = self.setts.check_loc('scope', scope)
+        label     = self.setts.check_loc('label'  , label, 'f')
+        rxe       = self.setts.check_loc('rx'     , rxe, 'fe')
 
         # if page is typed
         if type(page) in [str]:
             self.page(page)
         elif type(page) in [tuple]:
             self.page(page[0])
-
-        # if scope is extended, becarfull, it overwrite
-        if scope:
-            self.setts._scope.update(scope)
 
         if language:
             var2 = ',language={' + language + '}'
@@ -1771,7 +1805,7 @@ class texme:
             label = ''
 
         tex = '\\lstinputlisting[language=%5, firstline=%3, lastline=%4, caption={%1}, label={%2}, inputencoding=utf8, mathescape]{%6}'
-        tex = tex.replace('%1', regme(caption, self.setts.scope).package(rxe))
+        tex = tex.replace('%1', regme(caption, scope, rxe))
         tex = tex.replace('%2', label)
         tex = tex.replace('%3', first_line)
         tex = tex.replace('%4', last_line)
@@ -1798,26 +1832,19 @@ class texme:
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.test('active'):
-            return
+        if not self.setts.check_loc('active'): return
 
         # use global settings
-        inherit   = self.setts.test('inherit', inherit)
-        echo      = self.setts.test('echo'   , echo)
-        width     = self.setts.test('item_1c_width' , width)
-        rxe       = self.setts.test('rx'     , rxe, 'ie')
-        rxt       = self.setts.test('rx'     , rxt, 'it')
+        scope = self.setts.check_loc('scope', scope)
+        width = self.setts.check_loc('item_1c_width' , width)
+        rxe   = self.setts.check_loc('rx', rxe, 'ie')
+        rxt   = self.setts.check_loc('rx', rxt, 'it')
 
         # if page is typed
         if type(page) in [str]:
             self.page(page)
         elif type(page) in [tuple]:
             self.page(page[0])
-
-        # if scope is extended, becarfull, it overwrite
-        if scope:
-            self.setts._scope.update(scope)
-
 
         # prefix if-block
         if prefix in ['',' ']:
@@ -1841,8 +1868,9 @@ class texme:
             width -= (level-1)*7
 
         else:
-            raise ValueError('Unrecognized prefix element')
-
+            verrs.BCDR_pinky_texme_ERROR_General(
+                'e0627', 'Unrecognized prefix element'
+            )
 
         # remove too big space between to texme-items
         if self.__last_type == 'i':
@@ -1866,7 +1894,7 @@ class texme:
                 if col_r is None: col_r = 'L'
 
                 # create column pattern
-                columns = tools.translate('{{pcols}{col_l}{{width}}{col_r}}', {
+                columns = translate('{{pcols}{col_l}{{width}}{col_r}}', {
                     '{pcols}'   : pcols,
                     '{col_l}'   : col_l,
                     '{col_r}'   : col_r,
@@ -1889,7 +1917,7 @@ class texme:
                 if col_l is None: col_l = 'L'
 
                 # create column pattern
-                columns = tools.translate('{{pcols}{col_l}}',{
+                columns = translate('{{pcols}{col_l}}',{
                     '{pcols}'   : pcols,
                     '{col_l}'   : col_l,
                 })
@@ -1924,7 +1952,7 @@ class texme:
             if col_l is None: col_l = 'L'
 
             # create column pattern
-            columns = tools.translate('{{pcols}{col_l}}',{
+            columns = translate('{{pcols}{col_l}}',{
                 '{pcols}'   : pcols,
                 '{col_l}'   : col_l,
             })
@@ -1952,11 +1980,11 @@ class texme:
                 equation = glue.join(equation)
 
 
-        tex = tools.translate(tex, {
+        tex = translate(tex, {
             '{space_bt}'  : space_bt,
             '{columns}'   : columns,
             '{ptext}'     : ptext,
-            '{text}'      : regme(text.strip(), self.setts.scope).package(rxt),
+            '{text}'      : regme(text.strip(), scope, rxt),
             '{postfix}'   : postfix,
             '{flush_math}': flush_math,
             '{equation}'  : equation,
@@ -1974,3 +2002,20 @@ class texme:
             echo      = echo,
         )
     i = item
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

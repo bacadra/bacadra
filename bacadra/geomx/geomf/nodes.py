@@ -1,72 +1,73 @@
 '''
 ------------------------------------------------------------------------------
-BCDR += ***** (nodes) finite elements *****
+***** (nodes) finite elements *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
 Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
-    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
 
-# from ...cunit import cunit
+from ...dbase import parse
+from ...tools.setts import settsmeta
+
+#$ ____ class setts ________________________________________________________ #
+
+class setts(settsmeta):
+    _id_auto = 0
 
 #$ ____ class nodes ________________________________________________________ #
 
 class nodes:
-    #$$ def __init__
+
+    # class setts
+    setts = setts('setts', (setts,), {})
+
+
+#$$ ________ def __init__ __________________________________________________ #
+
     def __init__(self, core):
+
+        # project object
         self.core = core
-        self._id_auto_last = 0
 
-    #$$ def --enter--
-    def __enter__(self):
-        return self
+        # local setts
+        self.setts = self.setts('setts',(),{})
 
-    #$$ def --exit--
-    def __exit__(self, type, value, traceback):
-        pass
+
+#$$ ________ def add _______________________________________________________ #
 
     def add(self, id=None, x=0, y=0, z=0, ucst=None, ucid=None, fix=None, id_auto=False, ttl=None):
-        '''
-        Add node into FEM system.abs
 
-        :ucst: name of reference element, e.g. "node".
-        "ucid: id of reference element.
-        '''
+        id  = parse.chdr('setts.id' , id )
+        x   = parse.chdr('geomf.nodes.x'  , x  )
+        y   = parse.chdr('geomf.nodes.y'  , y  )
+        z   = parse.chdr('geomf.nodes.z'  , z  )
 
         # if fix is none, then use default setting
-        if fix is None:
-            fix = self.core.mdata.setts.get('nodes_fix')
+        fix = self.core.setts.check_loc('nodes_fix', fix)
 
         if id_auto and not id:
             id = self._id_auto(True)
 
         # reference type if-block
-        x,y,z = self._reference(ucst=ucst, ucid=ucid, x=x, y=y, z=z)
-
-        # parse data do nodes data
-        cols,data = self.core.dbase.parse(
-            id    = id,
-            x     = x,
-            y     = y,
-            z     = z,
-            ucst  = ucst,
-            ucid  = ucid,
-            fix   = fix,
-            ttl   = ttl,
-        )
+        if ucst:
+            x,y,z = self._reference(ucst=ucst, ucid=ucid, x=x, y=y, z=z)
 
         # add nodes data
         self.core.dbase.add(
+            mode  = 'r',
             table = '[111:nodes:topos]',
-            cols  = cols,
-            data  = data,
+            cols  = 'id,x,y,z,ucst,ucid,fix,ttl',
+            data  = (id,x,y,z,ucst,ucid,fix,ttl),
         )
 
 
-    def addm(self, cols, data, defs={}):
+#$$ ________ def adm _______________________________________________________ #
+
+    def adm(self, cols, data, defs={}):
         '''
         Data are parsed due to multi parser. All specific of multiparser are avaiable, like defs
 
@@ -81,7 +82,7 @@ class nodes:
 
         # parse data by multiparser
         # it return list of dictonary which can be used as **kwargs
-        cols,data = self.core.dbase.parse(parse_mode='addm',
+        data = parse.adm(
             cols  = cols,
             data  = data,
             defs  = defs,
@@ -93,36 +94,40 @@ class nodes:
             # unpack cols data
             self.add(**row)
 
+    #
+    #
+    # def edit(self, where, id=None, x=None, y=None, z=None, ucst=None, ucid=None, fix=None, ttl=None):
+    #
+    #     # parse data do nodes data
+    #     cols,data = self.core.dbase.parse( parse_mode='update',
+    #         id    = id,
+    #         x     = x,
+    #         y     = y,
+    #         z     = z,
+    #         ucst  = ucst,
+    #         ucid  = ucid,
+    #         fix   = fix,
+    #         ttl   = ttl,
+    #     )
+    #
+    #     # edit nodes data
+    #     self.core.dbase.edit(
+    #         table = '[111:nodes:topos]',
+    #         cols  = cols,
+    #         data  = data,
+    #         where = where,
+    #     )
 
 
-    def edit(self, where, id=None, x=None, y=None, z=None, ucst=None, ucid=None, fix=None, ttl=None):
-
-        # parse data do nodes data
-        cols,data = self.core.dbase.parse( parse_mode='update',
-            id    = id,
-            x     = x,
-            y     = y,
-            z     = z,
-            ucst  = ucst,
-            ucid  = ucid,
-            fix   = fix,
-            ttl   = ttl,
-        )
-
-        # edit nodes data
-        self.core.dbase.edit(
-            table = '[111:nodes:topos]',
-            cols  = cols,
-            data  = data,
-            where = where,
-        )
-
+#$$ ________ def _id_auto __________________________________________________ #
 
     def _id_auto(self, add=False):
         if add:
-            self._id_auto_last += 1
-        return 'a-' + str(self._id_auto_last)
+            self.setts._id_auto += 1
+        return 'a:' + str(self.setts._id_auto)
 
+
+#$$ ________ def _reference ________________________________________________ #
 
     def _reference(self, ucst, ucid, x, y, z):
         '''
@@ -131,15 +136,59 @@ class nodes:
 
         if ucst == 'node':
             # if reference object is node, then add ref node coor to user input
-            Δnode = self.core.dbase.get(f'''
-            SELECT [x],[y],[z] FROM [111:nodes:topos] WHERE [id] = {ucid}
-            ''')[0]
+            Δnode = self.core.dbase.get(
+                mode  = 'r',
+                table = '[111:nodes:topos]',
+                cols  = '[x],[y],[z]',
+                where = f'[id]={ucid}',
+            )
 
             return x+Δnode[0], y+Δnode[1], z+Δnode[2]
 
-        elif ucst==None:
-            return x,y,z
 
-        else:
-            raise ValueError('Undefined reference type')
+#$$ ________ def auto ______________________________________________________ #
 
+    def echo(self, mode='a+', where=None):
+
+        if 'a' in mode:
+            data = self.core.dbase.get(
+                mode  = 'm',
+                table = '[111:nodes:topos]',
+                cols  = 'id,x,y,z,ucst,ucid,fix,ttl',
+                where = where,
+            )
+
+            if not data: return
+
+            self.core.pinky.rstme.table(
+                caption= 'Nodes properties',
+                wrap   = [False, False, False, False, False, False, False, True],
+                width  = [True,True,True,True,True,True,True, True],
+                halign = ['l','c','c','c','c','c','c','l'],
+                valign = ['u','u','u','u','u','u','u','u'],
+                dtype  = ['t','f','f','f','t','t','t','t'],
+                header = ['id','x','y','z','ucst','ucid','fix','ttl'],
+                data   = data,
+                precision = [2,4,4,4,2,2,2,2],
+            )
+
+            if not '+' in mode: return
+
+            self.core.pinky.rstme.table(
+                wrap   = [False, False, False, True],
+                width  = [8, 8, 2,True],
+                halign = ['r','l','c','l'],
+                valign = ['u','u','u','u'],
+                dtype  = ['t','t','t','t'],
+                data   = [
+                    ['id'   , ''  , '-', 'identificator'       ],
+                    ['x',   '[m]' , '-', 'global x coordinate' ],
+                    ['y',   '[m]' , '-', 'global y coordinate' ],
+                    ['z',   '[m]' , '-', 'global z coordinate' ],
+                    ['ucst' , ''  , '-', 'reference type   '   ],
+                    ['ucid' , ''  , '-', 'reference id'        ],
+                    ['fix'  , ''  , '-', 'stiff fix'           ],
+                    ['ttl'  , ''  , '-', 'title'               ],
+                ],
+                border = False,
+            )

@@ -91,7 +91,7 @@
     %% prevent hyphen text
     %% must be inserted before babel package
 
-\usepackage[polish]{babel}
+\usepackage[greek,polish]{babel}
 
 \usepackage[utf8]{inputenc}
 
@@ -182,7 +182,7 @@
   \smallskip}
   \cfoot{\small %<author>%}
   \fancyfoot[R]{\footnotesize{Strona \thepage\ z \pageref{LastPage}}}
-  \fancyfoot[C]{\footnotesize{\textcolor{Gray}{\MONTH~\YEAR}}} %<foot_line_left>%
+  \fancyfoot[C]{\footnotesize{\textcolor{Gray}{\MONTH~\YEAR~r.}}} %<foot_line_left>%
 }
 \pagestyle{plain}
 
@@ -516,15 +516,15 @@
 % \counterwithin*{lstlisting}{subsection}
 }
 
-\lstset{
+\lstdefinestyle{bcdr0}{
     frame             = single,
     backgroundcolor   = \color{white},
-    language          = Python,
+    % language          = Python,
     aboveskip         = 3mm,
     belowskip         = 3mm,
     showstringspaces  = false,
     keepspaces        = true,
-    xleftmargin       = 24pt,
+    xleftmargin       = 22pt,
     xrightmargin      = 4pt,
     framexleftmargin  = 20pt,
     basicstyle        = {\footnotesize\ttfamily},
@@ -563,7 +563,29 @@
                         {Ś}{{\' S}}1
                         {ł}{{\l}}1
                         {Ł}{{\L}}1
+                        {ρ}{{\g{r}}}1
+                        {α}{{\g{a}}}1
+                        {β}{{\g{b}}}1
+                        {μ}{{\g{m}}}1
+                        {δ}{{\g{d}}}1
+                        {Δ}{{\g{D}}}1
+                        {σ}{{\g{s}}}1
+                        {τ}{{\g{t}}}1
+                        {θ}{{\g{q}}}1
+                        {ρ}{{\g{r}}}1
+                        {°}{{$^{\circ}$}}1
 }
+
+\lstdefinestyle{bcdr_rst_tables}{
+    style             = bcdr0,
+    frame             = none,
+}
+
+\lstdefinestyle{bcdr1}{
+    style             = bcdr0,
+    language          = Python,
+}
+
 
 %## ________ other2 ________________________________________________________ %
 
@@ -609,6 +631,9 @@
 \renewcommand{\u}[1]{\underline{#1}} % underline
 \renewcommand{\t}[1]{\text{#1}}      % normal text
 \newcommand  {\m}[1]{\texttt{#1}}    % monospace
+
+\newcommand{\g}[1]{\textgreek{#1}} % textgreek
+
 
 \newcommand{\ib}[1]{\textbf{\textit{#1}}}
 \newcommand{\bi}[1]{\textbf{\textit{#1}}}
@@ -662,7 +687,8 @@
 
 %### ____________ date settings ____________________________________________ %
 
-%<day_inc>%
+%<date>%
+%<date_inc>%
 
 %# ____ document ___________________________________________________________ %
 

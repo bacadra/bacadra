@@ -4,7 +4,8 @@ class template:
         self.base_keys = {
             'author'         : None,
             'head_line_0'    : None,
-            'day_inc'        : None,
+            'date_inc'       : None,
+            'date'           : None,
             'head_line_1'    : None,
             'foot_line_left' : None,
             'logo_path'      : None,
@@ -29,17 +30,45 @@ class template:
         self.base_keys['author'] = val
 
 
-    def day_inc(self, val):
+    def date_inc(self, val):
         if val == None:
             val = ''
 
         elif type(val) is int:
             val = r'\advance\day by ' + str(val)
 
+        elif type(val) in [list,tuple]:
+            val = (r'\advance\day by '   + str(val[0]) + '\n' +
+                   r'\advance\month by ' + str(val[1]) + '\n' +
+                   r'\advance\year by '  + str(val[2]))
+
+
         else:
             raise ValueError('Type of val must be val or None')
 
-        self.base_keys['day_inc'] = val
+        self.base_keys['date_inc'] = val
+
+
+
+    def date(self, val):
+        if val == None:
+            val = ''
+
+        elif type(val) is int:
+            val = r'\day=' + str(val)
+
+        elif type(val) in [list,tuple]:
+            val = (r'\day='   + str(val[0]) + '\n' +
+                   r'\month=' + str(val[1]) + '\n' +
+                   r'\year='  + str(val[2]))
+
+
+        else:
+            raise ValueError('Type of val must be val or None')
+
+        self.base_keys['date'] = val
+
+
 
 
     def head_line_0(self, val):
@@ -135,7 +164,8 @@ class template:
 
             		{\rule{\linewidth}{0.5mm}}           \\ [0.5cm]
 
-            		\normalsize \today \\ [0.5cm]
+            		%\normalsize \today \\ [0.5cm]
+            		\normalsize {\MONTH~\YEAR~r.} \\ [0.5cm]
 
                     {\rule{\linewidth}{0.5mm}}           \\ [0.5cm]
 

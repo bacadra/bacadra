@@ -1,69 +1,200 @@
+'''
+------------------------------------------------------------------------------
+***** module & local (sett)ing(s) *****
+==============================================================================
 
-import inspect
-import copy
+------------------------------------------------------------------------------
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
+Team members developing this package:
+Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+------------------------------------------------------------------------------
+'''
 
-#$ ____ metaclass settsmeta ________________________________________________ #
+#$ ____ module _____________________________________________________________ #
+
+from .color import colored
+
+
+#$ ____ class settsmeta ____________________________________________________ #
 
 class settsmeta(type):
 
-    #$$ def --enter--
-    def __enter__(self):
-        return self
 
-    #$$ def --exit--
-    def __exit__(self, type, value, traceback):
-        pass
+#$$ ________ atributes _____________________________________________________ #
 
-    #$$ def --setattr--
+    __temp__ = None
+    __save__ = True
+    __addp__ = []
+
+#$$ ________ def __setattr__ _______________________________________________ #
+
     def __setattr__(self, name, value):
         '''
         Method do not allow create new variable in class. It is provide more control over user correctly or spell-checker.
         '''
 
-        if not hasattr(self, name) and inspect.stack()[1][3] != '__init__':
+        if not hasattr(self, name):
             raise AttributeError(f"Creating new attributes <{name}> is not allowed!")
 
         type.__setattr__(self, name, value)
 
 
-    #$$ def --repr--
-    def __repr__(self):
+#$$ ________ def set _______________________________________________________ #
+
+    def set(self, **value):
         '''
-        Print only overwritten parameters and only not "private" atributes and methods.
+        Type of value is dict.
         '''
 
-        data = []
+        for key,val in value.items():
+            setattr(self, key, val)
+
+
+#$$ ________ def check _____________________________________________________ #
+
+    def check(self, name, value=None, subname=None):
+        try:
+            self.check_loc(name=name, value=value, subname=subname)
+        except:
+            self.check_cls(name=name, value=value, subname=subname)
+
+#$$ ________ def check_cls _________________________________________________ #
+
+    @classmethod
+    def check_cls(self, name, value=None, subname=None):
+        if value == None:
+            if subname:
+                return getattr(self, name)[subname]
+            else:
+                return getattr(self, name)
+        else:
+            if hasattr(self, '_setts__'+name):
+                self.__save__ = False
+                if subname:
+                    setattr(self, name, {subname:value})
+                else:
+                    setattr(self, name, value)
+                self.__save__ = True
+                return self.__temp__ if subname==None else self.__temp__[subname]
+            else:
+                return value
+
+
+#$$ ________ def check_loc _________________________________________________ #
+
+    def check_loc(self, name, value=None, subname=None):
+        if value == None:
+            if subname:
+                return getattr(self, name)[subname]
+            else:
+                return getattr(self, name)
+        else:
+            if hasattr(self, '_setts__'+name):
+                self.__save__ = False
+                if subname:
+                    setattr(self, name, {subname:value})
+                else:
+                    setattr(self, name, value)
+                self.__save__ = True
+                return self.__temp__ if subname==None else self.__temp__[subname]
+            else:
+                return value
+
+
+
+
+
+#$$ ________ def print _____________________________________________________ #
+
+    def print(self, inherit=False, get_cls=True):
+        try:
+            return self.print_loc(inherit=inherit, get_cls=get_cls)
+        except:
+            return self.print_cls(inherit=inherit)
+
+#$$ ________ def print_cls _________________________________________________ #
+
+    @classmethod
+    def print_cls(self, inherit=False):
+
+        data = {}
+
         for key in dir(self):
-            if (key[0] == '_' and key[1] != '_' and key[-1] != '_' and key not in ['_scope', '_scope_']):
-                val = eval('self.' + key)
-                if type(val) is str: val = '"' + str(val) + '"'
-                data.append('> {:14s} : {}'.format(key[1:], val))
+            if key[:8]=='_setts__':
+                val = getattr(self, key)
+                data.update({key[8:]:val})
 
-        return '\n'.join(data) if len(data) > 0 else 'There are no overwritten atributes :-)'
+        if self.__addp__:
+            data.update(self.__addp__)
 
-    #$$ def test
-    def test(self, name, value=None, subname=None):
-        '''
-        Methods provide interface to get local variable of settings. It does not change class atribute, only return as inherited.
-        '''
+        if inherit:
+            return data
 
-        if subname is None:
-            if value is None:
-                return eval(f'self.{name}')
-            else:
-                return eval(f'self._{name}_')(value)
 
-        elif subname is not None:
-            if value is None:
-                return eval(f'self.{name}')[subname]
-            else:
-                return (eval(f'self._{name}_')({subname:value}))[subname]
+        pdata = [colored('---------------------------------------------------------------------------\n''***** bacadra class settings *****', 'magenta')]
 
-    #$$ def set
-    def set(self, **kwargs):
-        '''
-        Methods provide interface to get local variable of settings. It does not change class atribute, only return as inherited.
-        '''
+        for key,val in data.items():
+            if type(val) is str: val = "'" + str(val) + "'"
+            pdata.append('> {:14s} : {}'.format(key, val))
 
-        for key,val in kwargs.items():
-            setattr(eval('self'), key, val)
+        if len(pdata)==1: pdata+=['There are no atributes.']
+        print('\n'.join(pdata))
+
+
+#$$ ________ def print_loc _________________________________________________ #
+
+    def print_loc(self, inherit=False, get_cls=True):
+
+        if get_cls:
+            try:
+                data = self.print_cls(inherit=True)
+
+            except:
+                data = {}
+        else:
+            data = {}
+
+        for key in dir(self):
+            if key[:8]=='_setts__':
+                val = getattr(self, key)
+                data.update({key[8:]:val})
+
+        if self.__addp__:
+            data.update(self.__addp__)
+
+        if inherit:
+            return data
+
+
+        pdata = [colored('---------------------------------------------------------------------------\n''***** bacadra object settings *****', 'magenta')]
+
+        for key,val in data.items():
+            if type(val) is str: val = "'" + str(val) + "'"
+            pdata.append('> {:14s} : {}'.format(key, val))
+
+        if len(pdata)==1: pdata+=['There are no atributes (maybe overwritten).']
+        print('\n'.join(pdata))
+
+
+#$$ ________ def __repr__ __________________________________________________ #
+
+    def __repr__(self):
+
+        try:
+            data = self.print_loc(inherit=True, get_cls=True)
+            name = 'object'
+        except:
+            data = self.print_cls(inherit=True)
+            name = 'class'
+
+        pdata = [colored('---------------------------------------------------------------------------\n''***** bacadra '+name+' settings *****', 'magenta')]
+
+        for key,val in data.items():
+            if type(val) is str: val = "'" + str(val) + "'"
+            pdata.append('> {:14s} : {}'.format(key, val))
+
+        if len(pdata)==1: pdata+=['There are no atributes (maybe overwritten).']
+        return '\n'.join(pdata)
+
+
+

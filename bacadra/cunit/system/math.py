@@ -1,5 +1,5 @@
 import math
-from ..units import cunit
+from ..cunit import cunit
 from ..ndict import ndict
 from .. import verrs
 

@@ -92,7 +92,7 @@ unicode_type = str
 bytes_type = bytes
 
 
-def obj2unicode(obj):
+def obj2unicode(obj): #$#
     """Return a unicode representation of a python object
     """
     if isinstance(obj, unicode_type):
@@ -107,7 +107,7 @@ def obj2unicode(obj):
         return unicode_type(obj)
 
 
-def len(iterable):
+def len(iterable): #$#
     """Redefining len here so it will be able to work with non-ASCII characters
     """
     if isinstance(iterable, bytes_type) or isinstance(iterable, unicode_type):
@@ -118,7 +118,7 @@ def len(iterable):
         return iterable.__len__()
 
 
-class ArraySizeError(Exception):
+class ArraySizeError(Exception): #$#
     """Exception raised when specified rows don't fit the required size
     """
 
@@ -130,19 +130,19 @@ class ArraySizeError(Exception):
         return self.msg
 
 
-class FallbackToText(Exception):
+class FallbackToText(Exception): #$#
     """Used for failed conversion to float"""
     pass
 
 
-class Texttable:
+class Texttable: #$#
 
     BORDER = 1
     HEADER = 1 << 1
     HLINES = 1 << 2
     VLINES = 1 << 3
 
-    def __init__(self, wrap=True, max_width=80):
+    def __init__(self, wrap=True, max_width=80): #$$#
         """Constructor
         - max_width is an integer, specifying the maximum width of the table
         - if set to 0, size is unlimited, therefore cells won't be wrapped
@@ -157,7 +157,7 @@ class Texttable:
         self.set_chars(['-', '|', '+', '='])
         self.reset()
 
-    def reset(self):
+    def reset(self): #$$#
         """Reset the instance
         - reset rows and header
         """
@@ -168,7 +168,7 @@ class Texttable:
         self._rows = []
         return self
 
-    def set_max_width(self, max_width):
+    def set_max_width(self, max_width): #$$#
         """Set the maximum width of the table
         - max_width is an integer, specifying the maximum width of the table
         - if set to 0, size is unlimited, therefore cells won't be wrapped
@@ -176,7 +176,7 @@ class Texttable:
         self._max_width = max_width if max_width > 0 else False
         return self
 
-    def set_chars(self, array):
+    def set_chars(self, array): #$$#
         """Set the characters used to draw lines between rows and columns
         - the array should contain 4 fields:
             [horizontal, vertical, corner, header]
@@ -191,7 +191,7 @@ class Texttable:
             self._char_corner, self._char_header) = array
         return self
 
-    def set_deco(self, deco):
+    def set_deco(self, deco): #$$#
         """Set the table decoration
         - 'deco' can be a combinaison of:
             Texttable.BORDER: Border around the table
@@ -206,7 +206,7 @@ class Texttable:
         self._deco = deco
         return self
 
-    def set_header_align(self, array):
+    def set_header_align(self, array): #$$#
         """Set the desired header alignment
         - the elements of the array should be either "l", "c" or "r":
             * "l": column flushed left
@@ -218,7 +218,7 @@ class Texttable:
         self._header_align = array
         return self
 
-    def set_cols_align(self, array):
+    def set_cols_align(self, array): #$$#
         """Set the desired columns alignment
         - the elements of the array should be either "l", "c" or "r":
             * "l": column flushed left
@@ -230,7 +230,7 @@ class Texttable:
         self._align = array
         return self
 
-    def set_cols_valign(self, array):
+    def set_cols_valign(self, array): #$$#
         """Set the desired columns vertical alignment
         - the elements of the array should be either "t", "m" or "b":
             * "t": column aligned on the top of the cell
@@ -242,7 +242,7 @@ class Texttable:
         self._valign = array
         return self
 
-    def set_cols_dtype(self, array):
+    def set_cols_dtype(self, array): #$$#
         """Set the desired columns datatype for the cols.
         - the elements of the array should be either a callable or any of
           "a", "t", "f", "e" or "i":
@@ -260,7 +260,7 @@ class Texttable:
         self._dtype = array
         return self
 
-    def set_cols_width(self, array):
+    def set_cols_width(self, array): #$$#
         """Set the desired columns width
         - the elements of the array should be integers, specifying the
           width of each column. For example:
@@ -292,26 +292,41 @@ class Texttable:
         self._width = array
         return self
 
-    def set_precision(self, width):
+    def set_precision(self, width): #$$#
         """Set the desired precision for float/exponential formats
         - width must be an integer >= 0
         - default value is set to 3
         """
 
-        if not type(width) is int or width < 0:
-            raise ValueError('width must be an integer greater then 0')
+        # commented because i want play list...
+
+        # if not type(width) is int or width < 0:
+        #     raise ValueError('width must be an integer greater then 0')
         self._precision = width
         return self
 
-    def header(self, array):
+    def header(self, array): #$$#
         """Specify the header of the table
         """
 
         self._check_row_size(array)
+        # print('array', array)
+
+        i=0
+
+        # extension for multiline header
+        for col in array:
+            if type(col)==list:
+                array[i] = [val if val!=None else '.' for val in array[i]]
+                array[i] = '\n'.join(array[i])
+            elif col==None:
+                array[i] = '.'
+            i+=1
+
         self._header = list(map(obj2unicode, array))
         return self
 
-    def add_row(self, array):
+    def add_row(self, array): #$$#
         """Add a row in the rows stack
         - cells can contain newlines and tabs
         """
@@ -327,11 +342,32 @@ class Texttable:
 
         cells = []
         for i, x in enumerate(array):
-            cells.append(self._str(i, x))
+
+            # add multiline cells
+            if type(x) in [list]:
+                nx = []
+                sub=0
+                for xj in x:
+                    if xj==None:
+                        nx += ['.']
+                    else:
+                        nx += [self._str(i, xj, sub)]
+                    sub += 1
+                x = '\n'.join(nx)
+                cells.append(x)
+
+            else:
+                # if value is None, then print dot
+                if x==None:
+                    x = '.'
+
+                cells.append(self._str(i, x))
+
         self._rows.append(cells)
+
         return self
 
-    def add_rows(self, rows, header=True):
+    def add_rows(self, rows, header=True): #$$#
         """Add several rows in the rows stack
         - The 'rows' argument can be either an iterator returning arrays,
           or a by-dimensional array
@@ -351,7 +387,7 @@ class Texttable:
             self.add_row(row)
         return self
 
-    def draw(self):
+    def draw(self): #$$#
         """Draw the table
         - the table is returned as a whole string
         """
@@ -389,7 +425,7 @@ class Texttable:
         return out[:-1]
 
     @classmethod
-    def _to_float(cls, x):
+    def _to_float(cls, x): #$$#
         if x is None:
             raise FallbackToText()
         try:
@@ -398,14 +434,14 @@ class Texttable:
             raise FallbackToText()
 
     @classmethod
-    def _fmt_int(cls, x, **kw):
+    def _fmt_int(cls, x, **kw): #$$#
         """Integer formatting class-method.
         - x will be float-converted and then used.
         """
         return str(int(round(cls._to_float(x))))
 
     @classmethod
-    def _fmt_float(cls, x, **kw):
+    def _fmt_float(cls, x, **kw): #$$#
         """Float formatting class-method.
         - x parameter is ignored. Instead kw-argument f being x float-converted
           will be used.
@@ -415,7 +451,7 @@ class Texttable:
         return '%.*f' % (n, cls._to_float(x))
 
     @classmethod
-    def _fmt_percent(cls, x, **kw):
+    def _fmt_percent(cls, x, **kw): #$$#
         """Float formatting class-method.
         - x parameter is ignored. Instead kw-argument f being x float-converted
           will be used.
@@ -425,7 +461,7 @@ class Texttable:
         return '%.*f %%' % (n, cls._to_float(x)*100)
 
     @classmethod
-    def _fmt_exp(cls, x, **kw):
+    def _fmt_exp(cls, x, **kw): #$$#
         """Exponential formatting class-method.
         - x parameter is ignored. Instead kw-argument f being x float-converted
           will be used.
@@ -435,7 +471,7 @@ class Texttable:
         return '%.*e' % (n, cls._to_float(x))
 
     @classmethod
-    def _fmt_Exp(cls, x, **kw):
+    def _fmt_Exp(cls, x, **kw): #$$#
         """Exponential engineering formatting class-method.
         - x parameter is ignored. Instead kw-argument f being x float-converted
           will be used.
@@ -451,12 +487,12 @@ class Texttable:
         return '%sE%s%s' % (x3, exp3_sign, exp3)
 
     @classmethod
-    def _fmt_text(cls, x, **kw):
+    def _fmt_text(cls, x, **kw): #$$#
         """String formatting class-method."""
         return obj2unicode(x)
 
     @classmethod
-    def _fmt_auto(cls, x, **kw):
+    def _fmt_auto(cls, x, **kw): #$$#
         """auto formatting class-method."""
         f = cls._to_float(x)
         if abs(f) > 1e8:
@@ -468,7 +504,7 @@ class Texttable:
                 fn = cls._fmt_float
         return fn(x, **kw)
 
-    def _str(self, i, x):
+    def _str(self, i, x, sub=None): #$$#
         """Handles string formatting of cell data
             i - index of the cell datatype in self._dtype
             x - cell data to format
@@ -483,8 +519,20 @@ class Texttable:
             't':self._fmt_text,
             }
 
+
         n = self._precision
+        if type(n) in [list]:
+            n = n[i]
+            if type(n) in [list]:
+                n = n[sub]
+
         dtype = self._dtype[i]
+
+        # print(dtype)
+        # add multiline dtype
+        if type(dtype)==list:
+            dtype = dtype[sub]
+
         try:
             if callable(dtype):
                 return dtype(x)
@@ -493,7 +541,7 @@ class Texttable:
         except FallbackToText:
             return self._fmt_text(x)
 
-    def _check_row_size(self, array):
+    def _check_row_size(self, array): #$$#
         """Check that the specified array fits the previous rows size
         """
 
@@ -503,43 +551,43 @@ class Texttable:
             raise ArraySizeError("array should contain %d elements" \
                 % self._row_size)
 
-    def _has_vlines(self):
+    def _has_vlines(self): #$$#
         """Return a boolean, if vlines are required or not
         """
 
         return self._deco & Texttable.VLINES > 0
 
-    def _has_hlines(self):
+    def _has_hlines(self): #$$#
         """Return a boolean, if hlines are required or not
         """
 
         return self._deco & Texttable.HLINES > 0
 
-    def _has_border(self):
+    def _has_border(self): #$$#
         """Return a boolean, if border is required or not
         """
 
         return self._deco & Texttable.BORDER > 0
 
-    def _has_header(self):
+    def _has_header(self): #$$#
         """Return a boolean, if header line is required or not
         """
 
         return self._deco & Texttable.HEADER > 0
 
-    def _hline_header(self):
+    def _hline_header(self): #$$#
         """Print header's horizontal line
         """
 
         return self._build_hline(True)
 
-    def _hline_special(self, symbol):
+    def _hline_special(self, symbol): #$$#
         """Print special's horizontal line
         """
 
         return self._build_hline(symbol=symbol)
 
-    def _hline(self):
+    def _hline(self): #$$#
         """Print an horizontal line
         """
 
@@ -547,7 +595,7 @@ class Texttable:
             self._hline_string = self._build_hline()
         return self._hline_string
 
-    def _build_hline(self, is_header=False, symbol=None):
+    def _build_hline(self, is_header=False, symbol=None): #$$#
         """Return a string used to separated rows or separate header from
         rows
         """
@@ -569,7 +617,7 @@ class Texttable:
             l += "\n"
         return l
 
-    def _len_cell(self, cell):
+    def _len_cell(self, cell): #$$#
         """Return the width of the cell
         Special characters are taken into account to return the width of the
         cell, such like newlines and tabs
@@ -587,7 +635,7 @@ class Texttable:
             maxi = max(maxi, length)
         return maxi
 
-    def _compute_cols_width(self):
+    def _compute_cols_width(self): #$$#
         """Return an array with the width of each column
         If a specific width has been specified, exit. If the total of the
         columns width exceed the table desired width, another width will be
@@ -626,7 +674,7 @@ class Texttable:
             maxi = newmaxi
         self._width = maxi
 
-    def _check_align(self):
+    def _check_align(self): #$$#
         """Check if alignment has been specified, set default one if not
         """
 
@@ -637,7 +685,7 @@ class Texttable:
         if not hasattr(self, "_valign"):
             self._valign = ["t"] * self._row_size
 
-    def _draw_line(self, line, isheader=False):
+    def _draw_line(self, line, isheader=False): #$$#
         """Draw a line
         Loop over a single cell length, over all the cells
         """
@@ -649,15 +697,26 @@ class Texttable:
             if self._has_border():
                 out += "%s " % self._char_vert
             length = 0
+
             for cell, width, align in zip(line, self._width, self._align):
                 length += 1
                 cell_line = cell[i]
+
+                # print('cell and line', cell, cell_line)
+                # print('align and i', align, i)
+
+                # add multiline cell align
+                if type(align)==list:
+                    align_line = align[i]
+                else:
+                    align_line = align
+
                 fill = width - len(cell_line)
                 if isheader:
-                    align = self._header_align[length - 1]
-                if align == "r":
+                    align_line = self._header_align[length - 1]
+                if align_line == "r":
                     out += fill * space + cell_line
-                elif align == "c":
+                elif align_line == "c":
                     out += (int(fill/2) * space + cell_line \
                             + int(fill/2 + fill%2) * space)
                 else:
@@ -667,7 +726,7 @@ class Texttable:
             out += "%s\n" % ['', space + self._char_vert][self._has_border()]
         return out
 
-    def _splitit(self, line, isheader):
+    def _splitit(self, line, isheader): #$$#
         """Split each element of line to fit the column width
         Each element is turned into a list, result of the wrapping of the
         string to the desired width
@@ -678,19 +737,45 @@ class Texttable:
 
         line_wrapped = []
         for cell, width, wrap in zip(line, self._width, self.wrap):
+            # print('cell, width, wrap',cell, width, wrap)
+
+
+            # TODO: multiline cell dont work with wrap
+            # wrap generate new line in cell, but cell still have only start count of halign
+            # wrap must extend self._align
+
             array = []
+
+            i = 0 # number of line, by split \n
             for c in cell.split('\n'):
                 if c.strip() == "":
                     array.append("")
                 else:
-                    if wrap:
-                        array.extend(textwrapper(c, width))
+
+                    # print(wrap)
+                    #
+                    # if type(wrap) in [list]:
+                    #     wrap_line = wrap[i]
+                    # else:
+                    wrap_line = wrap
+
+                    if wrap_line:
+                        wrapped_list = textwrapper(c, width)
+                        if len(wrapped_list)>1:
+                            pass
+                            # self._align[i].insert()
+                            # every one line can have otherone align...
+
+                        array.extend(wrapped_list)
                     else:
                         if len(c) > width:
                             array.extend([c[:width]])
                         else:
                             array.extend([c])
+                i+=1
             line_wrapped.append(array)
+
+
         max_cell_lines = reduce(max, list(map(len, line_wrapped)))
         for cell, valign in zip(line_wrapped, self._valign):
             if isheader:
@@ -706,7 +791,7 @@ class Texttable:
         return line_wrapped
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': #$#
     table = Texttable()
     table.set_cols_align(["l", "r", "c"])
     table.set_cols_valign(["t", "m", "b"])

@@ -1,180 +1,166 @@
 '''
 ------------------------------------------------------------------------------
-BCDR += ***** (parse) input data *****
+***** (parse) data *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
 Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
-    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
 
+from ..cunit.cunit import cunit
 from . import verrs
-from ..cunit import cunit
 
 
-#$ class parse
-class parse:
+data = {
+    'setts.id'         : {'t':[int,str,float]},
+    'setts.ttl'        : {'t':[str]},
 
-#$$ ________ organize ______________________________________________________ #
+    'mates.umate.ρ_o'  : {'u':'kg m**-3'},
+    'mates.umate.E_1'  : {'u':'Pa'},
+    'mates.umate.G_1'  : {'u':'Pa'},
+    'mates.umate.t_e'  : {'u':'°C**-1'},
 
-    #$$$ def run
-    def run(self, parse_mode, **kwargs):
-        '''
-        Prepare data to add into database.
-        '''
+    'usect.usecp.A'    : {'u':'m**2'},
+    'usect.usecp.A_y'  : {'u':'m**2'},
+    'usect.usecp.A_z'  : {'u':'m**2'},
+    'usect.usecp.A_1'  : {'u':'m**2'},
+    'usect.usecp.A_2'  : {'u':'m**2'},
+    'usect.usecp.Ι_y'  : {'u':'m**4'},
+    'usect.usecp.I_z'  : {'u':'m**4'},
+    'usect.usecp.I_t'  : {'u':'m**4'},
+    'usect.usecp.y_c'  : {'u':'m'},
+    'usect.usecp.z_c'  : {'u':'m'},
+    'usect.usecp.z_sc' : {'u':'m'},
+    'usect.usecp.y_sc' : {'u':'m'},
+    'usect.usecp.I_1'  : {'u':'m**4'},
+    'usect.usecp.I_2'  : {'u':'m**4'},
+    'usect.usecp.y_min': {'u':'m'},
+    'usect.usecp.y_max': {'u':'m'},
+    'usect.usecp.z_min': {'u':'m'},
+    'usect.usecp.z_max': {'u':'m'},
+    'usect.usecp.C_m'  : {'u':'m**6'},
+    'usect.usecp.C_ms' : {'u':'m**4'},
+    'usect.usecp.α'    : {'u':{}},
+    'usect.usecp.u'    : {'u':'m'},
+    'usect.usecp.m_g'  : {'u':'kg m**-1'},
 
-        # first parse data
-        kwargs = self.easy_cunit(**kwargs)
+    'usect.point.y'    : {'u':'m'},
+    'usect.point.z'    : {'u':'m'},
 
-        # if-block to detect work mode
-        if parse_mode == 1:
-            return self.prep_add(**kwargs)
+    'usect.tsect.h'    : {'u':'m'},
+    'usect.tsect.h_w'  : {'u':'m'},
+    'usect.tsect.t_w'  : {'u':'m'},
+    'usect.tsect.t_f_u': {'u':'m'},
+    'usect.tsect.b_f_u': {'u':'m'},
+    'usect.tsect.t_f_l': {'u':'m'},
+    'usect.tsect.b_f_l': {'u':'m'},
 
-        elif parse_mode == 2:
-            return self.prep_add_full(**kwargs)
+    'geomf.nodes.x'    : {'u':'m'},
+    'geomf.nodes.y'    : {'u':'m'},
+    'geomf.nodes.z'    : {'u':'m'},
 
-        elif parse_mode == 'update':
-            return self.prep_edit(**kwargs)
+    'loads.cates.γ_u'  : {'u':'m'},
+    'loads.cates.γ_f'  : {'u':'m'},
+    'loads.cates.γ_a'  : {'u':'m'},
+    'loads.cates.ψ_0'  : {'u':'m'},
+    'loads.cates.ψ_1'  : {'u':'m'},
+    'loads.cates.ψ_1s' : {'u':'m'},
+    'loads.cates.ψ_2'  : {'u':'m'},
+    'loads.cates.ttl'  : {'t':[str]},
+}
 
-        elif parse_mode == 'addm':
-            return self.prep_addm(**kwargs)
 
+
+def chdr(name, value):
+    '''
+    Check and drop. Validate value according to principles in data.
+    '''
+
+    # check type
+    if 't' in data[name] and value!=None:
+        if type(value) == cunit:
+            type_value = type(cunit._value)
         else:
-            verrs.f1ParseErorr(parse_mode)
+            type_value = type(value)
+
+        if type_value not in data[name]['t']:
+            verrs.BCDR_dbase_ERROR_Parse_Type(data[name]['t'])
 
 
-#$$ ________ parse data ____________________________________________________ #
+    # checks for cunit
+    if 'u' in data[name]:
+        if type(value)==cunit and data[name]['u']!=None:
+            value = value.drop(
+                units  = data[name]['u'],
+                fcover = True,
+                system = 'si',
+            )
 
-    #$$$ def easy-cunit
-    def easy_cunit(self, **kwargs):
-        # user input data as **kwargs, then loop over them
-        for key,val in kwargs.items():
-
-            # if data is cunit
-            if type(val)==cunit:
-                # then drop value due to SI system
-                kwargs[key] = val.drop(system='si')
-
-            # if data is list
-            elif type(val)==list:
-                # then loop over list and recursive call to parse method
-                kwargs[key] = [me.drop(system='si') if type(me) is cunit else me for me in val]
-
-            # if data is tuple
-            elif type(val)==tuple:
-                # the same like list
-                kwargs[key] = (me.drop(system='si') if type(me) is cunit else me for me in val)
-
-        # return parsed data
-        return kwargs
+    return value
 
 
-#$$ ________ prepare data __________________________________________________ #
 
-    #$$$ def prep-add
-    def prep_add(self, _data=None, **kwargs):
-        '''
-        Return an data prepare to use with self.dbase.add
-        '''
+#$ def get
+def get(name, value):
+    '''
+    Return cunit object with given value and unit according to data.
+    '''
 
-        # prepare string of cols names closed into square bracket with additional after commas
-        A = ''
-        for key in kwargs.keys():
-            A += f'[{key}],'
-
-        # delete last one comma (too much)
-        A = A[:-1]
-
-        # convert kwargs into tuple
-        # for key,val in kwargs.items():
-        #     if val is None and key in _data:
-        #             kwargs[key] = _data[key]
-        C = tuple([val if val is not None else '' for val in kwargs.values()])
-
-        # return cols and data
-        return A,C
+    if type(value)!=cunit and data[name]['u']!=None:
+        value = cunit.cc(value, data[name]['u'])
+    return value
 
 
-    #$$$ def prep-add-full
-    def prep_add_full(self, **kwargs):
-        '''
-        Return also string with noname, it use with hand parsing like:
-        eg. A,B,C = self.dbase.parse(id=id, name=name)
-            self.dbase.exe("INSERT INTO [011]" + A + " VALUES" + B ,C)
-        '''
-
-        # create col name
-        A = str(tuple(['['+str(key)+']' for key,val in kwargs.items()]))
-        A = A.replace('\'','')
-
-        # create ?,? list
-        B = str('('+('?,'*len(kwargs))[:-1]+')')
-
-        # convert kwargs into tuple
-        C = tuple([val for key,val in kwargs.items()])
-
-        # return cols, ?? and data
-        return A,B,C
 
 
-    #$$$ def prep-edit
-    def prep_edit(self, **kwargs):
-        '''
-        Use is if you write edit method. If somethink is none, then it is not in used.
-        '''
+#$ def adm
+def adm(cols, data, defs={}):
+    '''
+    Prepare data to multiadd command.
+    '''
 
-        J,C = '', []
+    ldict = []
 
-        for key,val in kwargs.items():
-            if val is not None:
-                J += f'[{key}] = ?,'
-                C.append(val)
+    #save length of cols header
+    cols_len = len(cols)
 
-        J = J[:-1]
-        C = tuple(C)
+    # loop over data row in data argument
+    for i in range(len(data)):
 
-        return J,C
+        # at first check consist of data, like length
+        # TODO: implement it
+        if len(data[i]) > cols_len:
+            verrs.f1ParseMultiError(len(data[i]), cols_len, data[i])
+        elif len(data[i]) < cols_len:
+            data[i] = [data[i][j] if j<len(data[i]) else None for j in range(cols_len)]
 
+        if type(data[i])==tuple:
+            data[i] = list(data[i])
 
-    #$$$ def prer-addm
-    def prep_addm(self, cols, data, defs={}):
-        ldict = []
+        idict = {}
+        # loop over data in row
+        for j in range(cols_len):
 
-        #save length of cols header
-        cols_len = len(cols)
+            # if factor of col is defined
+            if cols[j]+'+f' in defs:
+                # check that value is valid form to multiply
+                if type(data[i][j]) in [float,int,cunit]:
+                    data[i][j] *= defs[cols[j]+'+f']
 
-        # loop over data row in data argument
-        for i in range(len(data)):
+            # if default value of col is defined then replace None value
+            if cols[j]+'+d' in defs:
+                # then check that val is undefined (None)
+                if data[i][j] in [None]:
+                    # if it is, then replace it with default value
+                    data[i][j] = defs[cols[j]+'+d']
 
-            # at first check consist of data, like length
-            if len(data[i]) != cols_len:
-                verrs.f1ParseMultiError(len(data[i]), cols_len, data[i])
+            idict.update({cols[j]:data[i][j]})
 
-            idict = {}
-            # loop over data in row
-            for j in range(cols_len):
+        ldict.append(idict)
 
-                # if factor of col is defined
-                if cols[j]+'+f' in defs:
-                    # check that value is valid form
-                    if data[i][j] not in [True, False, None] and data[i][j]:
-                        # if value is valid then multiply it by factor
-                        # factor can consist of units
-                        # TODO: how to miss doubled unit by factor
-                        #       method should or not multiply cunit?
-                        data[i][j] *= defs[cols[j]+'+f']
+    return ldict
+    # return tuple(cols),ldict
 
-                # if default value of col is defined then replace None value
-                if cols[j]+'+d' in defs:
-                    # then check that val is undefined (None)
-                    if data[i][j] in [None]:
-                        # if it is, then replace it with default value
-                        data[i][j] = defs[cols[j]+'+d']
-
-                idict.update({cols[j]:data[i][j]})
-
-            ldict.append(idict)
-
-        return tuple(cols),ldict

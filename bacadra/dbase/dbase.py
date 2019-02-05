@@ -1,231 +1,482 @@
 '''
 ------------------------------------------------------------------------------
-BCDR += ***** (d)ata(base) ceneter *****
+***** bacadra (d)ata(base) *****
 ==============================================================================
-Database tools set, including table rdbse and parse functions.
 
-==============================================================================
+------------------------------------------------------------------------------
 Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
-    - Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
 
 import sqlite3
 
+from ..tools.setts import settsmeta
+from ..tools.fpack import translate
+
+from . import mdata
 from . import verrs
-from . import rdbse
-from . import parse
+from . import dlist
+
+
+#$ ____ class setts ________________________________________________________ #
+
+class setts(settsmeta):
+
+#$$ ________ def path ______________________________________________________ #
+
+    # path to database
+    # can be ":memory:" or just path to file, with extension!
+
+    __path = ':memory:'
+
+    @property
+    def path(self): return self.__path
+
+    @path.setter
+    def path(self, value):
+        if self.__save__: self.__path   = value
+        else:             self.__temp__ = value
+
+
+#$$ ________ def multithread _______________________________________________ #
+
+    __multithread = True
+
+    @property
+    def multithread(self): return self.__multithread
+
+    @multithread.setter
+    def multithread(self, value):
+        if self.__save__: self.__multithread = value
+        else:             self.__temp__ = value
+
+
+#$$ ________ def journal_mode ______________________________________________ #
+
+    __journal_mode = 'OFF'
+
+    @property
+    def journal_mode(self): return self.__journal_mode
+
+    @journal_mode.setter
+    def journal_mode(self, value):
+        if not value.lower() in ['delete', 'truncate', 'persist', 'memory', 'wal', 'off']:
+            verrs.BCDR_dbase_ERROR_General('e0111',
+                'Unsupported parameter of journal_mode!\n'
+                "Tip: try use 'delete' or 'truncate' or 'persist' or 'memory' or 'wal' or 'off'\n"
+                'Tip: https://www.sqlite.org/pragma.html#pragma_journal_mode'
+            )
+            value = value.upper()
+        if self.__save__: self.__journal_mode = value
+        else:             self.__temp__ = value
+
+
+#$$ ________ def auto_commit _______________________________________________ #
+
+    __auto_commit = True
+
+    @property
+    def auto_commit(self): return self.__auto_commit
+
+    @auto_commit.setter
+    def auto_commit(self, value):
+
+        if self.__save__: self.__auto_commit = value
+        else:             self.__temp__ = value
+
+
+#$$ ________ def asolve ____________________________________________________ #
+
+    __asolve = 'INSERT'
+
+    @property
+    def asolve(self): return self.__asolve
+
+    @asolve.setter
+    def asolve(self, value):
+
+        if value==None:
+            value = 'INSERT'
+        elif type(value)==str:
+            value = value.upper()
+        else:
+            raise ValueError('Unknow where type')
+
+        if value in ['INSERT OR REPLACE','REPLACE','IOR','R']:
+            value = 'INSERT OR REPLACE'
+
+        elif value in ['INSERT OR IGNORE','IGNORE','IOI','I']:
+            value = 'INSERT OR IGNORE'
+
+        else:
+            raise ValueError('Unknow where type')
+
+        if self.__save__: self.__asolve = value
+        else:             self.__temp__ = value
+
+
+
+
 
 
 #$ ____ class dbase ________________________________________________________ #
 
 class dbase:
     '''
-    Manage database SQLite3
+    Important links:
+    https://docs.python.org/3.7/library/sqlite3.html
     '''
 
+    # class setts
+    setts = setts('setts', (setts,), {})
+
+
+
     #$$ def __init__
-    def __init__(self):
-        self.path        = ':memory:' # can be ":memory:"
-        self.timeout     = 0.1        # None = lock will not interupt auto
-        self.multithread = True       # multithread connection to db
-                                      # please be becarefull - sql threat bool
-                                      # negattve as we do it
-        self.cb          = None       # database instant
-        self.db          = None       # cursor instant
-        self._connection = False      # flag (True|False) of database connection
-                                      # init state is False of course
+    def __init__(self, core=None):
 
-        self._scope = {}
+        self.core = core
 
-    @property
-    def scope(self):
-        return self._scope
+        # object setts
+        self.setts = self.setts('setts',(),{})
 
-    @scope.setter
-    def scope(self, value):
-        [self._scope.pop(key) for key in self._scope.keys()]
-        self._scope.update(value)
+        # sqlite3 connection
+        self.db = None
 
-    #$$ def --enter--
-    def __enter__(self):
-        return self
+        # sqlite3 connection.cursor
+        self.cr = None
 
-    #$$ def --exit--
-    def __exit__(self, type, value, traceback):
-        pass
+        # connection flags
+        # variable is False or string with connected database name
+        self._connQ = False
+
 
 
     #$$ def connect
-    def connect(self, path=None, clear=False):
+    def connect(self, path=None, clear=True):
         '''
-        Create database system.
+        Create and connect to database system.
         '''
 
-        # if user use path, then create local copy of db; otherwise :memory:
+        # if user type path, then set it as atribute
         if path:
-            # if user defined other extension than bcdr, then add it to name
-            if path[-5:] != '.bcdr':
-                path = path + '.bcdr'
-            # save name in object atribute
-            self.path = path
+            self.setts.path = path
 
+        # if connection is not established or other database was selected
+        if self._connQ != self.setts.path:
 
-        # first check if connection is established
-        if not self._connection:
-            # connect to database
-            # use timeomet and multithread options
-            self.cb = sqlite3.connect(
-                database          = self.path,
-                timeout           = self.timeout,
-                check_same_thread = self.multithread is False
+            # create sqlite.connection object
+            self.db = sqlite3.connect(
+                database          = self.setts.path,
+                timeout           = 0,
+                check_same_thread = not self.setts.multithread,
+                isolation_level   = None,
             )
-            self._connection = True
 
-            # create cursor object
-            self.db = self.cb.cursor()
+            # set connection flags as True
+            self._connQ = self.setts.path
+
+            # set row_factory
+            self.db.row_factory = sqlite3.Row
+
+            # create cursor instance
+            self.cr = self.db.cursor()
 
             # if clear is True, then redefine all table
             if clear:
-                self.delete_table()
+                self.interrupt()
+                self.cleardb()
+
+            # create tables if they not exists
+            self.create_system()
+
+        # if connection to current database is established and clear flags
+        elif clear:
+
+            # then redefine all table
+            self.cleardb()
 
             # create tables if they not exists
             self.create_system()
 
 
     #$$ def close
-    def close(self, save=True):
+    def close(self, commit=True, push_rstme=True):
         '''
-        Close connection to database. As defualt all changes will be commited (.save=True).
+        Close connection to database. As defualt all changes will be commited (.commit=True).
         '''
 
         # first check if connection is established
-        if self._connection:
-            if save:
-                self.save()
-            self.cb.close()
-            self._connection = False
+        if self._connQ:
+
+            # if commit flag is True
+            if commit==True:
+                # then commit journal
+                self.commit()
+
+            # close all links
+            self.interrupt()
+
+            # close database
+            self.db.close()
+
+            # change connection flag
+            self._connQ = False
+
+        else:
+
+            verrs.BCDR_dbase_WARN_Already_Closed()
+
+        if self.core and push_rstme:
+            self.core.pinky.rstme.push()
 
 
-    #$$ def clear-lock
-    def clear_lock(self):
+    #$$ def commit
+    def commit(self):
         '''
-        Clear lock of database. Locks occure if last quary was start and not finished yet (eg. side effects of python exception). Locks occure if dbase.timeout is set to None - then automaticly lock removes is disabled.
+        Commit changes.
         '''
-        # first check if connection is established
-        if not self._connection:
-            self.cb.interrupt()
+
+        # check if connection is established
+        self._check_connection()
+
+        # commit journal files
+        self.db.commit()
+
+
+
+    #$$ def _check_connection
+    def _check_connection(self):
+        '''
+        Raise ERROR if connection is not established.
+        '''
+
+        # if connection is not established
+        if not self._connQ:
+
+            # then raise error with tips
+            verrs.BCDR_dbase_ERROR_Open_Database()
+
+    #$$ def interrupt
+    def interrupt(self):
+        self.db.interrupt()
 
 
     #$$ def exe
-    def exe(self, code, data=None):
+    def exe(self, mode, code, data=None, auto_commit=None):
         '''
+        mode='r'
         Execution of single query. The method provide security interface with (?,?,?) and (a,b,c) data.
-        '''
-        self._check_connection()
 
-        if data:
-            self.db.execute(code, data)
-        else:
-            self.db.execute(code)
-
-
-    #$$ def exem
-    def exem(self, code, data=None):
-        '''
+        mode='m'
         Execution of single query. The method provide security interface with (?,?,?) and (a,b,c) data. Data should be inserted in list, as [(a,b), (c,d)].
-        '''
-        self._check_connection()
-        self.db.executemany(code, data)
 
-
-    #$$ def exes
-    def exes(self, code):
-        '''
+        mode='s'
         Execution of multi querys. Query must be sepparated by ";" symbol.
         '''
+
+        # check if connection is established
         self._check_connection()
-        self.db.executescript(code)
+
+        auto_commit = self.setts.check_loc('auto_commit', auto_commit)
+
+        if mode=='r' and data:
+            self.cr.execute(code, data)
+
+        elif mode=='r':
+            self.cr.execute(code)
+
+        elif mode=='m':
+            self.cr.executemany(code, data)
+
+        elif mode=='s':
+            self.cr.executescript(code)
+
+        else:
+            verrs.BCDR_dbase_ERROR_General('e0110',
+                'Undefined transaction mode!\n'
+                "Tip: use 'r', 'm' or 's'"
+            )
+
+        self.commit()
+
+
+    #$$ def add
+    def add(self, mode, table, cols, data, asolve=None):
+        '''
+        mode='r'
+        Add data into system. Dev need to provide information about table, list of oclumns and data tuple eg. (a,b).
+
+        mode='m'
+        Add many data into system. Dev need to provide information about table, list of column and data list eg. [(a,b),(c,d)].
+        '''
+
+        # connection is checked in exe method
+
+        asolve = self.setts.check_loc('asolve', asolve)
+
+        # if user type cols name as one string, then divide it into list
+        if type(cols) == str:
+
+            cols = cols.split(',')
+
+        # create noname vector
+        cole = ','.join(['?' for col in range(len(cols))])
+
+        # add bracket to column names
+        cols = [col if col[0]=='[' else '['+col+']' for col in cols]
+
+        # join to string form
+        cols = ','.join(cols)
+
+        # call to exe method
+        self.exe(
+            code = f"{self.setts.asolve} INTO {table}({cols}) VALUES({cole})",
+            data = data,
+            mode = mode,
+        )
+
 
 
     #$$ def get
-    def get(self, code):
+    def get(self, mode, table, cols=None, where=None, join=None, formula=1):
         '''
-        Get data from database. Dev need to write query with SELECT base. The data will be fetched in all quantity.
+        mode='s'
         '''
-        self._check_connection()
-        return self.db.execute(code).fetchall()
+
+        # connection is checked in exe method
+
+        # prepare tables
+        if type(table)==list:
+            table = ','.join(table)
+        elif type(table)==str:
+            pass
+        else:
+            raise ValueError('Unknow where type')
+
+        # prepare where
+        if where==None:
+            where = ''
+        elif type(where)==list:
+            where = 'where ' + ' AND '.join(['('+row+')' for row in where])
+        elif type(where)==str:
+            where = 'where ' + where
+        else:
+            raise ValueError('Unknow where type')
+
+        # prepare joins
+        if join==None:
+            join = ''
+        elif type(join)==list:
+            join = ' '.join(join)
+        elif type(where)==str:
+            pass
+        else:
+            raise ValueError('Unknow where type')
 
 
-    def add(self, table, cols, data):
-        '''
-        Add data into system. Dev need to provide information about table, list of oclumns and data tuple eg. (a,b).
-        '''
-        self._check_connection()
-        cols_noname = ''.join(['?,' for col in cols.split(',')])[:-1]
-        self.exe(f"INSERT INTO {table}({cols}) VALUES({cols_noname})", data)
+        # prepare columns
+        if cols==None:
+            cols = '*'
+        elif type(cols) == list:
+            cols = ','.join(cols)
+        elif type(cols)==str:
+            pass
+        else:
+            raise ValueError()
+
+        # select statment
+        if formula==1:
+            self.exe('r',f'''
+                SELECT {cols} from {table} {join} {where}
+            ''')
+
+        elif formula==2:
+            self.exe('r', f'''
+                SELECT * FROM (SELECT {cols} from {table} {join}) {where}
+            ''')
+
+        else:
+            raise ValueError()
 
 
-    def addm(self, table, cols, data):
-        '''
-        Add many data into system. Dev need to provide information about table, list of column and data list eg. [(a,b),(c,d)].
-        '''
-        self._check_connection()
-        cols_noname = ''.join(['?,' for col in cols.split(',')])[:-1]
-        self.exem(f"INSERT INTO {table}({cols}) VALUES({cols_noname})", data)
+        if  mode=='+':
+            return self.cr
 
+        elif mode=='r':
+            return self.cr.fetchone()
 
+        elif mode=='m':
+            return self.cr.fetchall()
+
+        elif mode=='s':
+            return self.cr.fetchone()[0]
+
+        else:
+            raise ValueError()
+
+    #$$ def obj
+    obj = mdata.obj
+
+    #$$ def edit
     def edit(self, table, cols, data, where):
         '''
         Edit data into system. Dev need to provide information about table, list of oclumns, data list and WHERE statment.
         '''
+
+        # check if connection is established
         self._check_connection()
-        self.exe(f"UPDATE {table} SET {cols} WHERE {where}", data)
+
+        self.exe(
+            code = f"UPDATE {table} SET {cols} WHERE {where}",
+            data = data,
+            mode = 'r',
+        )
 
 
-    #$$ def save
-    def save(self):
-        '''
-        Commit changes.
-        '''
-        self._check_connection()
-        self.cb.commit()
-
-
-    #$$ def delete-table
-    def delete_table(self, mode=1):
-        '''
-        Delete data in database
-        '''
-        self._check_connection()
-        if mode==1:
-            res = self.db.execute(
-                "SELECT name FROM sqlite_master WHERE type='table'")
-            res = res.fetchall()
-            for name in res:
-                name = name[0]
-                code = f'DROP TABLE IF EXISTS [{name}];'
-                self.exe(code)
-
-    #$$ def clear-all
-    def clear_all(self):
-        self.delete_table(mode=1)
-
-    #$$ def create-system
+    #$$ def create_system
     def create_system(self):
+
+        code = translate(dlist.sql_tables,
+        {
+            '$<journal_mode>$':self.setts.journal_mode,
+        })
+
+        self.exe(code=code, mode='s')
+
+
+    #$$ def cleardb
+    def cleardb(self):
         '''
-        Call to rdbse class in rdbse.py file.
+        Delete data in database.
+
+        Here is small tutorial about drop table, pragma statment involved.
+        http://www.sqlitetutorial.net/sqlite-drop-table/
         '''
+
+        # check if connection is established
         self._check_connection()
-        self.exes(rdbse.rdbse.code)
 
-    #$$ def parse
-    @staticmethod
-    def parse(parse_mode=1, **kwargs):
-        return parse.parse().run(parse_mode=parse_mode, **kwargs)
+        # get all existed tables
+        res = self.db.execute(
+            "SELECT name FROM sqlite_master WHERE type='table'")
 
-    #$$ def -check-connection
-    def _check_connection(self):
-        if not self._connection:
-            verrs.openDatabaseError()
+        # fetchall thems
+        res = res.fetchall()
+
+        # create code
+        code = 'PRAGMA foreign_keys = OFF;'
+        for name in res:
+            code += f'DROP TABLE [{name[0]}];'
+        code += 'PRAGMA foreign_keys = ON;'
+
+        # drop it
+        self.exe(code = code,mode = 's')
+
+        # self.exe('s','''
+        #     SQLITE_DBCONFIG_RESET_DATABASE=1;
+        #     VACUUM;
+        #     SQLITE_DBCONFIG_RESET_DATABASE=0;
+        # ''')
