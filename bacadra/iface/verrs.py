@@ -10,30 +10,24 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
-from .verre  import BCDR_ERRS,BCDR_WARN,BCDR_INFO
-
+from ..tools.verre import BCDR_ERRS,BCDR_WARN,BCDR_INFO
 
 #$ ____ errors _____________________________________________________________ #
 
-class BCDR_tools_ERROR(BCDR_ERRS):
+class BCDR_project_ERROR(BCDR_ERRS):
     pass
-
-def BCDR_tools_ERROR_General(code, text):
-    BCDR_tools_ERROR(code, text)
-
 
 #$ ____ warnings ___________________________________________________________ #
 
-class BCDR_tools_WARN(BCDR_WARN):
+class BCDR_project_WARN(BCDR_WARN):
     pass
-
-def BCDR_tools_WARN_General(code, text):
-    BCDR_tools_WARN(code, text)
 
 #$ ____ infos ______________________________________________________________ #
 
-class BCDR_tools_INFO(BCDR_INFO):
+class BCDR_project_INFO(BCDR_INFO):
     pass
 
-def BCDR_tools_INFO_General(code, text):
-    BCDR_tools_INFO(code, text)
+def BCDR_project_INFO_Scope(id):
+    BCDR_project_INFO('i0011',
+        f'The scope selector change to new id <{id}>.'
+    )

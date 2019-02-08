@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------------
 Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
-Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
++ Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
 
@@ -237,32 +237,6 @@ class setts(settsmeta):
         else:             self.__temp__ = value
 
 
-
-
-#$$ ________ def ssel ______________________________________________________ #
-
-    __ssel  = 0   # select scope bank
-
-    # @property
-    # def ssel(self):
-    #     return self.__ssel
-    #
-    # @ssel.scope
-    # def ssel(self, id):
-    #     '''
-    #     Selector of scope variable. 0-9.
-    #     '''
-    #
-    #     if type(id) not in [int,bool]:
-    #         verrs.BCDR_pinky_texme_ERROR_Type_Check(type(id), 'int,bool')
-    #
-    #     if id==True:
-    #         id = 0
-    #
-    #     if self.__save__: self.__ssel = id
-    #     else:             self.__temp__ = id
-
-
 #$$ ________ def scope _____________________________________________________ #
 
     _scope = [{}]*10 # turn off it to printng, to long...
@@ -376,7 +350,7 @@ class setts(settsmeta):
 
     @property
     def label(self):
-            return self.__label
+        return self.__label
 
     @label.setter
     def label(self, value):
@@ -389,9 +363,11 @@ class setts(settsmeta):
         '''
 
         if value == True:
-            ndict = {'h':True, 'p':True, 'f':True}
+            ndict = {'h':True, 'p':True, 'f':True, 'c':False}
+
         elif value == False:
-            ndict = {'h':False, 'p':False, 'f':True}
+            ndict = {'h':False, 'p':False, 'f':True, 'c':False}
+
         elif type(value) is dict:
             ndict = self.__label.copy()
             for key,val in value.items():
@@ -564,48 +540,46 @@ class setts(settsmeta):
         else:             self.__temp__ = value
 
 
-#$$ ________ def head_lvl_inc ______________________________________________ #
+#$$ ________ def hlvl_inc __________________________________________________ #
 
-    __head_lvl_inc = 0
+    __hlvl_inc = 0
 
     @property
-    def head_lvl_inc(self):
-            return self.__head_lvl_inc
+    def hlvl_inc(self):
+            return self.__hlvl_inc
 
-    @head_lvl_inc.setter
-    def head_lvl_inc(self, value):
+    @hlvl_inc.setter
+    def hlvl_inc(self, value):
         '''
         '''
 
         if type(value) is not int:
             verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'int')
 
-        if self.__save__: self.__head_lvl_inc = value
+        if self.__save__: self.__hlvl_inc = value
         else:             self.__temp__ = value
 
 
 
-#$$ ________ def item_1c_width _____________________________________________ #
+#$$ ________ def iwidth ____________________________________________________ #
 
-    __item_1c_width = 70
+    __iwidth = 70
 
     @property
-    def item_1c_width(self):
-            return self.__item_1c_width
+    def iwidth(self):
+            return self.__iwidth
 
-    @item_1c_width.setter
-    def item_1c_width(self, value):
+    @iwidth.setter
+    def iwidth(self, value):
         '''
         '''
 
         if value==True:
-            return 70
-        elif type(value) in [int]:
-            return value
-        else:
+            value = 70
+        elif type(value) not in [int]:
             verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'int,True')
 
-        if self.__save__: self.__item_1c_width = value
+        if self.__save__: self.__iwidth = value
         else:             self.__temp__ = value
 
 
@@ -733,7 +707,7 @@ class texme:
 
         # get default parametrs by test if None
         # do not test it in every generate method!!!
-        inherit = self.setts.check_loc('inherit', inherit)
+        inherit = self.setts.check('inherit', inherit)
 
         # base on iherit methods then return or add code
         if inherit is True:
@@ -748,7 +722,7 @@ class texme:
 
         # depend on setting echo in "t" print code or not
         # do not test it in every generate method!!!
-        if '+' in self.setts.check_loc('echo', echo):
+        if '+' in self.setts.check('echo', echo):
             print(f'[pinky.texme.{submodule}]\n{code}')
 
 
@@ -958,7 +932,7 @@ class texme:
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.check_loc('active', active):
+        if not self.setts.check('active', active):
             return
 
         # prepare template to replace blocks
@@ -1013,7 +987,7 @@ class texme:
 
 #$$$ ____________ def page _________________________________________________ #
 
-    def page(self, mode, val1=None, inherit=None, echo=None):
+    def page(self, mode, val1=None, active=None, inherit=None, echo=None):
         '''
         Check reference:
 
@@ -1024,15 +998,24 @@ class texme:
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.check_loc('active'): return
+        if not self.setts.check('active', active): return
 
-        if mode in ['cpage', 'cp', 'clearpage']:
+        if inherit in ['beg','end']:
+            if type(mode) in [tuple, list]:
+                if len>1: val1 = mode[1]
+                if len>2: val2 = mode[2]
+                mode = mode[0]
+
+        if mode in [None]:
+            code=None
+
+        elif mode in ['clearpage', 'cp']:
             '''
             Clearpage statment break page and block range for float items.
             '''
             code = r'\clearpage'
 
-        elif mode in ['cdpage', 'cdp', 'cleardoublepage']:
+        elif mode in ['cleardoublepage', 'cdp']:
             '''
             Clearpage statment break page and block range for float items.
             '''
@@ -1044,32 +1027,37 @@ class texme:
             '''
             code = r'\newpage'
 
-        elif mode in ['bpage', 'bp', 'breakpage', 'pagebreak']:
+        elif mode in ['pagebreak', 'pb']:
             code = r'\pagebreak'
 
-        elif mode in ['gpage', 'gp', 'goodbreak']:
+        elif mode in ['goodbreak', 'gp']:
             code = r'\goodbreak'
 
-        elif mode in ['anpb-b', 'absolutelynopagebreak-b']:
+        elif mode in ['absolutelynopagebreak-b', 'anpbb', 'ab']:
             code = r'\begin{absolutelynopagebreak}'
 
-        elif mode in ['anpb-e', 'absolutelynopagebreak-e']:
+        elif mode in ['absolutelynopagebreak-e', 'anpbe', 'ae']:
             code = r'\end{absolutelynopagebreak}'
 
-        elif mode in ['vs', 'vspace']:
+        elif mode in ['vspace', 'vs']:
             code = r'\vspace*{'+val1+'}'
 
         elif mode in ['newline', 'nl']:
             code = r'\newline'
-
-        elif mode in [None]:
-            return
 
         else:
             verrs.BCDR_pinky_texme_ERROR_General(
                 'e0625', 'Unknow mode of page method!\n'
                 'Tip: look into manual...'
             )
+
+        if inherit=='beg':
+            inherit = True
+            code    = (code + '\n' if code else '')
+
+        elif inherit=='end':
+            inherit = True
+            code    = ('\n'+ code if code else '')
 
         return self.add(
             submodule = 'page',
@@ -1079,63 +1067,65 @@ class texme:
         )
 
 
+
+
+
+
+
 #$$$ ____________ def text _________________________________________________ #
 
-    def text(self, text, rx=None, strip=True, inherit=None, echo=None, page=None, scope=None):
+    def text(self, text, rx=None, strip=True, active=None, inherit=None, echo=None, pbeg=None, pend=None, scope=None):
         '''
         Add formated text to tex document. Text can be striped and filter regme changed.
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.check_loc('active'): return
-
-        # use global settings
-        scope = self.setts.check_loc('scope', scope)
-        rx = self.setts.check_loc('rx', rx, 'xt')
+        if not self.setts.check('active', active): return
 
         # if page is typed
-        if type(page) in [str]:
-            self.page(page)
-        elif type(page) in [tuple]:
-            self.page(page[0])
+        pbeg = self.page(pbeg, inherit='beg')
+        pend = self.page(pend, inherit='end')
+
+        # use global settings
+        scope = self.setts.check('scope', scope)
+        rx = self.setts.check('rx', rx, 'xt')
 
         # use filter regme
         code = regme(text, scope, rx)
 
         # strip begind and end of text
-        if strip:
-            code = code.strip()
+        if strip: code = code.strip()
 
         return self.add(
             submodule = 'x',
-            code      = code,
+            code      = pbeg+code+pend,
             inherit   = inherit,
             echo      = echo,
         )
+
+
     x = text
 
 
 #$$$ ____________ def head _________________________________________________ #
 
-    def head(self, lvl, text, label=None, text2=None, rx=None, without_number=False, minitoc=None, inherit=None, echo=None, page=None, scope=None):
+    def head(self, lvl, text, label=None, text2=None, rx=None, without_number=False, minitoc=None, active=None, inherit=None, echo=None, pbeg=None, pend=None, scope=None):
         '''
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.check_loc('active'): return
-
-        # use global settings
-        scope = self.setts.check_loc('scope', scope)
-        echo    = self.setts.check_loc('echo'   , echo)
-        label   = self.setts.check_loc('label'  , label, 'h')
-        rx      = self.setts.check_loc('rx'     , rx,    'ht')
-        minitoc = self.setts.check_loc('minitoc', minitoc)
+        if not self.setts.check('active', active): return
 
         # if page is typed
-        if type(page) in [str]:
-            self.page(page)
-        elif type(page) in [tuple]:
-            self.page(page[0])
+        pbeg = self.page(pbeg, inherit='beg')
+        pend = self.page(pend, inherit='end')
+
+        # use global settings
+        scope   = self.setts.check('scope'  , scope         )
+        echo    = self.setts.check('echo'   , echo          )
+        label   = self.setts.check('label'  , label   , 'h' )
+        rx      = self.setts.check('rx'     , rx      , 'ht')
+        minitoc = self.setts.check('minitoc', minitoc       )
 
         # use filter regme
         text = regme(text, scope, rx)
@@ -1155,8 +1145,7 @@ class texme:
         else:
             without_number = ''
 
-
-        nlvl = lvl+self.setts.head_lvl_inc
+        nlvl = lvl+self.setts.hlvl_inc
 
         if nlvl == -1:
             tex = '\\part' + without_number + '%2{%1} ' + lab
@@ -1185,7 +1174,7 @@ class texme:
 
         else:
             verrs.BCDR_pinky_texme_ERROR_Header_Level(
-                nlvl,self.setts.head_lvl_inc)
+                nlvl,self.setts.hlvl_inc)
 
         if text2:
             text2 = '[' + regme(text2, scope, rx) + ']'
@@ -1208,12 +1197,9 @@ class texme:
 
             display(HTML(source.strip()))
 
-        if type(page) in [tuple]:
-            self.page(page[1])
-
         return self.add(
             submodule = 'h' + str(lvl),
-            code      = code,
+            code      = pbeg+code+pend,
             inherit   = inherit,
             echo      = echo,
         )
@@ -1223,28 +1209,24 @@ class texme:
 
 #$$$ ____________ def pic __________________________________________________ #
 
-    def pic(self, path, caption=False, label=None, float=None, abs_path=False, frame=True, grey_scale=False, caption2=False, rxc=None, width_factor=1, height_factor=0.9, mode='fig', pic_root=None, pic_error=True, inherit=None, echo=None, page=None, scope=None):
+    def pic(self, path, caption=False, label=None, float=None, abs_path=False, frame=True, grey_scale=False, caption2=False, rxc=None, width_factor=1, height_factor=0.9, mode='fig', pic_root=None, pic_error=True, active=None, inherit=None, echo=None, pbeg=None, pend=None, scope=None):
         '''
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.check_loc('active'): return
-
-        # use global settings
-        scope = self.setts.check_loc('scope', scope)
-        echo      = self.setts.check_loc('echo', echo)
-        label     = self.setts.check_loc('label', label,'p')
-        rx        = self.setts.check_loc('rx', rxc, 'pc')
-        float     = self.setts.check_loc('float', float,'p')
-        pic_root  = self.setts.check_loc('pic_root',pic_root)
+        if not self.setts.check('active', active): return
 
         # if page is typed
-        if type(page) in [str]:
-            self.page(page)
-        elif type(page) in [tuple]:
-            self.page(page[0])
+        pbeg = self.page(pbeg, inherit='beg')
+        pend = self.page(pend, inherit='end')
 
-        # path = path.replace('/','\\')
+        # use global settings
+        scope    = self.setts.check('scope'   , scope         )
+        echo     = self.setts.check('echo'    , echo          )
+        label    = self.setts.check('label'   , label   , 'p' )
+        rx       = self.setts.check('rx'      , rxc     , 'pc')
+        float    = self.setts.check('float'   , float   , 'p' )
+        pic_root = self.setts.check('pic_root', pic_root      )
 
         # save inputed path
         user_path = path
@@ -1451,8 +1433,7 @@ class texme:
 #
 
         else:
-            pass
-            # raise ValueError('unknown mode atribute, allowed are: "fig", "tab", "lst"')
+            raise ValueError('unknown mode atribute, allowed are: "fig", "tab", "lst"')
 
 
         if 'p' in echo:
@@ -1460,12 +1441,9 @@ class texme:
                 pathA, width=self.setts.pic_diswidth
             ))
 
-        if type(page) in [tuple]:
-            self.page(page[1])
-
         return self.add(
             submodule = _name1,
-            code      = code,
+            code      = pbeg+code+pend,
             inherit   = inherit,
             echo      = echo,
         )
@@ -1474,32 +1452,30 @@ class texme:
 
 #$$$ ____________ def math _________________________________________________ #
 
-    def math(self, equation, mode='i', label=None, rxe=None, rxt=None, exe=False, strip=True, inherit=None, echo=None, page=None, scope=None):
+    def math(self, equation, mode='i', label=None, rxe=None, rxt=None, exe=False, strip=True, active=None, inherit=None, echo=None, pbeg=None, pend=None, scope=None):
         '''
         Please remember about problem with equation block - there is fault working labels. To fix it use gather instead equation block. \\leavemode should fix it, but it is not tested yet.
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.check_loc('active'): return
-
-        # if page is typed
-        if type(page) in [str]:
-            self.page(page)
-        elif type(page) in [tuple]:
-            self.page(page[0])
-
-        # use global settings
-        scope = self.setts.check_loc('scope', scope)
-        echo      = self.setts.check_loc('echo'   , echo)
-        rxe       = self.setts.check_loc('rx'     , rxe, 'me')
-        rxt       = self.setts.check_loc('rx'     , rxt, 'mt')
+        if not self.setts.check('active', active): return
 
         # if given is list, then return self looped
         if type(equation)==list:
             if type(mode)==list:
-                return [self.math(eq1, m1, label, rxe, rxt, exe, inherit, echo) for eq1,m1 in zip(equation, mode)]
+                return [self.math(equation=eq, mode=mo, label=label, rxe=rxe, rxt=rxt, exe=exe, strip=strip, active=active, inherit=inherit, echo=echo, pbeg=pbeg, pend=pend, scope=scope) for eq,mo in zip(equation, mode)]
             else:
-                return [self.math(eq1, mode, label, rxe, rxt, exe, inherit, echo) for eq1 in equation]
+                return [self.math(equation=eq, mode=mode, label=label, rxe=rxe, rxt=rxt, exe=exe, strip=strip, active=active, inherit=inherit, echo=echo, pbeg=pbeg, pend=pend, scope=scope) for eq in equation]
+
+        # if page is typed
+        pbeg = self.page(pbeg, inherit='beg')
+        pend = self.page(pend, inherit='end')
+
+        # use global settings
+        scope = self.setts.check('scope', scope)
+        echo  = self.setts.check('echo'   , echo)
+        rxe   = self.setts.check('rx'     , rxe, 'me')
+        rxt   = self.setts.check('rx'     , rxt, 'mt')
 
         if strip:
             equation = equation.strip()
@@ -1513,7 +1489,7 @@ class texme:
 
             return self.add(
                 submodule = 'm',
-                code      = code,
+                code      = pbeg+code+pend,
                 inherit   = inherit,
                 echo      = echo,
             )
@@ -1574,12 +1550,9 @@ class texme:
                 '$'+regme(equation, scope, 99)+'$'
             ))
 
-        if type(page) in [tuple]:
-            self.page(page[1])
-
         return self.add(
             submodule = 'm',
-            code      = code,
+            code      = pbeg+code+pend,
             inherit   = inherit,
             echo      = echo,
         )
@@ -1589,25 +1562,23 @@ class texme:
 
 #$$$ ____________ def tab __________________________________________________ #
 
-    def tab(self, cols, data, options='\\textwidth', caption=None, label=None, float=False, header=None, stretchV=1.5, rxc=None, rxd=None, inherit=None, echo=None, page=None, scope=None):
+    def tab(self, cols, data, options=r'\textwidth', caption=None, label=None, float=False, header=None, stretchV=1.5, rxc=None, rxd=None, active=None, inherit=None, echo=None, pbeg=None, pend=None, scope=None):
         '''
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.check_loc('active'): return
-
-        # use global settings
-        scope = self.setts.check_loc('scope', scope)
-        echo      = self.setts.check_loc('echo'   , echo)
-        float     = self.setts.check_loc('float'  , float)['t']
-        rxd       = self.setts.check_loc('rx'     , rxc, 'tc')
-        rxd       = self.setts.check_loc('rx'     , rxd, 'td')
+        if not self.setts.check('active', active): return
 
         # if page is typed
-        if type(page) in [str]:
-            self.page(page)
-        elif type(page) in [tuple]:
-            self.page(page[0])
+        pbeg = self.page(pbeg, inherit='beg')
+        pend = self.page(pend, inherit='end')
+
+        # use global settings
+        scope = self.setts.check('scope'  , scope      )
+        echo  = self.setts.check('echo'   , echo       )
+        float = self.setts.check('float'  , float, 't' )
+        rxd   = self.setts.check('rx'     , rxc  , 'tc')
+        rxd   = self.setts.check('rx'     , rxd  , 'td')
 
         if caption:
             if label:
@@ -1654,9 +1625,6 @@ class texme:
         elif float == 'H':
             tex = '\\begin{table}[H]\n' + tex + '\n\\end{table}'
 
-        if type(page) in [tuple]:
-            self.page(page[1])
-
         return self.add(
             submodule = 't',
             code      = tex,
@@ -1668,27 +1636,25 @@ class texme:
 
 #$$$ ____________ def code _________________________________________________ #
 
-    def code(self, code, caption='', label='', style=None, language=None, rxe=None, rxc=None, strip=True, mathescape=True, inherit=None, echo=None, page=None, scope=None, rst=False):
+    def code(self, code, caption='', label='', style=None, language=None, rxe=None, rxc=None, strip=True, mathescape=True, active=None, inherit=None, echo=None, pbeg=None, pend=None, scope=None, rst=False):
         '''
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.check_loc('active'): return
-
-        # use global settings
-        scope = self.setts.check_loc('scope', scope)
-        echo = self.setts.check_loc('echo',echo)
-        label = self.setts.check_loc('label',label,'c')
-        rxe = self.setts.check_loc('rx', rxe,'ce')
-        rxc = self.setts.check_loc('rx', rxc,'cc')
-        style = self.setts.check_loc(
-            'lststyle', style if rst==False else 'bcdr_rst_tables')
+        if not self.setts.check('active', active): return
 
         # if page is typed
-        if type(page) in [str]:
-            self.page(page)
-        elif type(page) in [tuple]:
-            self.page(page[0])
+        pbeg = self.page(pbeg, inherit='beg')
+        pend = self.page(pend, inherit='end')
+
+        # use global settings
+        scope = self.setts.check('scope', scope      )
+        echo  = self.setts.check('echo' , echo       )
+        label = self.setts.check('label', label, 'c' )
+        rxe   = self.setts.check('rx'   , rxe  , 'ce')
+        rxc   = self.setts.check('rx'   , rxc  , 'cc')
+        style = self.setts.check(
+            'lststyle', style if rst==False else 'bcdr_rst_tables')
 
         if mathescape:
             var1 = ', mathescape'
@@ -1756,9 +1722,6 @@ class texme:
 
             _name1='c-text'
 
-        if type(page) in [tuple]:
-            self.page(page[1])
-
         return self.add(
             submodule = _name1,
             code      = tex,
@@ -1769,23 +1732,21 @@ class texme:
 
 
 
-    def file(self, path, caption=None, label=None, first_line=0, last_line=1e10, absolute_path=False, language='Python', rxe=0, inherit=None, echo=None, page=None, scope=None):
+    def file(self, path, caption=None, label=None, first_line=0, last_line=1e10, absolute_path=False, language='Python', rxe=0, active=None, inherit=None, echo=None, pbeg=None, pend=None, scope=None):
         '''
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.check_loc('active'): return
+        if not self.setts.check('active', active): return
 
         # use global settings
-        scope = self.setts.check_loc('scope', scope)
-        label     = self.setts.check_loc('label'  , label, 'f')
-        rxe       = self.setts.check_loc('rx'     , rxe, 'fe')
+        scope = self.setts.check('scope', scope      )
+        label = self.setts.check('label', label, 'f' )
+        rxe   = self.setts.check('rx'   , rxe  , 'fe')
 
         # if page is typed
-        if type(page) in [str]:
-            self.page(page)
-        elif type(page) in [tuple]:
-            self.page(page[0])
+        pbeg = self.page(pbeg, inherit='beg')
+        pend = self.page(pend, inherit='end')
 
         if language:
             var2 = ',language={' + language + '}'
@@ -1812,9 +1773,6 @@ class texme:
         tex = tex.replace('%5', var2)
         tex = tex.replace('%6', path.replace('\\', '/'))
 
-        if type(page) in [tuple]:
-            self.page(page[1])
-
         return self.add(
             submodule = 'f',
             code      = tex,
@@ -1826,25 +1784,23 @@ class texme:
 
 #$$$ ____________ def item _________________________________________________ #
 
-    def item(self, text=None, equation=None, mode='i', lmath=None, label=None, width=None, level=1, prefix='*', postfix=':', rxt=None, rxe=None, exe=False, col_l=None, col_r=None, inherit=None, echo=None, page=None, scope=None):
+    def item(self, text=None, equation=None, mode='i', lmath=None, label=None, width=None, level=1, prefix='*', postfix=':', rxt=None, rxe=None, exe=False, col_l=None, col_r=None, active=None, inherit=None, echo=None, pbeg=None, pend=None, scope=None):
         '''
         Column type must can defined explicit size in length dimension (like p{50mm} (or q,w,e).
         '''
 
         # if user want to overwrite global active atribute
-        if not self.setts.check_loc('active'): return
+        if not self.setts.check('active', active): return
 
         # use global settings
-        scope = self.setts.check_loc('scope', scope)
-        width = self.setts.check_loc('item_1c_width' , width)
-        rxe   = self.setts.check_loc('rx', rxe, 'ie')
-        rxt   = self.setts.check_loc('rx', rxt, 'it')
+        scope = self.setts.check('scope', scope)
+        width = self.setts.check('iwidth' , width)
+        rxe   = self.setts.check('rx', rxe, 'ie')
+        rxt   = self.setts.check('rx', rxt, 'it')
 
         # if page is typed
-        if type(page) in [str]:
-            self.page(page)
-        elif type(page) in [tuple]:
-            self.page(page[0])
+        pbeg = self.page(pbeg, inherit='beg')
+        pend = self.page(pend, inherit='end')
 
         # prefix if-block
         if prefix in ['',' ']:
@@ -1989,11 +1945,6 @@ class texme:
             '{flush_math}': flush_math,
             '{equation}'  : equation,
         })
-
-        if type(page) in [tuple]:
-            self.page(page[1])
-
-        self.__last_type = 'i'
 
         return self.add(
             submodule = 'i',

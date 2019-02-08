@@ -6,12 +6,12 @@
 ------------------------------------------------------------------------------
 Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
-Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
++ Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
 
 import random
-from ..cunit.units import cunit
+from ..cunit.cunit import cunit
 
 class sman:
 

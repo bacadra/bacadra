@@ -1,6 +1,6 @@
 '''
 ------------------------------------------------------------------------------
-***** bacadra *****
+***** bacadra (tools) interface *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
@@ -10,19 +10,20 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
-from .iface.bapps import bapps
-from .iface.cunit import cunit
-from .iface.iface import iface
-from .iface.pinky import pinky
-from .iface.sofix import sofix
-from .iface.solve import solve
-from .iface.tools import tools
+import copy
 
+#$ ____ class tools ________________________________________________________ #
 
+class tools:
 
+    from ..tools.clang import clang
 
+    from ..tools.verre import verrs
 
+    from ..tools import fpack
 
+    from ..tools import vpatt
 
+    def __init__(self, core=None):
 
-
+        self.clang = self.clang(core=core)

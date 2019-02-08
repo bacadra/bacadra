@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------------
 Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
-Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
++ Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
 
@@ -54,9 +54,9 @@ class settsmeta(type):
 
     def check(self, name, value=None, subname=None):
         try:
-            self.check_loc(name=name, value=value, subname=subname)
+            return self.check_loc(name=name, value=value, subname=subname)
         except:
-            self.check_cls(name=name, value=value, subname=subname)
+            return self.check_cls(name=name, value=value, subname=subname)
 
 #$$ ________ def check_cls _________________________________________________ #
 
@@ -176,9 +176,10 @@ class settsmeta(type):
         print('\n'.join(pdata))
 
 
-#$$ ________ def __repr__ __________________________________________________ #
+#$$ ________ def me ________________________________________________________ #
 
-    def __repr__(self):
+    @property
+    def me(self):
 
         try:
             data = self.print_loc(inherit=True, get_cls=True)
@@ -194,7 +195,28 @@ class settsmeta(type):
             pdata.append('> {:14s} : {}'.format(key, val))
 
         if len(pdata)==1: pdata+=['There are no atributes (maybe overwritten).']
-        return '\n'.join(pdata)
+        print('\n'.join(pdata))
 
 
 
+#$$ ________ def me ________________________________________________________ #
+
+    def __call__(self, *args):
+        if args:
+            return type.__call__(self, *args)
+
+        try:
+            data = self.print_loc(inherit=True, get_cls=True)
+            name = 'object'
+        except:
+            data = self.print_cls(inherit=True)
+            name = 'class'
+
+        pdata = [colored('---------------------------------------------------------------------------\n''***** bacadra '+name+' settings *****', 'magenta')]
+
+        for key,val in data.items():
+            if type(val) is str: val = "'" + str(val) + "'"
+            pdata.append('> {:14s} : {}'.format(key, val))
+
+        if len(pdata)==1: pdata+=['There are no atributes (maybe overwritten).']
+        print('\n'.join(pdata))

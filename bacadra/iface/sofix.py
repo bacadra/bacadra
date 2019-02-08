@@ -1,6 +1,6 @@
 '''
 ------------------------------------------------------------------------------
-***** bacadra *****
+***** bacadra (sofix) interface *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
@@ -10,19 +10,20 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
-from .iface.bapps import bapps
-from .iface.cunit import cunit
-from .iface.iface import iface
-from .iface.pinky import pinky
-from .iface.sofix import sofix
-from .iface.solve import solve
-from .iface.tools import tools
+#$ ____ class sofix ________________________________________________________ #
 
+class sofix:
 
+    from ..sofix.sbase import sbase
 
+    from ..sofix.trade import trade
 
+    from ..sofix.wgraf import wgraf
 
+    def __init__(self, core=None):
 
+        self.sbase = sofix.sbase(core=core)
 
+        self.trade = sofix.trade(core=core)
 
-
+        self.wgraf = sofix.wgraf(core=core)

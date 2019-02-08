@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------------
 Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
-Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
++ Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
 
@@ -15,9 +15,7 @@ import sqlite3
 from ..tools.setts import settsmeta
 from ..tools.fpack import translate
 
-from . import mdata
 from . import verrs
-from . import dlist
 
 
 #$ ____ class setts ________________________________________________________ #
@@ -87,37 +85,30 @@ class setts(settsmeta):
         else:             self.__temp__ = value
 
 
-#$$ ________ def asolve ____________________________________________________ #
+#$$ ________ def write _____________________________________________________ #
 
-    __asolve = 'INSERT'
+    __write = 'insert'
 
     @property
-    def asolve(self): return self.__asolve
+    def write(self): return self.__write
 
-    @asolve.setter
-    def asolve(self, value):
+    @write.setter
+    def write(self, value):
 
-        if value==None:
-            value = 'INSERT'
-        elif type(value)==str:
-            value = value.upper()
-        else:
-            raise ValueError('Unknow where type')
+        if value in [None, True, 'i']:
+            value = 'insert'
 
-        if value in ['INSERT OR REPLACE','REPLACE','IOR','R']:
-            value = 'INSERT OR REPLACE'
+        elif value in ['insert or replace','replace','ior']:
+            value = 'insert or replace'
 
-        elif value in ['INSERT OR IGNORE','IGNORE','IOI','I']:
-            value = 'INSERT OR IGNORE'
+        elif value in ['insert or ignore','ignore','ioi']:
+            value = 'insert or ignore'
 
         else:
             raise ValueError('Unknow where type')
 
-        if self.__save__: self.__asolve = value
+        if self.__save__: self.__write = value
         else:             self.__temp__ = value
-
-
-
 
 
 
@@ -133,8 +124,8 @@ class dbase:
     setts = setts('setts', (setts,), {})
 
 
+#$$ ________ def __init __ __________________________________________________ #
 
-    #$$ def __init__
     def __init__(self, core=None):
 
         self.core = core
@@ -148,13 +139,16 @@ class dbase:
         # sqlite3 connection.cursor
         self.cr = None
 
+        # structure and constraint of database
+        self.chk = {}
+
         # connection flags
         # variable is False or string with connected database name
         self._connQ = False
 
 
+#$$ ________ def connect ____________________________________________________ #
 
-    #$$ def connect
     def connect(self, path=None, clear=True):
         '''
         Create and connect to database system.
@@ -187,22 +181,23 @@ class dbase:
             # if clear is True, then redefine all table
             if clear:
                 self.interrupt()
-                self.cleardb()
+                self.clear()
 
             # create tables if they not exists
-            self.create_system()
+            self._create_system()
 
         # if connection to current database is established and clear flags
         elif clear:
 
             # then redefine all table
-            self.cleardb()
+            self.clear()
 
             # create tables if they not exists
-            self.create_system()
+            self._create_system()
 
 
-    #$$ def close
+#$$ ________ def cloase _____________________________________________________ #
+
     def close(self, commit=True, push_rstme=True):
         '''
         Close connection to database. As defualt all changes will be commited (.commit=True).
@@ -233,7 +228,8 @@ class dbase:
             self.core.pinky.rstme.push()
 
 
-    #$$ def commit
+#$$ ________ def commit _____________________________________________________ #
+
     def commit(self):
         '''
         Commit changes.
@@ -246,8 +242,8 @@ class dbase:
         self.db.commit()
 
 
+#$$ ________ def _check_connection __________________________________________ #
 
-    #$$ def _check_connection
     def _check_connection(self):
         '''
         Raise ERROR if connection is not established.
@@ -259,12 +255,15 @@ class dbase:
             # then raise error with tips
             verrs.BCDR_dbase_ERROR_Open_Database()
 
-    #$$ def interrupt
+
+#$$ ________ def interupt ___________________________________________________ #
+
     def interrupt(self):
         self.db.interrupt()
 
 
-    #$$ def exe
+#$$ ________ def exe ________________________________________________________ #
+
     def exe(self, mode, code, data=None, auto_commit=None):
         '''
         mode='r'
@@ -303,104 +302,116 @@ class dbase:
         self.commit()
 
 
-    #$$ def add
-    def add(self, mode, table, cols, data, asolve=None):
+#$$ ________ def add ________________________________________________________ #
+
+    def add(self, mode, table, cols, data, write=None):
         '''
         mode='r'
         Add data into system. Dev need to provide information about table, list of oclumns and data tuple eg. (a,b).
 
         mode='m'
         Add many data into system. Dev need to provide information about table, list of column and data list eg. [(a,b),(c,d)].
+
+        cols = [..
+            [table, column name, alias],
+        ..]
+
         '''
 
         # connection is checked in exe method
+        write = self.setts.check_loc('write', write)
 
-        asolve = self.setts.check_loc('asolve', asolve)
+        _table = []
+        for row in table:
+            if type(row)==str:
+                _table.append('['+row+']')
+            elif type(row)==list and len(row)==2:
+                _table.append('['+row[0]+']'+' as ['+row[2]+']')
+        table = ','.join(_table)
 
-        # if user type cols name as one string, then divide it into list
-        if type(cols) == str:
-
-            cols = cols.split(',')
+        _cols = []
+        for row in cols:
+            if type(row)==str:
+                _cols.append('['+row+']')
+            elif type(row)==list and len(row)==2:
+                _cols.append('['+row[0]+'].['+row[1]+']')
+            elif type(row)==list and len(row)==3:
+                _cols.append('['+row[0]+'].['+row[1]+']'+' as ['+row[2]+']')
+        cols = ',\n'.join(_cols)
 
         # create noname vector
-        cole = ','.join(['?' for col in range(len(cols))])
-
-        # add bracket to column names
-        cols = [col if col[0]=='[' else '['+col+']' for col in cols]
-
-        # join to string form
-        cols = ','.join(cols)
+        cole = ','.join(['?' for col in range(len(_cols))])
 
         # call to exe method
         self.exe(
-            code = f"{self.setts.asolve} INTO {table}({cols}) VALUES({cole})",
+            code = f"{self.setts.write} INTO {table}({cols}) VALUES({cole})",
             data = data,
             mode = mode,
         )
 
 
+#$$ ________ def get ________________________________________________________ #
 
-    #$$ def get
     def get(self, mode, table, cols=None, where=None, join=None, formula=1):
         '''
         mode='s'
+
+        connection is checked in exe method
         '''
 
-        # connection is checked in exe method
-
         # prepare tables
-        if type(table)==list:
-            table = ','.join(table)
-        elif type(table)==str:
-            pass
-        else:
-            raise ValueError('Unknow where type')
+        _table = []
+        for row in table:
+            if type(row)==str:
+                _table.append('['+row+']')
+            elif type(row)==list and len(row)==2:
+                _table.append('['+row[0]+']'+' as ['+row[2]+']')
+        table = ','.join(_table)
 
         # prepare where
         if where==None:
             where = ''
-        elif type(where)==list:
-            where = 'where ' + ' AND '.join(['('+row+')' for row in where])
         elif type(where)==str:
-            where = 'where ' + where
+            where = '\nwhere ' + where
         else:
-            raise ValueError('Unknow where type')
+            where = '\nwhere ' + ' AND '.join(['('+row+')' for row in where])
 
         # prepare joins
+        _join = []
         if join==None:
-            join = ''
-        elif type(join)==list:
-            join = ' '.join(join)
-        elif type(where)==str:
-            pass
+            join=''
         else:
-            raise ValueError('Unknow where type')
-
+            for row in join:
+                if type(row)==str:
+                    _join.append(row)
+                elif type(row)==list and len(row)==3:
+                    _join.append(row[0]+' '+row[1]+' on '+row[2])
+            join = '\n' + '\n'.join(_join)
 
         # prepare columns
         if cols==None:
             cols = '*'
-        elif type(cols) == list:
-            cols = ','.join(cols)
-        elif type(cols)==str:
-            pass
         else:
-            raise ValueError()
+            _cols = []
+            for row in cols:
+                if type(row)==str:
+                    _cols.append('['+row+']')
+                elif type(row)==list and len(row)==2:
+                    _cols.append('['+row[0]+'].['+row[1]+']')
+                elif type(row)==list and len(row)==3:
+                    _cols.append('['+row[0]+'].['+row[1]+']'+' as ['+row[2]+']')
+            cols = ',\n'.join(_cols)
 
         # select statment
         if formula==1:
-            self.exe('r',f'''
-                SELECT {cols} from {table} {join} {where}
-            ''')
+            self.exe('r',
+                f'SELECT\n{cols}\nfrom {table} {join} {where}'
+            )
 
         elif formula==2:
-            self.exe('r', f'''
-                SELECT * FROM (SELECT {cols} from {table} {join}) {where}
-            ''')
-
-        else:
-            raise ValueError()
-
+            self.exe('r',
+                f'SELECT* FROM (SELECT\n{cols}\nfrom {table} {join}) {where}'
+            )
 
         if  mode=='+':
             return self.cr
@@ -417,10 +428,13 @@ class dbase:
         else:
             raise ValueError()
 
-    #$$ def obj
-    obj = mdata.obj
 
-    #$$ def edit
+#$$ ________ def obj ________________________________________________________ #
+
+    from .crema import obj
+
+#$$ ________ def edit _______________________________________________________ #
+
     def edit(self, table, cols, data, where):
         '''
         Edit data into system. Dev need to provide information about table, list of oclumns, data list and WHERE statment.
@@ -436,10 +450,14 @@ class dbase:
         )
 
 
-    #$$ def create_system
-    def create_system(self):
+#$$ ________ def _create_system _____________________________________________ #
 
-        code = translate(dlist.sql_tables,
+    def _create_system(self):
+        from . import dlist
+
+        self.chk = dlist.chk
+
+        code = translate(dlist.sql,
         {
             '$<journal_mode>$':self.setts.journal_mode,
         })
@@ -447,8 +465,9 @@ class dbase:
         self.exe(code=code, mode='s')
 
 
-    #$$ def cleardb
-    def cleardb(self):
+#$$ ________ def clear ______________________________________________________ #
+
+    def clear(self):
         '''
         Delete data in database.
 
@@ -475,8 +494,3 @@ class dbase:
         # drop it
         self.exe(code = code,mode = 's')
 
-        # self.exe('s','''
-        #     SQLITE_DBCONFIG_RESET_DATABASE=1;
-        #     VACUUM;
-        #     SQLITE_DBCONFIG_RESET_DATABASE=0;
-        # ''')

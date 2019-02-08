@@ -1,6 +1,6 @@
 '''
 ------------------------------------------------------------------------------
-***** bacadra *****
+***** bacadra (bapps) interface *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
@@ -10,19 +10,5 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
-from .iface.bapps import bapps
-from .iface.cunit import cunit
-from .iface.iface import iface
-from .iface.pinky import pinky
-from .iface.sofix import sofix
-from .iface.solve import solve
-from .iface.tools import tools
-
-
-
-
-
-
-
-
-
+class bapps:
+    pass

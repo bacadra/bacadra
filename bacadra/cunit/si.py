@@ -1,5 +1,5 @@
 #$ definicja jednostek
-from ..units import cunit # przypisanie klasy do zmiennej, mniej pisania
+from .cunit import cunit # przypisanie klasy do zmiennej, mniej pisania
 cunit.system = 'si'
 cu   = cunit(1, {})
 kN   = cunit('kN')

@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------------
 Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
-Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
++ Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
 
@@ -138,6 +138,7 @@ class value:
 
                 ] for row in data],
                 precision = 2,
+                inherit = True if 'x' in mode else False,
             )
 
             if not '+' in mode: return

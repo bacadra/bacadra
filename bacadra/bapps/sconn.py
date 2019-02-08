@@ -13,8 +13,6 @@ class joint:
 
 
 
-
-
 class sconn:
     γ_M2 = 1.25
 

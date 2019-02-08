@@ -13,12 +13,13 @@ Thera are class which should be inherited to all modules.
 ------------------------------------------------------------------------------
 Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
-Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
++ Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
 
 
 from .color import colored
+from ..pinky.rstme import cjkwrap
 
 #$ ____ errors _____________________________________________________________ #
 
@@ -34,6 +35,16 @@ try:
         if exception_type.__name__[:4]=='BCDR' and not verrs.original:
                 if verrs.traceback==True:
                     print('\n'.join(traceback[:-2]))
+
+                # divide text by new line symbol
+                exception = str(exception).split('\n')
+
+                # new three-lvl list comprehension
+                exception = '\n'.join(['\n'.join(['\n'.join(cjkwrap.wrap(line, 80,
+                         break_long_words=False, replace_whitespace=False))
+                         for line in text.splitlines() if line.strip() != ''])
+                         for text in exception])
+
                 print('---------------------------------------------------------------------------\n'
                     '*****', exception_type.__name__,':',__exname__, '*****\n\033[1;30;1m'+str(exception),
                     file=sys.stderr)
@@ -64,8 +75,26 @@ class BCDR_ERRS(BCDR_ERROR,metaclass=__meta_1):
 
 class __meta_2(type):
     def __call__(self,code, value=''):
+        head = True
+        if type(code)==tuple:
+            code,head=code
+
         if getattr(verrs, code)==True:
-            print(colored('---------------------------------------------------------------------------\n''***** '+self.__name__+' : '+code+' *****\n', self.__color__) +'\033[1;30;1m'+str(value))
+
+            # divide text by new line symbol
+            value = value.split('\n')
+
+            # new three-lvl list comprehension
+            value = '\n'.join(['\n'.join(['\n'.join(cjkwrap.wrap(line, 80,
+                     break_long_words=False, replace_whitespace=False))
+                     for line in text.splitlines() if line.strip() != ''])
+                     for text in value])
+
+            if head:
+                print(colored('---------------------------------------------------------------------------\n''***** '+self.__name__+' : '+code+' *****\n', self.__color__) +'\033[1;30;1m'+str(value))
+            else:
+                print(str(value))
+
 
 class BCDR_WARN(metaclass=__meta_2):
     __color__ = 'yellow'
@@ -128,7 +157,6 @@ class verrs(metaclass=__meta_3):
     # 00xx - tools
     e0011 = True # BCDR_tools_ERROR_Parse_Type
 
-
     # 01xx - dbase
     e0101 = True # BCDR_dbase_ERROR_Open_Database
     e0110 = True # BCDR_dbase_ERROR_General .. transaction exe
@@ -187,4 +215,6 @@ class verrs(metaclass=__meta_3):
     # 06xx - pinky texme
     i0611 = True # BCDR_pinky_texme_INFO_Scope
 
+    # 09xx - sofix
+    i0915 = True # BCDR_sofix_INFO_Rum
 

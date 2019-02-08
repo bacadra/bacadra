@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------------
 Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
-Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
++ Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
 
@@ -30,7 +30,7 @@ class cunitmeta(type):
 
 #$$ ________ def system ____________________________________________________ #
 
-    _system = None
+    _system = 'si'
 
     @property
     def system(self):
@@ -39,10 +39,13 @@ class cunitmeta(type):
     @system.setter
     def system(self, value):
         if 'base_'+value in self.__dict__:
-            self.base = getattr(self, 'base_'+value)
             self._system = value
         else:
             raise verrs.BCDR_cunit_ERROR_System_Exists(value)
+
+    @property
+    def base(self):
+        return getattr(self, 'base_'+self.system)
 
 
 #$$ ________ def create_system _____________________________________________ #
@@ -120,6 +123,10 @@ class cunit(object, metaclass=cunitmeta):
     nnot = 'f'
 
     # system definition
+    @property
+    def base(self):
+        return getattr(self, 'base_'+self._system)
+
     # the system atribute type must be dictonary. Inside them we need include the fallowing type:
     # {'<name>' : (<numerical object with value>,
     #              <dictonary object with unit def>)}
@@ -250,6 +257,8 @@ class cunit(object, metaclass=cunitmeta):
         Called class return cunit object. It have two arguments: value and units. The value can be numeric type data, while units accept only dictonary and string.
         '''
 
+        self._system = cunit.system if system is None else system
+
         # if value's type is string, then try to get unit definition from base_{x}.
         if type(value)==str and units==None:
             self._get(value)
@@ -268,7 +277,6 @@ class cunit(object, metaclass=cunitmeta):
             self._value = value
             self._units = units
 
-        self._system = cunit.system if system is None else system
 
 
 #$$ ________ def __setattr__ _______________________________________________ #
@@ -318,7 +326,8 @@ class cunit(object, metaclass=cunitmeta):
         '''
         try:
         # get value and unit from system defintion
-            base_value = cunit.base[units]
+            base_value = getattr(cunit, 'base_'+self._system)[units]
+            # base_value = cunit.base[units]
 
             # if returned was base unit (value is equal to None), then prepare object value and unit by hand
             if base_value == None:
@@ -331,7 +340,7 @@ class cunit(object, metaclass=cunitmeta):
 
         # if unit does not exist in base system, then raise error
         except:
-            verrs.BCDR_cunit_ERROR_Units_in_System(cunit.system, units)
+            verrs.BCDR_cunit_ERROR_Units_in_System(self.system, units)
 
 
 #$$ ________ def add _______________________________________________________ #
@@ -651,7 +660,7 @@ class cunit(object, metaclass=cunitmeta):
         units=None, acc=None, style=None, fcover=False, trail=None, nnot=None, system=None,
 
         # short names
-        u=None, a=None, ad=None, ai=None, s=None, f=None, t=None, n=None,
+        u=None, ad=None, ai=None, s=None, f=None, t=None, n=None,
 
         inplace=False):
         '''
@@ -668,11 +677,9 @@ class cunit(object, metaclass=cunitmeta):
             if system:
                 _system_old = cunit.system
                 cunit.system = system
-                # print(self.base)
 
             # convert short name to long name
             if u  and not units : units  = u
-            if a  and not acc   : acc    = a
             if (acc is None) and ((ad is not None) or (ai is not None)):
                 acc = [None, None]
                 if ad is not None: acc[0] = ad
@@ -688,7 +695,7 @@ class cunit(object, metaclass=cunitmeta):
             else:
                 othe = self.copy()
 
-            if system: othe.primary(
+            othe.primary(
                 system=system,
                 inplace=True,
             )

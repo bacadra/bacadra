@@ -6,7 +6,7 @@ BCDR += ***** create (r)e(s)ructured (t)ext (m)assive (e)nvelope *****
 ------------------------------------------------------------------------------
 Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
-    Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+    + Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
 
@@ -29,7 +29,6 @@ from ...tools.setts import settsmeta
 class setts(settsmeta):
 
     _self = None # here will be placed self instance
-    _report_mode = None # support variable
 
 #$$ ________ def active ____________________________________________________ #
 
@@ -313,139 +312,7 @@ class rstme:
 
 
 
-#$$$ ____________ def report _______________________________________________ #
 
-    def report(self,
-        mode='a+',
-
-        general_information                 = None,
-        model_data                          = None,
-            materials                       = None,
-                tab_mates_umate             = None,
-            unit_sections                   = None,
-                unit_sections_1d            = None,
-                    tab_usecp_value         = None,
-                    tab_usecp_point         = None,
-                    tab_usecp_tsect         = None,
-            nodes                           = None,
-                tab_geomf_nodes             = None,
-            truss                           = None,
-                tab_geomf_truss             = None,
-        loads                               = None,
-            tab_loads_cates                 = None,
-            tab_loads_lcase                 = None,
-        combinations                        = None,
-        static_analysis                     = None,
-        dynamic_analysis                    = None,
-        design_analysis                     = None,
-        summary                             = None,
-        toc                                 = 'b',
-
-        ):
-
-        if mode==False: mode=''
-        lvl_list = [mode]*5
-
-        def mloc(lvl, now):
-            if now==None:
-                lvl_list[lvl] = lvl_list[lvl-1]
-                self.setts._report_mode = lvl_list[lvl]
-                return self.setts._report_mode
-            elif type(now)==str:
-                lvl_list[lvl] = now
-                self.setts._report_mode = lvl_list[lvl]
-                return self.setts._report_mode
-            else:
-                return ''
-
-
-        if mloc(1, general_information):
-
-            self.h(1, 'General information')
-
-        if mloc(1, model_data):
-
-            self.h(1, 'Model data')
-
-        if mloc(2, materials):
-
-            self.h(2, 'Materials')
-
-        if mloc(3, tab_mates_umate):
-
-            self.core.mates.umate.echo(mode=self.setts._report_mode)
-
-        if mloc(2, unit_sections):
-
-            self.h(2, 'Unit sections')
-
-        if mloc(3, unit_sections):
-
-            self.h(3, 'Unit sections 1d')
-
-        if mloc(4, tab_usecp_value):
-
-            self.core.usecp.value.echo(mode=self.setts._report_mode)
-
-        if mloc(4, tab_usecp_point):
-
-            self.core.usecp.point.echo(mode=self.setts._report_mode)
-
-        if mloc(4, tab_usecp_tsect):
-
-            self.core.usecp.tsect.echo(mode=self.setts._report_mode)
-
-        if mloc(2, nodes):
-
-            self.h(2, 'Nodes') #$$#
-
-        if mloc(3, tab_geomf_nodes):
-
-            self.core.geomf.nodes.echo(mode=self.setts._report_mode)
-
-        if mloc(2, truss):
-
-            self.h(2, 'Truss elements') #$$#
-
-        if mloc(3, tab_geomf_truss):
-
-            self.core.geomf.truss.echo(mode=self.setts._report_mode)
-
-        if mloc(1, loads):
-
-            self.h(1, 'Loads')
-
-        if mloc(2, tab_loads_cates):
-
-            self.core.loads.cates.echo(mode=self.setts._report_mode)
-
-        if mloc(2, tab_loads_lcase):
-
-            self.core.loads.lcase.echo(mode=self.setts._report_mode)
-
-        if mloc(1, combinations):
-
-            self.h(1, 'Combinations')
-
-        if mloc(1, static_analysis):
-
-            self.h(1, 'Static analysis')
-
-        if mloc(1, dynamic_analysis):
-
-            self.h(1, 'Dynamic analysis')
-
-        if mloc(1, design_analysis):
-
-            self.h(1, 'Design analysis')
-
-        if mloc(1, summary):
-
-            self.h(1, 'Summary')
-
-        if mloc(1, toc):
-
-            self.toc(mode=self.setts._report_mode)
 
 
 #$$ ________ generate methods ______________________________________________ #
@@ -632,10 +499,6 @@ class rstme:
 
         if border == False:
             table.set_deco(0)
-
-        # convert None to empty string, better to plot...
-        # DONE: in texttable module
-        # data = [[item if item!=None else '.' for item in row] for row in data]
 
         table.add_rows(rows=data, header=False)
 

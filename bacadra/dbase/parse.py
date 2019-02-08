@@ -6,117 +6,67 @@
 ------------------------------------------------------------------------------
 Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
-Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
++ Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
 
 from ..cunit.cunit import cunit
+from .dlist import chk
 from . import verrs
 
+#$ ____ def chdr ____________________________________________________________ #
 
-data = {
-    'setts.id'         : {'t':[int,str,float]},
-    'setts.ttl'        : {'t':[str]},
-
-    'mates.umate.ρ_o'  : {'u':'kg m**-3'},
-    'mates.umate.E_1'  : {'u':'Pa'},
-    'mates.umate.G_1'  : {'u':'Pa'},
-    'mates.umate.t_e'  : {'u':'°C**-1'},
-
-    'usect.usecp.A'    : {'u':'m**2'},
-    'usect.usecp.A_y'  : {'u':'m**2'},
-    'usect.usecp.A_z'  : {'u':'m**2'},
-    'usect.usecp.A_1'  : {'u':'m**2'},
-    'usect.usecp.A_2'  : {'u':'m**2'},
-    'usect.usecp.Ι_y'  : {'u':'m**4'},
-    'usect.usecp.I_z'  : {'u':'m**4'},
-    'usect.usecp.I_t'  : {'u':'m**4'},
-    'usect.usecp.y_c'  : {'u':'m'},
-    'usect.usecp.z_c'  : {'u':'m'},
-    'usect.usecp.z_sc' : {'u':'m'},
-    'usect.usecp.y_sc' : {'u':'m'},
-    'usect.usecp.I_1'  : {'u':'m**4'},
-    'usect.usecp.I_2'  : {'u':'m**4'},
-    'usect.usecp.y_min': {'u':'m'},
-    'usect.usecp.y_max': {'u':'m'},
-    'usect.usecp.z_min': {'u':'m'},
-    'usect.usecp.z_max': {'u':'m'},
-    'usect.usecp.C_m'  : {'u':'m**6'},
-    'usect.usecp.C_ms' : {'u':'m**4'},
-    'usect.usecp.α'    : {'u':{}},
-    'usect.usecp.u'    : {'u':'m'},
-    'usect.usecp.m_g'  : {'u':'kg m**-1'},
-
-    'usect.point.y'    : {'u':'m'},
-    'usect.point.z'    : {'u':'m'},
-
-    'usect.tsect.h'    : {'u':'m'},
-    'usect.tsect.h_w'  : {'u':'m'},
-    'usect.tsect.t_w'  : {'u':'m'},
-    'usect.tsect.t_f_u': {'u':'m'},
-    'usect.tsect.b_f_u': {'u':'m'},
-    'usect.tsect.t_f_l': {'u':'m'},
-    'usect.tsect.b_f_l': {'u':'m'},
-
-    'geomf.nodes.x'    : {'u':'m'},
-    'geomf.nodes.y'    : {'u':'m'},
-    'geomf.nodes.z'    : {'u':'m'},
-
-    'loads.cates.γ_u'  : {'u':'m'},
-    'loads.cates.γ_f'  : {'u':'m'},
-    'loads.cates.γ_a'  : {'u':'m'},
-    'loads.cates.ψ_0'  : {'u':'m'},
-    'loads.cates.ψ_1'  : {'u':'m'},
-    'loads.cates.ψ_1s' : {'u':'m'},
-    'loads.cates.ψ_2'  : {'u':'m'},
-    'loads.cates.ttl'  : {'t':[str]},
-}
-
-
-
-def chdr(name, value):
+def chdr(t, n, v):
     '''
-    Check and drop. Validate value according to principles in data.
+    Check and drop. Validate value according to principles in chk.
+    t -- table name
+    n -- columns name
+    v -- value
     '''
 
     # check type
-    if 't' in data[name] and value!=None:
-        if type(value) == cunit:
-            type_value = type(cunit._value)
-        else:
-            type_value = type(value)
+    if v==None: return
 
-        if type_value not in data[name]['t']:
-            verrs.BCDR_dbase_ERROR_Parse_Type(data[name]['t'])
+    # first resolve cunit
+    if type(v)==cunit:
+        type_value = type(v._value)
+    else:
+        type_value = type(v)
+
+    if chk[t][n]['c']!=None and type_value not in chk[t][n]['c']:
+        verrs.BCDR_dbase_ERROR_Parse_Type(chk[t][n]['c'])
 
 
     # checks for cunit
-    if 'u' in data[name]:
-        if type(value)==cunit and data[name]['u']!=None:
-            value = value.drop(
-                units  = data[name]['u'],
-                fcover = True,
-                system = 'si',
-            )
+    if type(v)==cunit and chk[t][n]['u']!=None:
+        v = v.drop(
+            units  = chk[t][n]['u'],
+            fcover = True,
+            system = 'si',
+        )
 
-    return value
+    return v
 
+#$ ____ def get _____________________________________________________________ #
 
-
-#$ def get
-def get(name, value):
+def get(t, n, v=None):
     '''
-    Return cunit object with given value and unit according to data.
+    Return cunit object with given value and unit according to chk.
     '''
 
-    if type(value)!=cunit and data[name]['u']!=None:
-        value = cunit.cc(value, data[name]['u'])
-    return value
+    if v==None: return v
+
+    u = chk[t][n]['u']
+
+    return cunit(v, u) if u!=None else v
 
 
 
 
-#$ def adm
+
+
+#$ ____ def adm _____________________________________________________________ #
+
 def adm(cols, data, defs={}):
     '''
     Prepare data to multiadd command.

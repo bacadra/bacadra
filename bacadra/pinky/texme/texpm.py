@@ -1,6 +1,6 @@
 from .texme import texme
 
-class texpj:
+class texpm:
 
     def __init__(self, core=None, tex=None):
 

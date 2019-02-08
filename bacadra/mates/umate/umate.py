@@ -1,12 +1,12 @@
 '''
 ------------------------------------------------------------------------------
-BCDR += ***** univerial (mate)rials *****
+***** univerial (mate)rials *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
 Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
 Team members developing this package:
-    Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
++ Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
 ------------------------------------------------------------------------------
 '''
 
@@ -42,12 +42,15 @@ class umate:
 
     def add(self, id=None, ρ_o=None, E_1=None, v_1=None, G_1=None, t_e=None, ttl=None, subcl=None):
 
-        # drop units to si
-        id  = parse.chdr('setts.id' , id )
-        ρ_o = parse.chdr('mates.umate.ρ_o', ρ_o)
-        E_1 = parse.chdr('mates.umate.E_1', E_1)
-        G_1 = parse.chdr('mates.umate.G_1', G_1)
-        t_e = parse.chdr('mates.umate.t_e', t_e)
+        table = '011:mates:umate'
+        id = parse.chdr(table, 'id', id)
+        ρ_o = parse.chdr(table, 'ρ_o', ρ_o)
+        E_1 = parse.chdr(table, 'E_1', E_1)
+        v_1 = parse.chdr(table, 'v_1', v_1)
+        G_1 = parse.chdr(table, 'G_1', G_1)
+        t_e = parse.chdr(table, 't_e', t_e)
+        ttl = parse.chdr(table, 'ttl', ttl)
+        subcl = parse.chdr(table, 'subcl', subcl)
 
         # overwrite last defined material
         self.setts._ldef_id = id
@@ -58,24 +61,11 @@ class umate:
         # add universal material
         self.core.dbase.add(
             mode  = 'r',
-            table = '[011:mates:umate]',
-            cols  = '[id],[ρ_o],[E_1],[v_1],[G_1],[t_e],[ttl],[subcl]',
-            data  = (id,ρ_o,E_1,v_1,G_1,t_e,ttl,subcl),
+            table = ['011:mates:umate'],
+            cols  = ['id','ρ_o','E_1','v_1','G_1','t_e','ttl','subcl'],
+            data  = [id,ρ_o,E_1,v_1,G_1,t_e,ttl,subcl],
         )
 
-
-#$$ ________ def obj _______________________________________________________ #
-
-    def obj(self, where=None, sn='1', unit=None, mode=None):
-        if where==None:
-            where='id='+str(self.setts._ldef_id)
-
-        return self.core.dbase.obj(
-            name  = 'mates.umate-'+sn,
-            where = where,
-            unit  = unit,
-            mode  = mode
-        )
 
 #$$ ________ def echo ______________________________________________________ #
 
