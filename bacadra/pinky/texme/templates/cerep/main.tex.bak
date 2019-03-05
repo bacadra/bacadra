@@ -66,18 +66,18 @@
 
 %## ________ math __________________________________________________________ %
 
+% musi byc na samym poczatku
 \usepackage{etoolbox}
-	% musi byc na samym poczatku
 
+% znaki specjalne matematyczne
+% niestety musi byc ladowany na poczatku, przed jezykowymi
 \usepackage{amssymb}
-    % znaki specjalne matematyczne
-    % niestety musi byc ladowany na poczatku, przed jezykowymi
 
+% pola matematyczne
 \usepackage{amsmath}
-    % pola matematyczne
 
+% pola matematyczne
 \usepackage{breqn}
-    % pola matematyczne
 
 % wyrownanie matmy
 \makeatletter
@@ -87,9 +87,9 @@
 
 %## ________ language settings _____________________________________________ %
 
+%% prevent hyphen text
+%% must be inserted before babel package
 \usepackage[english=nohyphenation,polish=nohyphenation]{hyphsubst}
-    %% prevent hyphen text
-    %% must be inserted before babel package
 
 \usepackage[greek,polish]{babel}
 
@@ -103,20 +103,20 @@
 
 \usepackage{newunicodechar}
 
+%% dummy text package
 \usepackage{lipsum}
-    %% dummy text package
 
-\usepackage[bookmarksnumbered]{hyperref}
-    %% tworzy hiperlacza w dokumencie
-    %% ,colorlinks=true
+%% tworzy hiperlacza w dokumencie
+%% ,colorlinks=true
+\usepackage[bookmarksnumbered,unicode]{hyperref}
 
 %## ________ page style ____________________________________________________ %
 
 %### ____________ geometry _________________________________________________ %
 
+%% https://www.sharelatex.com/learn/Page_size_and_margins
+%% ustawienia marginesow, geometrii strony
 \usepackage{geometry}
-    %% https://www.sharelatex.com/learn/Page_size_and_margins
-    %% ustawienia marginesow, geometrii strony
 
 \geometry{
     left       = 25mm, % lewy margines
@@ -129,8 +129,8 @@
 	% showframe,
 }
 
+%% https://www.sharelatex.com/learn/Multiple_columns
 \usepackage{multicol}
-    %% https://www.sharelatex.com/learn/Multiple_columns
 
 \usepackage{setspace}
 % \setlength{\parindent}{0pt}
@@ -140,12 +140,12 @@
 
 %### ____________ header and footer ________________________________________ %
 
+% styl strony
 \usepackage{fancyhdr}
-    % styl strony
 
+% zwraca informacje o ilosci stron
+% uzywane w stopce
 \usepackage{lastpage}
-    % zwraca informacje o ilosci stron
-    % uzywane w stopce
 
 \newcommand{\MONTH}{%
   \ifcase\month% 0
@@ -164,11 +164,13 @@
   \fi}
 \newcommand{\YEAR}{\number\year}
 
+% extra bold chars
 \usepackage[outline]{contour}
-    % extra bold chars
 \contourlength{0.4pt}
 
-\pagestyle{plain} % rodzaj naglowka, plain -> tylko numerowanie stron
+% rodzaj naglowka, plain -> tylko numerowanie stron
+\pagestyle{plain}
+
 \fancypagestyle{plain}{
 	\fancyhf{}
 	\renewcommand{\headrulewidth}{2.0pt}
@@ -184,22 +186,23 @@
   \fancyfoot[R]{\footnotesize{Strona \thepage\ z \pageref{LastPage}}}
   \fancyfoot[C]{\footnotesize{\textcolor{Gray}{\MONTH~\YEAR~r.}}} %<foot_line_left>%
 }
+
 \pagestyle{plain}
 
 %## ________ text style ____________________________________________________ %
 
-% \usepackage{times}
-    %% change font to TimesNewRoman
+%% change font
 \usepackage{lmodern}
+% \usepackage{times}
 % \usepackage{kpfonts}
 % \usepackage{mathptmx}
 
+%% lamanie pierwszej linii po naglowku
 \usepackage{indentfirst}
-    %% lamanie pierwszej linii po naglowku
 
+%% elementy plywajace, blokada obrazow
+%% \begin{figure}[H] ...
 \usepackage{float}
-    %% elementy plywajace, blokada obrazow
-    %% \begin{figure}[H] ...
 
 \sloppy
 \frenchspacing % wylacza zwiekszone odestepy przy justowaniu na koncu zdania
@@ -210,11 +213,12 @@
 % turn off warning: Overfull \hbox (xxxx too wide) detected at line...
 % \hfuzz=99999pt
 
+% https://www.sharelatex.com/learn/Using_colours_in_LaTeX#Reference_guide
 \usepackage[usenames, dvipsnames]{xcolor}
-    % https://www.sharelatex.com/learn/Using_colours_in_LaTeX#Reference_guide
+
+% https://tex.stackexchange.com/questions/94799/how-do-i-color-table-columns
+% kolorowanie kolumn w tabelu
 \usepackage{colortbl}
-    % https://tex.stackexchange.com/questions/94799/how-do-i-color-table-columns
-    % kolorowanie kolumn w tabelu
 
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
@@ -240,7 +244,9 @@
 %#### ________________ chapter _____________________________________________ %
 
 \usepackage{xcolor,calc, blindtext}
-% \aliaspagestyle{chapter}{empty} % usuwa head and foot na stronie z chapterem
+
+% usuwa head and foot na stronie z chapterem
+% \aliaspagestyle{chapter}{empty}
 
 %##### ____________________ style 1 ________________________________________ %
 
@@ -289,7 +295,7 @@
     \parbox{\textwidth}{\chaptitlefont \strut bg\\bg\strut}}
   \renewcommand\printchaptertitle[1]{%
     \parbox[t][\chaptertitleboxheight][t]{\textwidth}{%
-      %\microtypesetup{protrusion=false}% add this if you use microtype
+      \microtypesetup{protrusion=false}% add this if you use microtype
       \chaptitlefont\strut ##1\strut}%
 }}
 \chapterstyle{hansen}
@@ -297,7 +303,7 @@
 
 %##### ____________________ style 2 ________________________________________ %
 
-%Options: Sonny, Lenny, Glenn, Conny, Rejne, Bjarne, Bjornstrup
+%O ptions: Sonny, Lenny, Glenn, Conny, Rejne, Bjarne, Bjornstrup
 % \usepackage[Bjornstrup]{fncychap}
 
 %#### ________________ section _____________________________________________ %
@@ -327,20 +333,22 @@
 
 %#### ________________ paragraph ___________________________________________ %
 
-\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
-    {3.25ex \@plus1ex \@minus.2ex}%
-    {-1em}%
-    {\normalfont\normalsize\bfseries}}
+% \makeatletter
+% \renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+%     {3.25ex \@plus1ex \@minus.2ex}%
+%     {-1em}%
+%     {\normalfont\normalsize\bfseries}}
+% \makeatother
 
 %#### ________________ subparagraph ________________________________________ %
 
 % change style, no indent + new line
-\makeatletter
-\renewcommand\subparagraph{\@startsection{subparagraph}{5}{0em}
-    {1.25ex \@plus 1ex \@minus .2ex}%
-    {0.75ex plus 0.1ex}% space after heading
-    {\normalfont\normalsize\bfseries}}
-\makeatother
+% \makeatletter
+% \renewcommand\subparagraph{\@startsection{subparagraph}{5}{0em}
+%     {1.25ex \@plus 1ex \@minus .2ex}%
+%     {0.75ex plus 0.1ex}% space after heading
+%     {\normalfont\normalsize\bfseries}}
+% \makeatother
 
 %#### ________________ toc _________________________________________________ %
 
@@ -388,7 +396,6 @@
 
 \usepackage{tabularx} % zaawansowane tabele, dodatek kolumny X
 
-
 % Q,q,L,l - do lewej
 % W,w,C,c - srodkowanie
 % E,e,R,r - do prawej
@@ -433,6 +440,8 @@
 \usepackage{makecell}
 \newcommand\tabitem{\makebox[3mm][r]{$-\,$~}}
 
+
+\newcommand{\hlineb}{\Xhline{1.3pt}}
 
 %#### ________________ tabular-numbering ___________________________________ %
 

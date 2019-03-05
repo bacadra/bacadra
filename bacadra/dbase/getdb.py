@@ -1,6 +1,6 @@
 '''
 ------------------------------------------------------------------------------
-***** (cre)eated (m)apped dat(a) *****
+***** (get) (d)ata(b)ase data *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
@@ -10,7 +10,9 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
-from ..tools.mdata import mdata
+#$ ######################################################################### #
+
+from ..tools.fpack import mdata
 from . import parse
 
 #$ ____ def obj ____________________________________________________________ #
@@ -79,28 +81,29 @@ def mates_umate_a(self, **kwargs):
 
 def mates_steea_a(self, **kwargs):
     cols = [
-        ['011:mates:umate','id'   ,'id'   ],
-        ['011:mates:umate','ρ_o'  ,'ρ_o'  ],
-        ['011:mates:umate','E_1'  ,'E_1'  ],
-        ['011:mates:umate','v_1'  ,'v_1'  ],
-        ['011:mates:umate','G_1'  ,'G_1'  ],
-        ['011:mates:umate','t_e'  ,'t_e'  ],
-        ['011:mates:umate','ttl'  ,'ttl'  ],
+        ['011:mates:umate' ,'id'      ,'id'         ] ,
+        ['011:mates:umate' ,'ρ_o'     ,'ρ_o'        ] ,
+        ['011:mates:umate' ,'E_1'     ,'E_1'        ] ,
+        ['011:mates:umate' ,'v_1'     ,'v_1'        ] ,
+        ['011:mates:umate' ,'G_1'     ,'G_1'        ] ,
+        ['011:mates:umate' ,'t_e'     ,'t_e'        ] ,
+        ['011:mates:umate' ,'ttl'     ,'ttl'        ] ,
 
-        ['013:mates:steea','grade','grade'],
-        ['013:mates:steea','t_max','t_max'],
-        ['013:mates:steea','f_yk' ,'f_yk' ],
-        ['013:mates:steea','f_uk' ,'f_uk' ],
-        ['013:mates:steea','E_a'  ,'E_a'  ],
-        ['013:mates:steea','ε_yk' ,'ε_yk' ],
-        ['013:mates:steea','ε_uk' ,'ε_uk' ],
-        ['013:mates:steea','γ_M0' ,'γ_M0' ],
-        ['013:mates:steea','γ_M1' ,'γ_M1' ],
-        ['013:mates:steea','γ_M2' ,'γ_M2' ],
-        ['013:mates:steea','γ_M3' ,'γ_M3' ],
-        ['013:mates:steea','γ_M4' ,'γ_M4' ],
-        ['013:mates:steea','γ_M5' ,'γ_M5' ],
-        ['013:mates:steea','γ_M6' ,'γ_M6' ],
+        ['013:mates:steea' ,'grade'   ,'grade'      ] ,
+        ['013:mates:steea' ,'t_max'   ,'t_max'      ] ,
+        ['013:mates:steea' ,'f_yk'    ,'f_yk'       ] ,
+        ['013:mates:steea' ,'f_uk'    ,'f_uk'       ] ,
+        ['013:mates:steea' ,'E_a'     ,'E_a'        ] ,
+        ['013:mates:steea' ,'ε_yk'    ,'ε_yk'       ] ,
+        ['013:mates:steea' ,'ε_uk'    ,'ε_uk'       ] ,
+        ['013:mates:steea' ,'γ_M0'    ,'γ_M0'       ] ,
+        ['013:mates:steea' ,'γ_M1'    ,'γ_M1'       ] ,
+        ['013:mates:steea' ,'γ_M2'    ,'γ_M2'       ] ,
+        ['013:mates:steea' ,'γ_M3'    ,'γ_M3'       ] ,
+        ['013:mates:steea' ,'γ_M4'    ,'γ_M4'       ] ,
+        ['013:mates:steea' ,'γ_M5'    ,'γ_M5'       ] ,
+        ['013:mates:steea' ,'γ_M6'    ,'γ_M6'       ] ,
+        ['013:mates:steea' ,'γ_M_ser' ,'γ_M_ser'    ] ,
     ]
 
     data = self.get(
@@ -116,3 +119,4 @@ def mates_steea_a(self, **kwargs):
 
     return cols,data
 
+#$ ######################################################################### #

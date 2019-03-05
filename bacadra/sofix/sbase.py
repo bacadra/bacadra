@@ -10,31 +10,23 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
+#$ ######################################################################### #
+
 #$ ____ import _____________________________________________________________ #
 
 import os
 
-from ..tools.setts import settsmeta
+from ..tools.setts import setts_init
 from . import verrs
 
 
 #$ ____ class setts ________________________________________________________ #
 
-class setts(settsmeta):
+class setts(setts_init):
 
 #$$ ________ def sofi_env __________________________________________________ #
 
-    __sofi_env = r'c:\Program Files\SOFiSTiK\2018\SOFiSTiK 2018'
-
-    @property
-    def sofi_env(self):
-        return self.__sofi_env
-
-    @sofi_env.setter
-    def sofi_env(self, value=None):
-        '''
-        Create self.__sofi_env atribute.
-        '''
+    def sofi_env(self, value=None, check=None, reset=None):
 
         if value=='v2018':
             value = r'c:\Program Files\SOFiSTiK\2018\SOFiSTiK 2018'
@@ -42,26 +34,13 @@ class setts(settsmeta):
         elif value=='v2016':
             value = r'c:\Program Files\SOFiSTiK\2016\ANALYSIS_33_X64'
 
-        elif value:
-            pass
+        return self.tools.gst('sofi_env', value, check, reset)
 
-        if self.__save__: self.__sofi_env = value
-        else:             self.__temp__ = value
 
 
 #$$ ________ def sofi_run __________________________________________________ #
 
-    __sofi_run = r'sps.exe'
-
-    @property
-    def sofi_run(self):
-        return self.__sofi_run
-
-    @sofi_run.setter
-    def sofi_run(self, value):
-        '''
-        Create self.__sofi_run atribute.
-        '''
+    def sofi_run(self, value=None, check=None, reset=None):
 
         if value=='wps':
             value = r'wps.exe'
@@ -69,109 +48,52 @@ class setts(settsmeta):
         elif value=='sps':
             value = r'sps.exe'
 
-        if self.__save__: self.__sofi_run = value
-        else:             self.__temp__ = value
+        return self.tools.gst('sofi_run', value, check, reset)
 
 
 #$$ ________ def sofi_urs __________________________________________________ #
 
-    __sofi_urs = r'ursula.exe'
-
-    @property
-    def sofi_urs(self):
-        return self.__sofi_urs
-
-
-    @sofi_urs.setter
-    def sofi_urs(self, value):
-        '''
-        Create self.__sofi_urs atribute.
-        '''
-
-        if self.__save__: self.__sofi_urs = value
-        else:             self.__temp__ = value
+    def sofi_urs(self, value=None, check=None, reset=None):
+        return self.tools.gst('sofi_urs', value, check, reset)
 
 
 #$$ ________ def magi_env __________________________________________________ #
 
-    __magi_env = r'c:\Program Files\ImageMagick-7.0.7-Q16'
-
-    @property
-    def magi_env(self):
-        return self.__magi_env
-
-    @magi_env.setter
-    def magi_env(self, value):
-        '''
-        Create self.__magi_env atribute.
-        '''
-
+    def magi_env(self, value=None, check=None, reset=None):
         if value=='v7.0.7-Q16':
             value = r'c:\Program Files\ImageMagick-7.0.7-Q16'
-
-        if self.__save__: self.__magi_env = value
-        else:             self.__temp__ = value
-
+        return self.tools.gst('magi_env', value, check, reset)
 
 #$$ ________ def magi_mck __________________________________________________ #
 
-    __magi_mck = r'magick.exe'
-
-    @property
-    def magi_mck(self):
-        return self.__magi_mck
-
-    @magi_mck.setter
-    def magi_mck(self, value):
-        '''
-        Create self.__magi_mck atribute.
-        '''
-
-        if self.__save__: self.__magi_mck = value
-        else:             self.__temp__ = value
-
-
-
+    def magi_mck(self, value=None, check=None, reset=None):
+        if value=='v7.0.7-Q16':
+            value = r'c:\Program Files\ImageMagick-7.0.7-Q16'
+        return self.tools.gst('magi_mck', value, check, reset)
 
 #$$ ________ def project ___________________________________________________ #
 
-    __project = r'.\sofix'
-
-    @property
-    def project(self):
-        return self.__project
-
-    @project.setter
-    def project(self, value):
-
-        if self.__save__: self.__project = value
-        else:             self.__temp__ = value
-
+    def project(self, value=None, check=None, reset=None):
+        return self.tools.gst('project', value, check, reset)
 
 #$$ ________ def cdb_name __________________________________________________ #
 
-    __cdb_name = r'c_main.cdb'
-
-    @property
-    def cdb_name(self):
-        return self.__cdb_name
-
-    @cdb_name.setter
-    def cdb_name(self, value):
-
-        if self.__save__: self.__cdb_name = value
-        else:             self.__temp__ = value
-
-
-
-
+    def cdb_name(self, value=None, check=None, reset=None):
+        return self.tools.gst('cdb_name', value, check, reset)
 
 #$ ____ class sbase ________________________________________________________ #
 
 class sbase:
 
-    # class setts
-    setts = setts('setts', (setts,), {})
+    setts = setts()
+    setts.sofi_env('v2018')
+    setts.sofi_run('sps')
+    setts.sofi_urs('ursula.exe')
+    setts.magi_env('v7.0.7-Q16')
+    setts.magi_mck('magick.exe')
+    setts.project(r'.\sofix')
+    setts.project(r'c_main.cdb')
+
 
 #$$ ________ def __init__ __________________________________________________ #
 
@@ -179,8 +101,7 @@ class sbase:
 
         self.core = core
 
-        # object setts
-        self.setts = self.setts('setts',(),{'_self':self})
+        self.setts = setts(self.setts, self)
 
 # import os
 # import platform
@@ -502,3 +423,5 @@ class sbase:
 #     # size      = {'h':'2023x1296+289+289',
 #     #             'v':'2023x2668+289+289',
 #     #             's':'2139x1266+229+242'}
+
+#$ ######################################################################### #

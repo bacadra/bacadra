@@ -10,7 +10,9 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
-from ..cunit.cunit import cunit
+#$ ######################################################################### #
+
+from ..unise.unise import unise
 from .dlist import chk
 from . import verrs
 
@@ -27,8 +29,8 @@ def chdr(t, n, v):
     # check type
     if v==None: return
 
-    # first resolve cunit
-    if type(v)==cunit:
+    # first resolve unise
+    if type(v)==unise:
         type_value = type(v._value)
     else:
         type_value = type(v)
@@ -37,8 +39,8 @@ def chdr(t, n, v):
         verrs.BCDR_dbase_ERROR_Parse_Type(chk[t][n]['c'])
 
 
-    # checks for cunit
-    if type(v)==cunit and chk[t][n]['u']!=None:
+    # checks for unise
+    if type(v)==unise and chk[t][n]['u']!=None:
         v = v.drop(
             units  = chk[t][n]['u'],
             fcover = True,
@@ -51,14 +53,14 @@ def chdr(t, n, v):
 
 def get(t, n, v=None):
     '''
-    Return cunit object with given value and unit according to chk.
+    Return unise object with given value and unit according to chk.
     '''
 
     if v==None: return v
 
     u = chk[t][n]['u']
 
-    return cunit(v, u) if u!=None else v
+    return unise(v, u) if u!=None else v
 
 
 
@@ -97,7 +99,7 @@ def adm(cols, data, defs={}):
             # if factor of col is defined
             if cols[j]+'+f' in defs:
                 # check that value is valid form to multiply
-                if type(data[i][j]) in [float,int,cunit]:
+                if type(data[i][j]) in [float,int,unise]:
                     data[i][j] *= defs[cols[j]+'+f']
 
             # if default value of col is defined then replace None value
@@ -114,3 +116,5 @@ def adm(cols, data, defs={}):
     return ldict
     # return tuple(cols),ldict
 
+
+#$ ######################################################################### #

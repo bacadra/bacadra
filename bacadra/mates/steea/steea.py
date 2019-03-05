@@ -1,6 +1,6 @@
 '''
 ------------------------------------------------------------------------------
-***** Structural (stee)l *****
+***** structural (stee)l *****
 ==============================================================================
 
 ------------------------------------------------------------------------------
@@ -10,39 +10,37 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
+#$ ######################################################################### #
+
 import numpy as np
 
 from ...dbase import parse
-from ...tools.setts import settsmeta
-from ...tools.mdata import mdata
-from ...cunit.cunit import cunit
-
-from ...cunit.si    import kN
-from ...cunit.cmath import ln,sqrt,exp
+from ...tools.setts import setts_init
+from ...tools.fpack import mdata
+from ...unise.unise import unise
+from ...unise.umath import ln,sqrt,exp
 
 
 #$ ____ class setts ________________________________________________________ #
 
-class setts(settsmeta):
+class setts(setts_init):
+
     _ldef_id = None
 
 #$ ____ class steea ________________________________________________________ #
 
 class steea:
-    a = kN+15*kN
 
-    # class setts
-    setts = setts('setts', (setts,), {})
+    setts = setts()
 
 #$$ ________ def __init__ __________________________________________________ #
 
     def __init__(self, core):
 
-        # project object
         self.core = core
 
-        # local setts
-        self.setts = self.setts('setts',(),{})
+        self.setts = setts(self.setts, self)
+
 
 #$$ ________ def add _______________________________________________________ #
 
@@ -52,6 +50,7 @@ class steea:
     family = None  , grade = None , t_max = None , f_yk = None , f_uk = None ,
     E_a    = None  , ε_yk  = None , ε_uk  = None , γ_M0 = None , γ_M1 = None ,
     γ_M2   = None  , γ_M3  = None , γ_M4  = None , γ_M5 = None , γ_M6 = None ,
+    γ_M_ser= None  ,
     ):
 
         table  = '011:mates:umate'
@@ -80,6 +79,7 @@ class steea:
         γ_M4   = parse.chdr(table , 'γ_M4'   , γ_M4   )
         γ_M5   = parse.chdr(table , 'γ_M5'   , γ_M5   )
         γ_M6   = parse.chdr(table , 'γ_M6'   , γ_M6   )
+        γ_M_ser= parse.chdr(table , 'γ_M_ser', γ_M_ser)
 
         # resolve Young module
         if   not E_1 and E_a: E_1 = E_a
@@ -96,16 +96,11 @@ class steea:
             mode  = 'r',
             table = ['013:mates:steea'],
             cols  = ['id','family','grade','t_max','f_yk','f_uk','E_a','ε_yk',
-                     'ε_uk','γ_M0','γ_M1','γ_M2','γ_M3','γ_M4','γ_M5','γ_M6'],
+                     'ε_uk','γ_M0','γ_M1','γ_M2','γ_M3','γ_M4','γ_M5','γ_M6','γ_M_ser'],
             data  =
                 [id,family,grade,t_max,f_yk,f_uk,E_a,ε_yk,
-                ε_uk,γ_M0,γ_M1,γ_M2,γ_M3,γ_M4,γ_M5,γ_M6],
+                ε_uk,γ_M0,γ_M1,γ_M2,γ_M3,γ_M4,γ_M5,γ_M6,γ_M_ser],
         )
-
-
-    # def sample(self, family, grade):
-
-
 
 
 
@@ -154,21 +149,21 @@ class steea:
                 )
 
             # średnia z próby n wyników
-            m_y = (sum(ln(x_i.d('MPa')) for x_i in x))*cunit(1,'MPa') / n
+            m_y = (sum(ln(x_i.d('MPa')) for x_i in x))*unise(1,'MPa') / n
 
             # współczynnik obliczeniowy przypisany kwantylowi wartości charakterystycznej
             s_y = max(
-                V_x_min*cunit(1,'MPa'),
+                V_x_min*unise(1,'MPa'),
 
-                sqrt(1/(n-1)*sum([(ln(x_i.d('MPa'))*cunit(1,'MPa')-m_y)**2
+                sqrt(1/(n-1)*sum([(ln(x_i.d('MPa'))*unise(1,'MPa')-m_y)**2
                     for x_i in x]))
                 )
 
             # D7.2 Oszacowanie wartości charakterystycznych
-            f_k = η_d * exp((m_y - k_n*s_y).d('MPa'))*cunit(1,'MPa')
+            f_k = η_d * exp((m_y - k_n*s_y).d('MPa'))*unise(1,'MPa')
 
             # D7.3 Bezpośrednie oszacowanie wartości obliczeniowych do sprawdzania stanów granicznych nośności ULS
-            f_d = η_d * exp((m_y - k_d_n * s_y).d('MPa'))*cunit(1,'MPa')
+            f_d = η_d * exp((m_y - k_d_n * s_y).d('MPa'))*unise(1,'MPa')
 
 
 
@@ -197,49 +192,4 @@ class steea:
 
         return obj
 
-
-#$$ ________ def echo ______________________________________________________ #
-
-    def echo(self, mode='a+', where=None, label=None):
-
-        if 'a' in mode:
-            data = self.core.dbase.get(
-                mode  = 'm',
-                table = '[013:mates:steea]',
-                cols  = '[id],[grade],[t_max],[f_yk],[f_uk],[E_a],[ε_yk],[ε_uk],[γ_M0],[γ_M1],[γ_M2],[γ_M3],[γ_M4],[γ_M5],[γ_M6]',
-                where = where,
-            )
-
-            caption = self.core.tools.clang(
-                en = 'Structural steel properties',
-                pl = 'Parametry stali konstrukcyjnej',
-            )
-
-            out = self.core.pinky.rstme.table(
-                caption = None if 'x' in mode else caption,
-                wrap    = [False,False,False,False,False],
-                width   = [True,True,True,True,True],
-                halign  = ['l','c','c','c','c'],
-                valign  = ['u','u','u','u','u'],
-                dtype   = ['t','e','e','e','e'],
-                header  = [
-                    ['id','grade','t_max'],
-                    ['f_yk','f_uk','E_a'],
-                    ['ε_yk','ε_uk','γ_M0'],
-                    ['γ_M1','γ_M2','γ_M3'],
-                    ['γ_M4','γ_M5','γ_M6']
-                ],
-                data    = [[
-                    [row['id'],row['grade'],row['t_max']],
-                    [row['f_yk'],row['f_uk'],row['E_a']],
-                    [row['ε_yk'],row['ε_uk'],row['γ_M0']],
-                    [row['γ_M1'],row['γ_M2'],row['γ_M3']],
-                    [row['γ_M4'],row['γ_M5'],row['γ_M6']],
-                ] for row in data],
-                precision = 2,
-                inherit = True if 'x' in mode else False,
-            )
-
-            if 'x' in mode:
-                self.core.pinky.texme.code(
-                    caption=caption, code=out, rst=True, label=None,strip=False)
+#$ ######################################################################### #

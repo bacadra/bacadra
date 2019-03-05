@@ -10,13 +10,15 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
-from ...dbase import parse
-from ...tools.setts import settsmeta
+#$ ######################################################################### #
 
+from ...dbase import parse
+from ...tools.setts import setts_init
 
 #$ ____ class setts ________________________________________________________ #
 
-class setts(settsmeta):
+class setts(setts_init):
+
     _ldef_id = None
 
 
@@ -24,33 +26,31 @@ class setts(settsmeta):
 
 class umate:
 
-    # class setts
-    setts = setts('setts', (setts,), {})
+    setts = setts()
 
 
 #$$ ________ def __init__ __________________________________________________ #
 
     def __init__(self, core):
 
-        # project object
         self.core = core
 
-        # local setts
-        self.setts = self.setts('setts',(),{})
+        self.setts = setts(self.setts, self)
+
 
 #$$ ________ def add _______________________________________________________ #
 
     def add(self, id=None, ρ_o=None, E_1=None, v_1=None, G_1=None, t_e=None, ttl=None, subcl=None):
 
         table = '011:mates:umate'
-        id = parse.chdr(table, 'id', id)
-        ρ_o = parse.chdr(table, 'ρ_o', ρ_o)
-        E_1 = parse.chdr(table, 'E_1', E_1)
-        v_1 = parse.chdr(table, 'v_1', v_1)
-        G_1 = parse.chdr(table, 'G_1', G_1)
-        t_e = parse.chdr(table, 't_e', t_e)
-        ttl = parse.chdr(table, 'ttl', ttl)
-        subcl = parse.chdr(table, 'subcl', subcl)
+        id    = parse.chdr(table , 'id'    , id    )
+        ρ_o   = parse.chdr(table , 'ρ_o'   , ρ_o   )
+        E_1   = parse.chdr(table , 'E_1'   , E_1   )
+        v_1   = parse.chdr(table , 'v_1'   , v_1   )
+        G_1   = parse.chdr(table , 'G_1'   , G_1   )
+        t_e   = parse.chdr(table , 't_e'   , t_e   )
+        ttl   = parse.chdr(table , 'ttl'   , ttl   )
+        subcl = parse.chdr(table , 'subcl' , subcl )
 
         # overwrite last defined material
         self.setts._ldef_id = id
@@ -65,99 +65,6 @@ class umate:
             cols  = ['id','ρ_o','E_1','v_1','G_1','t_e','ttl','subcl'],
             data  = [id,ρ_o,E_1,v_1,G_1,t_e,ttl,subcl],
         )
-
-
-#$$ ________ def echo ______________________________________________________ #
-
-    def echo(self, mode='a+', where=None, label=None):
-
-        if 'a' in mode:
-            data = self.core.dbase.get(
-                mode  = 'm',
-                table = '[011:mates:umate]',
-                cols  = '[id],[ρ_o],[E_1],[v_1],[G_1],[t_e],[subcl],[ttl]',
-                where = where,
-            )
-
-            if not data: return
-
-            caption = 'General properties of materials'
-
-            out = self.core.pinky.rstme.table(
-                caption = None if 'x' in mode else caption,
-                wrap    = [False,False,False,False,False,False,False,True],
-                width   = [True,8,8,4,8,8,5,True],
-                halign  = ['l','c','c','c','c','c','c','l'],
-                valign  = ['u','u','u','u','u','u','u','u'],
-                dtype   = ['t','e','e','e','e','e','t','t'],
-                header  = ['id','ρ_o','E_1','v_1','G_1','t_e','subcl','ttl'],
-                data    = data,
-                precision = 2,
-                inherit = True if 'x' in mode else False,
-            )
-
-            if 'x' in mode:
-                self.core.pinky.texme.code(
-                    caption=caption, code=out, rst=True, label=None,strip=False)
-
-
-        if 'b' in mode:
-            data = self.core.dbase.get(
-                mode  = 'm',
-                table = '[011:mates:umate]',
-                cols  = '[id],[ρ_o],[E_1],[v_1],[G_1],[t_e],[subcl],[ttl]',
-                where = where,
-            )
-
-            if not data: return
-
-            caption = 'General properties of materials'
-
-            out = self.core.pinky.rstme.table(
-                caption = None if 'x' in mode else caption,
-                wrap    = [False,False,False,False,False,False,False,True],
-                width   = [True,8,8,4,8,8,5,True],
-                halign  = ['l','c','c','c','c','c','c','l'],
-                valign  = ['u','u','u','u','u','u','u','u'],
-                dtype   = ['t','e','e','e','e','e','t','t'],
-                header  = [
-                    'id',
-                    ['ρ_o','[kg/m3]'],['E_1','[N/m2]'],['v_1','[1]'],['G_1','[N/m2]'],['t_e','[1/°C]'],'subcl','ttl'],
-                data    = data,
-                precision = 2,
-                inherit = True if 'x' in mode else False,
-            )
-
-            if 'x' in mode:
-                self.core.pinky.texme.code(
-                    caption=caption, code=out, rst=True, label=None,strip=False)
-
-
-
-        if '+' in mode:
-
-            out = self.core.pinky.rstme.table(
-                wrap   = [False, False, False, True],
-                width  = [8, 8, 2,True],
-                halign = ['r','l','c','l'],
-                valign = ['u','u','u','u'],
-                dtype  = ['t','t','t','t'],
-                data   = [
-                    ['id' , ''       , '-', 'identificator'   ],
-                    ['ρ_o', '[kg/m3]', '-', 'densinity'       ],
-                    ['E_1', '[N/m2]' , '-', 'Young\'s modulus'],
-                    ['G_1', '[N/m2]' , '-', 'Kirchoff modulus'],
-                    ['v_1', '[1]'    , '-', 'poisson ratio'   ],
-                    ['t_e', '[1/°C]' , '-', 'Kirchoff modulus'],
-                    ['ttl', ''       , '-', 'title'           ],
-                ],
-                border = False,
-                inherit = True if 'x' in mode else False,
-            )
-
-            if 'x' in mode:
-                self.core.pinky.texme.code(
-                    code=out, rst=True, label=None,strip=False)
 
 
 
@@ -179,3 +86,4 @@ class umate:
         return E,v,G
 
 
+#$ ######################################################################### #

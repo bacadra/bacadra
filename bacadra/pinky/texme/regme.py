@@ -10,11 +10,13 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
+#$ ######################################################################### #
+
 import re
 import regex
 import numpy as np
 from ...tools.fpack import translate
-from ...cunit.cunit import cunit
+from ...unise.unise import unise
 from . import verrs
 
 #$ ____ precopiled regex ___________________________________________________ #
@@ -27,13 +29,13 @@ regme_recomp2 = re.compile(r'(\_\{[a-zA-Z0-9α-ωΑ-Ω,]+)\_(?!\{)')
 
 # usuwanie gwiazdki przez jednostkami
 str_begin = r'(\*|\\cdot|~)[ ]*'
-str_unit  = r'(m|kN|s|C|N|MN|mm|cm|km|Pa|kPa|MPa|GPa|kNm|Nm|MNm|kg|Hz|kHz|rad|mrad|deg|minu|hr|day|yr)'
-str_end   = r'( |\n|~|\+|\-|\%|\@|=|\*|\(|\)|{|}|\$|\:|$|\^|\\)'
+str_unit  = r'(m|kg|s|K|rad|mrad|C|Hz|t|cm|mm|km|dm|N|kN|MN|GN|Pa|kPa|MPa|GPa|yr|day|hr|min)'
+str_end   = r'( |\n|~|\+|\-|\%|\@|=|\*|\(|\)|{|}|\$|\:|$|\^|\\|/)'
 regme_unit1 = re.compile(str_begin + str_unit + str_end)
 
-
 # prostowanie jednostek
-str_begin = r'( |[0-9]|\n|~|\+|\-|\%|\@|=|\*|\(|\)|{|}|\$|\:)[ ]*'
+str_begin = r'( |[0-9]|\n|~|\+|\-|\%|\@|=|\*|\(|\)|\{|}|\$|\:|/|\\)[ ]*'
+str_end   = r'( |\n|~|\+|\-|\%|\@|=|\*|\(|\)|{|}|\$|\:|$|\^|\\|/)'
 regme_unit2 = re.compile(str_begin + str_unit + str_end)
 
 str_begin = r'( |[0-9]|\n|~|\+|\-|\%|\@|=|\*|\(|\)|}|\$|\:)[ ]*'
@@ -59,17 +61,34 @@ regme_textstyle5 = regex.compile(r'\\(?:mm|tm)'+bm)
 
 
 
-#$ ____ class regme ________________________________________________________ #
-
+#$ ____ class Regme ________________________________________________________ #
 
 class Regme:
-    #$$ def __init__
-    def __init__(self, text='', dict={}, package=None, math_mode=False):
+
+#$$ ________ def __init__ __________________________________________________ #
+
+    def __init__(self, text='', dict={}, package=None):
         self.text = text
-        self.math_mode = math_mode
+        self.math_mode = False
         self.dict = dict
 
-    #$$ def math_inline
+        self._math_mode = False # in math region True
+
+
+#$$ ________ def mmode _____________________________________________________ #
+
+    def mmode(self):
+        '''
+        Toogle math_mode.
+        '''
+
+        if self.math_mode==True:
+            self.math_mode = False
+        else:
+            self.math_mode = True
+
+#$$ ________ def math_inline _______________________________________________ #
+
     def math_inline(self, RegMEFunctions):
         '''
         Detect math in string.
@@ -95,16 +114,16 @@ class Regme:
             self.text = self.text
         return self.text
 
+#$$ ________ def eval ______________________________________________________ #
 
-    #$$ def eval
     def eval(self):
         '''
-        Detect math in string.
+        Detect string chunks to evaluate in string.
         '''
 
         def root(text):
-            old = cunit.style
-            cunit.style = 'latex'
+            old = unise.setts.style
+            unise.setts.style = 'latex'
             try:
                 a = [text.find('@')]
                 i = 0
@@ -163,7 +182,7 @@ class Regme:
                                 new += str(new1)
                     text = new
             finally:
-                cunit.style = old
+                unise.setts.style = old
             return text
 
 
@@ -172,10 +191,11 @@ class Regme:
         else:
             self.text = root(self.text)
 
-    #$$ def wb
-    def wb(self):
+#$$ ________ def orphan ____________________________________________________ #
+
+    def orphan(self):
         '''
-        Wdowy i bekarty
+        Convert orphan to ~orphan
         '''
 
         def root(text):
@@ -188,58 +208,180 @@ class Regme:
         else:               self.text = root(self.text)
 
 
-    ##$ def greek
+#$$ ________ def greek _____________________________________________________ #
+
     def greek(self):
         '''
         Translate original greek to latex greek.
         '''
 
         def root(text):
-            ndict = { 'ς': '{\\zeta}', # V
-                      'ε': '{\\varepsilon}', # e
-                      'ϕ': '{\\varphi}', # j
-                      'ϵ': '{\\epsilon}', # ϵ
-                      'ρ': '{\\rho}', # r
-                      'τ': '{\\tau}', # t
-                      'υ': '{\\upsilon}', # u
-                      'θ': '{\\theta}', # q
-                      'ι': '{\\iota}', # i
-                      'ο': '{\\o}', # o
-                      'π': '{\\pi}', # p
-                      'α': '{\\alpha}', # a
-                      'σ': '{\\sigma}', # s
-                      'δ': '{\\delta}', # d
-                      'φ': '{\\phi}', # f
-                      'γ': '{\\gamma}', # g
-                      'η': '{\\eta}', # h
-                      'ξ': '{\\xi}', # x
-                      'κ': '{\\kappa}', # k
-                      'λ': '{\\lambda}', # l
-                      'ζ': '{\\zeta}', # z
-                      'χ': '{\\chi}', # c
-                      'ψ': '{\\psi}', # y
-                      'ω': '{\\omega}', # w
-                      'β': '{\\beta}', # b
-                      'ν': '{\\nu}', # n
-                      'μ': '{\\mu}', # m
-                      'Τ': '{\\T}', # T
-                      'Θ': '{\\Theta}', # Q
-                      'Π': '{\\Pi}', # P
-                      'Σ': '{\\sum}', # S
-                      'Δ': '{\\Delta}', # D
-                      'Φ': '{\\Phi}', # F
-                      'Γ': '{\\Gamma}', # G
-                      'Ξ': '{\\Xi}', # X
-                      'Λ': '{\\Lambda}', # L
-                      'Ψ': '{\\Psi}', # Y
-                      'Ω': '{\\Omega}'} # W
-            text = translate(text, ndict)
-            return text
+            return translate(text, {
+                # q-Q
+                '!θ' : r'{\texttheta}'       ,
+                'θ'  : r'{\theta}'           ,
+                '!Θ' : r'{\textTheta}'       ,
+                'Θ'  : r'{\Theta}'           ,
+
+                # w-W
+                '!ω' : r'{\textomega}'       ,
+                'ω'  : r'{\omega}'           ,
+                '!Ω' : r'{\textOmega}'       ,
+                'Ω'  : r'{\Omega}'           ,
+
+                # e-E
+                '!ε' : r'{\textepsilon}'     ,
+                'ε'  : r'{\varepsilon}'      ,
+                '!Ε' : r'{\textEpsilon}'     ,
+                'Ε'  : r'{\Epsilon}'         ,
+                '!ϵ' : r'{\straightepsilon}' ,
+                'ϵ'  : r'{\epsilon}'         ,
+
+
+                # r-R
+                '!ρ' : r'{\textrho}'         ,
+                'ρ'  : r'{\rho}'             ,
+                '!Ρ' : r'{\textRho}'         ,
+                'Ρ'  : r'{\Rho}'             ,
+
+                # t-T
+                '!τ' : r'{\texttau}'         ,
+                'τ'  : r'{\tau}'             ,
+                '!Τ' : r'{\textTau}'         ,
+                'Τ'  : r'{\Tau}'             ,
+
+                # y-Y
+                '!ψ' : r'{\textpsi}'         ,
+                'ψ'  : r'{\psi}'             ,
+                '!Ψ' : r'{\textPsi}'         ,
+                'Ψ'  : r'{\Psi}'             ,
+
+                # u-U
+                '!υ' : r'{\textupsilon}'     ,
+                'υ'  : r'{\upsilon}'         ,
+                '!Υ' : r'{\textUpsilon}'     ,
+                'Υ'  : r'{\Upsilon}'         ,
+
+                # i-I
+                '!ι' : r'{\textiota}'        ,
+                'ι'  : r'{\iota}'            ,
+                '!Ι' : r'{\textIota}'        ,
+                'Ι'  : r'{\Iota}'            ,
+
+                # o-O
+                '!ο' : r'{\textomikron}'     ,
+                'ο'  : r'{\omnikron}'        ,
+                '!Ο' : r'{\textOmikron}'     ,
+                'Ο'  : r'{\Omikron}'         ,
+
+                # p-P
+                '!π' : r'{\textpi}'          ,
+                'π'  : r'{\pi}'              ,
+                '!Π' : r'{\textPi}'          ,
+                'Π'  : r'{\Pi}'              ,
+
+                # a-A
+                '!α' : r'{\textalpha}'       ,
+                'α'  : r'{\alpha}'           ,
+                '!Α' : r'{\textAlpha}'       ,
+                'Α'  : r'{\Alpha}'           ,
+
+                # s-S
+                '!σ' : r'{\textsigma}'       ,
+                'σ'  : r'{\sigma}'           ,
+                '!Σ' : r'{\textSigma}'       ,
+                'Σ'  : r'{\Sigma}'           ,
+
+                # d-D
+                '!δ' : r'{\textdelta}'       ,
+                'δ'  : r'{\delta}'           ,
+                '!Δ' : r'{\textDelta}'       ,
+                'Δ'  : r'{\Delta}'           ,
+
+                # f-F
+                '!φ' : r'{\straightphi}'     ,
+                'φ'  : r'{\phi}'             ,
+                '!Φ' : r'{\textPhi}'         ,
+                'Φ'  : r'{\Phi}'             ,
+
+                # g-G
+                '!γ' : r'{\textgamma}'       ,
+                'γ'  : r'{\gamma}'           ,
+                '!Γ' : r'{\textGamma}'       ,
+                'Γ'  : r'{\Gamma}'           ,
+
+                # h-H
+                '!η' : r'{\texteta}'         ,
+                'η'  : r'{\eta}'             ,
+                '!Η' : r'{\textEta}'         ,
+                'Η'  : r'{\Eta}'             ,
+
+                # j-J
+                '!ϕ' : r'{\textphi}'         ,
+                'ϕ'  : r'{\varphi}'          ,
+                '!ϑ' : r'{\scripttheta}'     ,
+                'ϑ'  : r'{\theta}'           ,
+
+                # k-K
+                '!κ' : r'{\textkappa}'       ,
+                'κ'  : r'{\kappa}'           ,
+                '!Κ' : r'{\textKappa}'       ,
+                'Κ'  : r'{\Kappa}'           ,
+
+                # l-L
+                '!λ' : r'{\textlambda}'      ,
+                'λ'  : r'{\lambda}'          ,
+                '!Λ' : r'{\textLambda}'      ,
+                'Λ'  : r'{\Lambda}'          ,
+
+                # z-Z
+                '!ζ' : r'{\textzeta}'        ,
+                'ζ'  : r'{\zeta}'            ,
+                '!Ζ' : r'{\textZeta}'        ,
+                'Ζ'  : r'{\Zeta}'            ,
+
+                # x-X
+                '!ξ' : r'{\textxi}'          ,
+                'ξ'  : r'{\xi}'              ,
+                '!Ξ' : r'{\textXi}'          ,
+                'Ξ'  : r'{\Xi}'              ,
+
+                # c-C
+                '!χ' : r'{\textchi}'         ,
+                'χ'  : r'{\chi}'             ,
+                '!Χ' : r'{\textChi}'         ,
+                'Χ'  : r'{\Chi}'             ,
+
+                # v-V
+                '!ς' : r'{\textvarsigma}'    ,
+
+                # b-B
+                '!β' : r'{\textbeta}'        ,
+                'β'  : r'{\beta}'            ,
+                '!Β' : r'{\textBeta}'        ,
+                'Β'  : r'{\Beta}'            ,
+
+                # n-N
+                '!ν' : r'{\textnu}'          ,
+                'ν'  : r'{\nu}'              ,
+                '!Ν' : r'{\textNu}'          ,
+                'Ν'  : r'{\Nu}'              ,
+
+                # m-M
+                '!μ' : r'{\textmugreek}'     ,
+                'μ'  : r'{\mu}'              ,
+                '!Μ' : r'{\textMu}'          ,
+                'Μ'  : r'{\Mu}'              ,
+
+
+                # '!θ' : r'{\straighttheta}'   ,
+            })
 
         if self.math_mode:  self.text = self.math_inline(root)
         else:               self.text = root(self.text)
 
-    #$$ def bslash
+#$$ ________ def bslash ____________________________________________________ #
+
     # TODO: problem with statment like frac{mt{ib{....
     def bslash(self):
         '''
@@ -253,7 +395,8 @@ class Regme:
         if self.math_mode:  self.text = self.math_inline(root)
         else:               self.text = root(self.text)
 
-    #$$ def subscript
+#$$ ________ def subscript _________________________________________________ #
+
     def subscript(self):
         '''
         '''
@@ -267,21 +410,39 @@ class Regme:
         if self.math_mode:  self.text = self.math_inline(root)
         else:               self.text = root(self.text)
 
-    #$$ def unit
-    def unit(self):
+#$$ ________ def unit_point ________________________________________________ #
+
+    def unit_point(self):
         '''
+        Usuwanie gwiazdek przed jednostka
         '''
 
         def root(text):
-            text = regme_unit1.sub(r' \2 \3', text)
-            # text = regme_unit2.sub(r'\1~\\textrm{\2}\3',text)
-            # text = text.replace('{~', '{')
+            return regme_unit1.sub(r'\2\3', text)
+
+        if self.math_mode:  self.text = self.math_inline(root)
+        else:               self.text = root(self.text)
+
+
+#$$ ________ def unit_noitalic _____________________________________________ #
+
+    def unit_noitalic(self):
+        '''
+        Prostowanie jednostek
+        '''
+
+        def root(text):
+            for i in range(4):
+                text = regme_unit2.sub(r'\1\\mathrm{\,\2}\3', text)
             return text
 
         if self.math_mode:  self.text = self.math_inline(root)
         else:               self.text = root(self.text)
 
-    #$$ def rmfunction
+
+
+#$$ ________ def rmfunction ________________________________________________ #
+
     def rmfunction(self):
         '''
         '''
@@ -299,9 +460,11 @@ class Regme:
         if self.math_mode:  self.text = self.math_inline(root)
         else:               self.text = root(self.text)
 
-    #$$ def math-fraction
+#$$ ________ def math_fraction _____________________________________________ #
+
     def math_fraction(self):
         '''
+        Convert math ()/() to frac{}{} and a/b to frac{a}{b}
         '''
 
         def root(text):
@@ -316,45 +479,50 @@ class Regme:
         if self.math_mode:  self.text = self.math_inline(root)
         else:               self.text = root(self.text)
 
-    #$$ def symbols
+#$$ ________ def symbols ___________________________________________________ #
+
     def symbols(self):
         '''
+        Convert most popular symbols
         '''
 
         def root(text):
             ndict = {
-                '**': '^',
-                 '*': ' \\cdot ',
-                 '⋅': ' \\cdot ',
-                 '<=': ' \\leqslant ',
-                 '>=': ' \\geqslant ',
-                 '==': ' \\equiv ',
-                 '=~=': ' \\approx ',
-                 '!=': ' \\neq ',
-                 '≠': ' \\neq ',
-                 #'/':  ' \\div ',
-                 '||': ' \\parallel',
-                 '_|_': ' \perp',
+                '**'   : '^',
+                 '*'   : ' \\cdot ',
+                 '⋅'    : ' \\cdot ',
+                 '<='  : ' \\leqslant ',
+                 '>='  : ' \\geqslant ',
+                 '=='  : ' \\equiv ',
+                 '=~=' : ' \\approx ',
+                 '!='  : ' \\neq ',
+                 '≠'   : ' \\neq ',
+                 #'/'  : ' \\div ',
+                 '||'  : ' \\parallel',
+                 '_|_' : ' \perp',
+                 '+='  : '\\mathrel{+}=',
+                 '**=' : '\\mathrel{**}=',
+                 '-='  : '\\mathrel{-}=',
 
-                 '<->': ' \\Leftrightarrow ',
-                 '->': ' \\Rightarrow ',
-                 '<-': ' \\Leftarrow ',
+                 '<->' : ' \\Leftrightarrow ',
+                 '->'  : ' \\Rightarrow ',
+                 '<-'  : ' \\Leftarrow ',
 
-                 '∫[':  '\\int\\limits_[',
-                 '∫{':  '\\int\\limits_{',
-                 '∫':   '\\int\\limits ',
-                 '∬[':  '\\iint\\limits_[',
-                 '∬{':  '\\iint\\limits_{',
-                 '∬':  '\\iint\\limits ',
-                 '∭[':  '\\iiint\\limits_[',
-                 '∭{':  '\\iiint\\limits_{',
-                 '∭':  '\\iiint\\limits ',
-                 '∑[':  '\\sum\\limits_[',
-                 '∑{':  '\\sum\\limits_{',
-                 '∑':  '\\sum\\limits ',
-                 '√':  '\\sqrt',
-                 '∂':  '\\partial ',
-                 '∞':  '\\infty ',
+                 '∫['  : '\\int\\limits_[',
+                 '∫{'  : '\\int\\limits_{',
+                 '∫'   : '\\int\\limits ',
+                 '∬['  : '\\iint\\limits_[',
+                 '∬{'  : '\\iint\\limits_{',
+                 '∬'   : '\\iint\\limits ',
+                 '∭['  : '\\iiint\\limits_[',
+                 '∭{'  : '\\iiint\\limits_{',
+                 '∭'   : '\\iiint\\limits ',
+                 '∑['  : '\\sum\\limits_[',
+                 '∑{'  : '\\sum\\limits_{',
+                 '∑'   : '\\sum\\limits ',
+                 '√'   : '\\sqrt',
+                 '∂'   : '\\partial ',
+                 '∞'   : '\\infty ',
             }
             text = translate(text, ndict)
 
@@ -370,9 +538,11 @@ class Regme:
         if self.math_mode:  self.text = self.math_inline(root)
         else:               self.text = root(self.text)
 
-    #$$ def symbols-bracket
-    def symbols_bracket(self):
+#$$ ________ def bracket ___________________________________________ #
+
+    def bracket(self):
         '''
+        convert bracket to left and right
         '''
 
         def root(text):
@@ -385,8 +555,8 @@ class Regme:
         if self.math_mode:  self.text = self.math_inline(root)
         else:               self.text = root(self.text)
 
+#$$ ________ def mcadenv ___________________________________________________ #
 
-    #$$ def mcadenv
     def mcadenv(self): # only to display math in hydrogen latex python
         '''
         '''
@@ -397,9 +567,11 @@ class Regme:
         # self.text = re.sub(r'\\end{mcad}', r'\\end{array}', self.text)
         # self.text = re.sub(r'\\end{mcin}', r'\\end{array}', self.text)
 
-    #$$ def textstyle
-    def textstyle(self): # only to display math in hydrogen latex python
+#$$ ________ def textstyle _________________________________________________ #
+
+    def textstyle(self):
         '''
+        Only to display math in hydrogen latex python
         '''
 
         def root(text):
@@ -412,51 +584,48 @@ class Regme:
         if self.math_mode:  self.text = self.math_inline(root)
         else:               self.text = root(self.text)
 
-    #$$ def package
-    def package(self, mode=1):
+#$ ____ def run ____________________________________________________________ #
+
+    def run(self, code=''):
         '''
+        + -- math mode toogle
+        e -- eval code in @..@
+
+        old packages:
+        0  -> ''
+        1  -> 'e+fbusy+hrgo'
+        11 -> 'efbusyhrgo'
+        99 -> 'mt'
         '''
-        if mode==0:
-            pass
 
-        elif mode==1:
-            self.math_mode = False
-            self.eval()
-            self.math_mode = True
-            self.math_fraction()
-            self.symbols_bracket()
-            self.unit()
-            self.subscript()
-            self.symbols()
-            self.math_mode = False
-            self.bslash()
-            self.rmfunction()
-            self.greek()
-            self.wb()
+        # loop over letters in run code
+        for letter in code:
 
-        elif mode==11:
-            self.math_mode = False
-            self.eval()
-            self.math_fraction()
-            self.symbols_bracket()
-            self.unit()
-            self.subscript()
-            self.symbols()
-            self.bslash()
-            self.rmfunction()
-            self.greek()
-            self.wb()
-
-
-        elif mode==99:
-            self.mcadenv()
-            self.textstyle()
+            # special char, toogle math_mode, default is False
+            if   letter=='$': self.mmode()
+            elif letter=='e': self.eval()
+            elif letter=='o': self.orphan()
+            elif letter=='g': self.greek()
+            elif letter=='h': self.bslash()
+            elif letter=='s': self.subscript()
+            elif letter=='u': self.unit_point()
+            elif letter=='i': self.unit_noitalic()
+            elif letter=='r': self.rmfunction()
+            elif letter=='f': self.math_fraction()
+            elif letter=='y': self.symbols()
+            elif letter=='b': self.bracket()
+            elif letter=='m': self.mcadenv()
+            elif letter=='t': self.textstyle()
 
         return self.text
 
-def regme(text, dict, package, math_mode=False):
-    self = Regme(text, dict, package, math_mode)
-    if package!=None:
-        return self.package(package)
+def regme(text, dict, code):
+    # create Regme instance
+    self = Regme(text, dict, code)
+
+    if code!=None:
+        return self.run(code)
     else:
-        return self
+        return self.text
+
+#$ ######################################################################### #

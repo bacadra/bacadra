@@ -20,7 +20,7 @@ class template:
             # return method with the same name and send value
             if key in self.exte_keys:
                 val = self.exte_keys[key]
-            exec(f'self.{key}({val})')
+            getattr(self, key)(val)
         return self.base_keys
 
     def author(self, val):

@@ -10,9 +10,11 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
+#$ ######################################################################### #
+
 import sqlite3
 
-from ..tools.setts import settsmeta
+from ..tools.setts import setts_init
 from ..tools.fpack import translate
 
 from . import verrs
@@ -20,82 +22,38 @@ from . import verrs
 
 #$ ____ class setts ________________________________________________________ #
 
-class setts(settsmeta):
+class setts(setts_init):
 
 #$$ ________ def path ______________________________________________________ #
 
-    # path to database
-    # can be ":memory:" or just path to file, with extension!
-
-    __path = ':memory:'
-
-    @property
-    def path(self): return self.__path
-
-    @path.setter
-    def path(self, value):
-        if self.__save__: self.__path   = value
-        else:             self.__temp__ = value
+    def path(self, value=None, check=None, reset=None):
+        '''
+        path to database
+        can be ":memory:" or just path to file, with extension!
+        '''
+        return self.tools.gst('path', value, check, reset)
 
 
 #$$ ________ def multithread _______________________________________________ #
 
-    __multithread = True
-
-    @property
-    def multithread(self): return self.__multithread
-
-    @multithread.setter
-    def multithread(self, value):
-        if self.__save__: self.__multithread = value
-        else:             self.__temp__ = value
-
+    def multithread(self, value=None, check=None, reset=None):
+        return self.tools.gst('multithread', value, check, reset)
 
 #$$ ________ def journal_mode ______________________________________________ #
 
-    __journal_mode = 'OFF'
-
-    @property
-    def journal_mode(self): return self.__journal_mode
-
-    @journal_mode.setter
-    def journal_mode(self, value):
-        if not value.lower() in ['delete', 'truncate', 'persist', 'memory', 'wal', 'off']:
-            verrs.BCDR_dbase_ERROR_General('e0111',
-                'Unsupported parameter of journal_mode!\n'
-                "Tip: try use 'delete' or 'truncate' or 'persist' or 'memory' or 'wal' or 'off'\n"
-                'Tip: https://www.sqlite.org/pragma.html#pragma_journal_mode'
-            )
-            value = value.upper()
-        if self.__save__: self.__journal_mode = value
-        else:             self.__temp__ = value
-
+    def journal_mode(self, value=None, check=None, reset=None):
+        return self.tools.gst('journal_mode', value, check, reset)
 
 #$$ ________ def auto_commit _______________________________________________ #
 
-    __auto_commit = True
-
-    @property
-    def auto_commit(self): return self.__auto_commit
-
-    @auto_commit.setter
-    def auto_commit(self, value):
-
-        if self.__save__: self.__auto_commit = value
-        else:             self.__temp__ = value
-
+    def auto_commit(self, value=None, check=None, reset=None):
+        return self.tools.gst('auto_commit', value, check, reset)
 
 #$$ ________ def write _____________________________________________________ #
 
-    __write = 'insert'
+    def write(self, value=None, check=None, reset=None):
 
-    @property
-    def write(self): return self.__write
-
-    @write.setter
-    def write(self, value):
-
-        if value in [None, True, 'i']:
+        if value in [True, 'insert', 'i']:
             value = 'insert'
 
         elif value in ['insert or replace','replace','ior']:
@@ -107,9 +65,26 @@ class setts(settsmeta):
         else:
             raise ValueError('Unknow where type')
 
-        if self.__save__: self.__write = value
-        else:             self.__temp__ = value
+        return self.tools.gst('write', value, check, reset)
 
+    __write = 'insert'
+
+
+#$$ ________ def echo ______________________________________________________ #
+
+    def echo(self, value=None, x=None, check=None, reset=None):
+        '''
+        Atribute <echo> set the output of base methods in texme class. It provide letters interface "+" which can turn on/off
+
+        > "+" -- plain sql code.
+
+        User can type value as True then will be set "+" configuration or False then no output will be produced.
+        '''
+
+        return self.tools.let('echo', value, check, reset,
+            x=x,
+            full={'True':'x', 'False':''}
+        )
 
 
 #$ ____ class dbase ________________________________________________________ #
@@ -120,8 +95,13 @@ class dbase:
     https://docs.python.org/3.7/library/sqlite3.html
     '''
 
-    # class setts
-    setts = setts('setts', (setts,), {})
+    setts = setts()
+    setts.path(':memory:')
+    setts.multithread(True)
+    setts.journal_mode('OFF')
+    setts.auto_commit(True)
+    setts.write('insert')
+    setts.echo(False)
 
 
 #$$ ________ def __init __ __________________________________________________ #
@@ -130,8 +110,7 @@ class dbase:
 
         self.core = core
 
-        # object setts
-        self.setts = self.setts('setts',(),{})
+        self.setts = setts(self.setts, self)
 
         # sqlite3 connection
         self.db = None
@@ -156,21 +135,21 @@ class dbase:
 
         # if user type path, then set it as atribute
         if path:
-            self.setts.path = path
+            self.setts.path(path)
 
         # if connection is not established or other database was selected
-        if self._connQ != self.setts.path:
+        if self._connQ != self.setts.path():
 
             # create sqlite.connection object
             self.db = sqlite3.connect(
-                database          = self.setts.path,
+                database          = self.setts.path(),
                 timeout           = 0,
-                check_same_thread = not self.setts.multithread,
+                check_same_thread = not self.setts.multithread(),
                 isolation_level   = None,
             )
 
             # set connection flags as True
-            self._connQ = self.setts.path
+            self._connQ = self.setts.path()
 
             # set row_factory
             self.db.row_factory = sqlite3.Row
@@ -264,7 +243,7 @@ class dbase:
 
 #$$ ________ def exe ________________________________________________________ #
 
-    def exe(self, mode, code, data=None, auto_commit=None):
+    def exe(self, mode, code, data=None):
         '''
         mode='r'
         Execution of single query. The method provide security interface with (?,?,?) and (a,b,c) data.
@@ -279,7 +258,8 @@ class dbase:
         # check if connection is established
         self._check_connection()
 
-        auto_commit = self.setts.check_loc('auto_commit', auto_commit)
+        if '+' in self.setts.echo():
+            print('[dbase]\n'+code)
 
         if mode=='r' and data:
             self.cr.execute(code, data)
@@ -299,7 +279,8 @@ class dbase:
                 "Tip: use 'r', 'm' or 's'"
             )
 
-        self.commit()
+        if self.setts.auto_commit():
+            self.commit()
 
 
 #$$ ________ def add ________________________________________________________ #
@@ -344,7 +325,7 @@ class dbase:
 
         # call to exe method
         self.exe(
-            code = f"{self.setts.write} INTO {table}({cols}) VALUES({cole})",
+            code = f"{self.setts.write()} INTO {table}({cols}) VALUES({cole})",
             data = data,
             mode = mode,
         )
@@ -413,7 +394,7 @@ class dbase:
                 f'SELECT* FROM (SELECT\n{cols}\nfrom {table} {join}) {where}'
             )
 
-        if  mode=='+':
+        if  mode=='i':
             return self.cr
 
         elif mode=='r':
@@ -431,7 +412,7 @@ class dbase:
 
 #$$ ________ def obj ________________________________________________________ #
 
-    from .crema import obj
+    from .getdb import obj
 
 #$$ ________ def edit _______________________________________________________ #
 
@@ -457,9 +438,8 @@ class dbase:
 
         self.chk = dlist.chk
 
-        code = translate(dlist.sql,
-        {
-            '$<journal_mode>$':self.setts.journal_mode,
+        code = translate(dlist.sql, {
+            '$<journal_mode>$': self.setts.journal_mode(),
         })
 
         self.exe(code=code, mode='s')
@@ -492,5 +472,6 @@ class dbase:
         code += 'PRAGMA foreign_keys = ON;'
 
         # drop it
-        self.exe(code = code,mode = 's')
+        self.exe(code=code, mode='s')
 
+#$ ######################################################################### #

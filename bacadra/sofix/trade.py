@@ -10,97 +10,58 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
+#$ ######################################################################### #
+
 #$ ____ import _____________________________________________________________ #
 
 import os
 import subprocess
-from ..cunit import cunit
-from ..tools.setts import settsmeta
+from ..unise import unise
+from ..tools.setts import setts_init
 from . import verrs
 
 #$ ____ class setts ________________________________________________________ #
 
-class setts(settsmeta):
-
-    _self = None # here will be placed self instance
+class setts(setts_init):
 
 #$$ ________ def active ____________________________________________________ #
 
-    __active = True
-
-    @property
-    def active(self):
-            return self.__active
-
-    @active.setter
-    def active(self, value):
-        '''
-        User can deactive all methods, then methods will exit at the begging.
-        '''
-
-        if type(value) is not bool:
-            verrs.BCDR_pinky_texme_ERROR_Type_Check(type(value), 'bool')
-
-        if self.__save__: self.__active = value
-        else:             self.__temp__ = value
-
+    def active(self, value=None, check=None, reset=None):
+        return self.tools.gst('active', value, check, reset)
 
 #$$ ________ def name ______________________________________________________ #
 
-    __name = 'x_main.dat'
-
-    @property
-    def name(self):
-            return self.__name
-
-    @name.setter
-    def name(self, value):
-
-        if self.__save__: self.__name = value
-        else:             self.__temp__ = value
+    def name(self, value=None, check=None, reset=None):
+        return self.tools.gst('name', value, check, reset)
 
 #$$ ________ def project ___________________________________________________ #
 
-    __project = None
-
-    @property
-    def project(self):
-        if self._self.core and not self.__project:
-            return self._self.core.sofix.sbase.setts.project
-        else:
-            return self.__project
-
-    @project.setter
-    def project(self, value):
-        if self.__save__: self.__project = value
-        else:             self.__temp__ = value
+    def project(self, value=None, check=None, reset=None):
+        # if self._self.core and not self.__project:
+        #     return self._self.core.sofix.sbase.setts.project
+        # else:
+        #     return self.__project
+        return self.tools.gst('project', value, check, reset)
 
 
 #$$ ________ def cdb_name __________________________________________________ #
 
-    __cdb_name = None
-
-    @property
-    def cdb_name(self):
-        if self._self.core and not self.__cdb_name:
-            return self._self.core.sofix.sbase.setts.cdb_name
-        else:
-            return self.__cdb_name
-
-    @cdb_name.setter
-    def cdb_name(self, value):
-
-        if self.__save__: self.__cdb_name = value
-        else:             self.__temp__ = value
-
-
+    def cdb_name(self, value=None, check=None, reset=None):
+        # if self._self.core and not self.__cdb_name:
+        #     return self._self.core.sofix.sbase.setts.cdb_name
+        # else:
+        #     return self.__cdb_name
+        return self.tools.gst('cdb_name', value, check, reset)
 
 #$ ____ class trade _______________________________________________________ #
 
 class trade:
 
-    # class setts
-    setts = setts('setts', (setts,), {})
+    setts = setts()
+    setts.active(True)
+    setts.name('x_main.dat')
+    setts.project(r'.\sofix')
+    setts.cdb_name('c_main.cdb')
 
 #$$ ________ def __init __ _________________________________________________ #
 
@@ -108,8 +69,7 @@ class trade:
 
         self.core = core
 
-        # object setts
-        self.setts = self.setts('setts',(),{'_self':self})
+        self.setts = setts(self.setts, self)
 
         self._data_sto = []
         self._data_del = []
@@ -121,13 +81,13 @@ class trade:
     def sto(self, name, val, comment=None, active=None):
 
         # if user want to overwrite global active atribute
-        if not self.setts.check_loc('active', active): return
+        if not self.setts.active(active, check=True): return
 
         if comment:
             comment = ' $ ' + comment
         else:
             comment = ''
-        if type(val) == cunit:
+        if type(val) == unise:
             val = val.drop()
         elif type(val) == list:
             val = str(val)[1:-1].replace(', ',' $$\n')
@@ -140,7 +100,7 @@ class trade:
     def defb(self, name, val, comment=None, active=None):
 
         # if user want to overwrite global active atribute
-        if not self.setts.check_loc('active', active): return
+        if not self.setts.active(active, check=True): return
 
         if comment:
             comment = '$$ ' + comment + '\n'
@@ -154,7 +114,7 @@ class trade:
     def defi(self, name, val, comment=None, active=None):
 
         # if user want to overwrite global active atribute
-        if not self.setts.check_loc('active', active): return
+        if not self.setts.active(active, check=True): return
 
         if comment:
             comment = '$$ ' + comment + '\n'
@@ -168,11 +128,11 @@ class trade:
     def push(self, active=None):
 
         # if user want to overwrite global active atribute
-        if not self.setts.check_loc('active', active): return
+        if not self.setts.active(active, check=True): return
 
         temp  = os.path.join(
-            self.core.sofix.sbase.setts.project,
-            '.'.join(os.path.splitext(self.setts.name)[:-1])
+            self.core.sofix.sbase.setts.project(),
+            '.'.join(os.path.splitext(self.setts.name())[:-1])
         )
 
         pathd = temp + '.dat' # main file
@@ -185,7 +145,7 @@ class trade:
         data2 = '\n'.join(self._data_del)
         self._data_def,self._data_sto,self._data_del = [],[],[]
 
-        temp = self.core.sofix.sbase.setts.project
+        temp = self.core.sofix.sbase.setts.project()
         if not os.path.exists(temp):
             os.makedirs(temp)
 
@@ -212,10 +172,10 @@ $ --------- set variables --------------------------------------------------- $
 $ --------------------------------------------------------------------------- $
 end
 '''[1:-1].format(**{
-            'name' :self.setts.name,
-            'data0':'.'.join(os.path.splitext(self.setts.name)[:-1])+'.$d0',
-            'data1':'.'.join(os.path.splitext(self.setts.name)[:-1])+'.$d1',
-            'data2':'.'.join(os.path.splitext(self.setts.name)[:-1])+'.$d2'})
+            'name' :self.setts.name(),
+            'data0':'.'.join(os.path.splitext(self.setts.name())[:-1])+'.$d0',
+            'data1':'.'.join(os.path.splitext(self.setts.name())[:-1])+'.$d1',
+            'data2':'.'.join(os.path.splitext(self.setts.name())[:-1])+'.$d2'})
         else:
             temp = ''
 
@@ -226,15 +186,17 @@ end
     def make(self, active=None):
 
         # if user want to overwrite global active atribute
-        if not self.setts.check_loc('active', active): return
+        if not self.setts.active(active, check=True): return
 
         code = 'cmd /c pushd "{p0}" & "{p1}" -cdb:"{p2}" "{p3}"'.format(**{
-            'p0': os.path.abspath(self.core.sofix.sbase.setts.project),
+            'p0': os.path.abspath(self.core.sofix.sbase.setts.project()),
             'p1': os.path.join(
-                    self.core.sofix.sbase.setts.sofi_env,
-                    self.core.sofix.sbase.setts.sofi_run,
+                    self.core.sofix.sbase.setts.sofi_env(),
+                    self.core.sofix.sbase.setts.sofi_run(),
                   ).replace('/', '\\'),
-            'p2': self.core.sofix.sbase.setts.cdb_name,
-            'p3': self.setts.name})
+            'p2': self.core.sofix.sbase.setts.cdb_name(),
+            'p3': self.setts.name()})
 
         subprocess.run(code)
+
+#$ ######################################################################### #

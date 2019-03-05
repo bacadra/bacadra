@@ -10,220 +10,50 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
+#$ ######################################################################### #
 
-class clangmeta(type):
+from .setts import setts_init
 
-    propme = (
-    "__face = 'en'              \n"
+#$ ____ class setts ________________________________________________________ #
 
-    "@property                  \n"
-    "def face(self):            \n"
-    "    return self.__face     \n"
+class setts(setts_init):
 
-    "@face.setter               \n"
-    "def face(self, value):     \n"
-    "    self.__face = value    \n"
+    interface = lambda self, x=None: self.tools.gst('interface', x)
+    output = lambda self, x=None: self.tools.gst('output', x)
 
-    "__out = 'en'               \n"
+#$ ____ class clang ________________________________________________________ #
 
-    "@property                  \n"
-    "def out(self):             \n"
-    "    return self.__out      \n"
+class clang:
+    setts = setts()
+    setts.interface('en')
+    setts.output('en')
 
-    "@out.setter                \n"
-    "def out(self, value):      \n"
-    "    self.__out = value     \n"
-    )
-
-    exec(propme)
-
-
-class clang(metaclass=clangmeta):
-
-    exec(clangmeta.propme)
+#$$ ________ def __init__ __________________________________________________ #
 
     def __init__(self, core=None):
 
         self.core = core
 
-#$ ____ def __call__ ________________________________________________________ #
+        self.setts = setts(self.setts, self)
 
-    def __call__(self, mode='out', en='<No english description!>', language=None, l=None, **kwargs):
-        '''
-        (c)hoose (lang)uage
-        '''
+#$$ ________ def __call__ __________________________________________________ #
 
-        # resolve shortcuts...
-        if l: language = l
+    def __call__(self, mode='output', en='<No english description!>', language=None, **kwargs):
 
         # choose output language
-        if   not language and mode=='out' : language = self.out
-        elif not language and mode=='face': language = self.face
-        if language==None: language='en'
+        if   not language and mode=='interface':
+            language = self.setts.interface()
+        elif not language and mode=='output':
+            language = self.setts.output()
 
-        # join dict
-        data = {**{'en':en}, **kwargs}
-
-        # send correct data
-        if language in data:
-            return data[language]
+        # use default language
+        if language=='en':
+            text = en
         else:
-            return data['en']
+            text = kwargs[language]
 
+        return text
 
-
-# from .setts import settsmeta
-#
-#
-# #$ ____ class setts ________________________________________________________ #
-#
-# class setts(settsmeta):
-#
-# #$$ ________ def face ______________________________________________________ #
-#
-#     __face = 'en'
-#
-#     @property
-#     def face(self): return self.__face
-#
-#     @face.setter
-#     def face(self, value):
-#         '''
-#         Language of syste, interface.
-#         '''
-#
-#         if self.__save__: self.__face   = value
-#         else:             self.__temp__ = value
-#
-#
-# #$$ ________ def out _______________________________________________________ #
-#
-#     __out = 'en'
-#
-#     @property
-#     def out(self): return self.__out
-#
-#     @out.setter
-#     def out(self, value):
-#         '''
-#         Language of project output.
-#         '''
-#
-#         if self.__save__: self.__out    = value
-#         else:             self.__temp__ = value
-#
-#
-# class clang:
-#
-#     # class setts
-#     setts = setts('setts', (setts,), {})
-#
-#     def __init__(self, core=None):
-#
-#         self.core = core
-#
-#         # object setts
-#         self.setts = self.setts('setts',(),{})
-#
-# #$ ____ def __call__ ________________________________________________________ #
-#
-#     def __call__(self, mode, en='<No english description!>', language=None, l=None, **kwargs):
-#         '''
-#         (c)hoose (lang)uage
-#         '''
-#
-#         # resolve shortcuts...
-#         if l: language = l
-#
-#         # choose output language
-#         if   not language and mode=='out' : language = self.setts.out
-#         elif not language and mode=='face': language = self.setts.face
-#         if language==None: language='en'
-#
-#         # join dict
-#         data = {**{'en':en}, **kwargs}
-#
-#         # send correct data
-#         if language in data:
-#             return data[language]
-#         else:
-#             return data['en']
-
-
-
-
-
-
-# class clang:
-#
-# #$$ ________ def face ______________________________________________________ #
-#
-#     __face = 'en'
-#
-#     @property
-#     def face(self): return self.__face
-#
-#     @face.setter
-#     def face(self, value):
-#         '''
-#         Language of syste, interface.
-#         '''
-#
-#         if self.__save__: self.__face   = value
-#         else:             self.__temp__ = value
-#
-#
-# #$$ ________ def out _______________________________________________________ #
-#
-#     __out = 'en'
-#
-#     @property
-#     def out(self): return self.__out
-#
-#     @out.setter
-#     def out(self, value):
-#         '''
-#         Language of project output.
-#         '''
-#
-#         if self.__save__: self.__out    = value
-#         else:             self.__temp__ = value
-#
-#     def __init__(self, core=None):
-#
-#         self.core = core
-#
-#
-#
-# #$ ____ def __call__ ________________________________________________________ #
-#
-#     def __call__(self, mode='out', en='<No english description!>', language=None, l=None, **kwargs):
-#         '''
-#         (c)hoose (lang)uage
-#         '''
-#
-#         # resolve shortcuts...
-#         if l: language = l
-#
-#         # choose output language
-#         if   not language and mode=='out' : language = self.out
-#         elif not language and mode=='face': language = self.face
-#         if language==None: language='en'
-#
-#         # join dict
-#         data = {**{'en':en}, **kwargs}
-#
-#         # send correct data
-#         if language in data:
-#             return data[language]
-#         else:
-#             return data['en']
-
-
-
-
-
-
-
+#$ ######################################################################### #
 
 
