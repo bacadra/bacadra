@@ -93,14 +93,14 @@ class setts(sinit):
 
 #$$ ________ def template __________________________________________________ #
 
-    def template(self, folder_path=None, cave=None, filename=None, check=None, mode='cpn'):
+    def template(self, name=None, cave=None, filename=None, check=None):
 
-        cave = self.tools.sgc('cave', cave, check)
+        cave = self.tools.sgc('template:cave', cave, check)
 
-        if folder_path:
+        if name:
 
             self.source(folder_path=os.path.join(
-                cave, folder_path), filename=filename)
+                cave, name), filename=filename)
 
 
             # load external methods depend on template
@@ -114,11 +114,9 @@ class setts(sinit):
             spec.loader.exec_module(external)
 
             if self.tools.root==None:
-
                 obj = texme
 
             else:
-
                 obj = self.tools.root
 
             obj.tmp = external.tmp(obj)
@@ -290,6 +288,54 @@ class setts(sinit):
         if width!=None: self.tools.sgc(name='itemset:width', value=width, check=False)
 
 
+
+#$$ ________ def fclib _____________________________________________________ #
+
+    def fclib(self, name=None, id=None, cave=None, check=None):
+        '''
+        File of main tex document in inpath folder.
+        '''
+
+        cave = self.tools.sgc('fclib:cave', cave, check)
+
+        if name:
+
+            path = os.path.join(cave, name+'.py')
+
+            spec = importlib.util.spec_from_file_location("fclib", path)
+
+            external = importlib.util.module_from_spec(spec)
+
+            spec.loader.exec_module(external)
+
+            if self.tools.root==None:
+                obj = texme
+
+            else:
+                obj = self.tools.root
+
+
+            # simple load single lib
+            if id==None:
+                obj.lib = external.lib(obj)
+
+            # create dict of libs
+            else:
+                if type(obj.lib)!=dict: obj.lib = {}
+
+                obj.lib[id] = external.lib(obj)
+
+
+
+
+
+
+
+
+
+
+
+
 # #$$ ________ def lststyle ________________________________________________ #
 #
 #     def lststyle(self, value=None, check=None, reset=None):
@@ -346,7 +392,7 @@ class texme:
     setts.source(folder_path=r'.\src', filename='main.tex')
 
     setts.template(cave=os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),'templates'), mode='')
+        os.path.dirname(os.path.realpath(__file__)),'temps'))
 
     setts.tools.data['keys'] = {}
 
@@ -391,8 +437,13 @@ class texme:
         width = 80,
     )
 
+    setts.fclib(cave=os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),'fclib'))
 
 
+    tmp = None
+
+    lib = None
 
 
 
@@ -466,7 +517,7 @@ class texme:
         '''
 
         basepath = os.path.dirname(os.path.realpath(__file__))
-        os.system(os.path.join(basepath, r'templates\bibme.bat'))
+        os.system(os.path.join(basepath, r'temps\bibme.bat'))
 
 
 #$$$ ____________ def _copy_template ______________________________________ #
@@ -541,7 +592,10 @@ class texme:
         '''
 
         # output main tex file path
-        path1 = self.setts.source()
+        path1 = os.path.join(
+            self.setts.path(),
+            self.setts.source(mode='n'),
+        )
 
         # output main tex file path bak file
         path2 = path1 + '.bak'
@@ -1051,6 +1105,8 @@ class texme:
                     'e0626', 'Unknow float mode'
                 )
 
+            code += '\\catcode`\\#=12\n'
+
             code += translate( '\\includegraphics[{1}width={2}\\linewidth,height={3}\\textheight,keepaspectratio]{{0}}\n',
                 {'{0}': path,
                  '{1}': frame,
@@ -1127,6 +1183,8 @@ class texme:
                 verrs.BCDR_pinky_texme_ERROR_General(
                     'e0626', 'Unknow float mode'
                 )
+
+            code += '\\catcode`\\#=12\n'
 
             if caption:
                 caption = regme(caption, re_pc)

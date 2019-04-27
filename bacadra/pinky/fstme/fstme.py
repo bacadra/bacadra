@@ -17,11 +17,11 @@ Team members developing this package:
 
 import os
 
-import sympy as sp
-
-from sympy.parsing.sympy_parser import parse_expr
-
-from IPython.display import Image, Latex, HTML, Markdown, display
+# import sympy as sp
+#
+# from sympy.parsing.sympy_parser import parse_expr
+#
+# from IPython.display import Image, Latex, HTML, Markdown, display
 
 # from . import verrs
 
@@ -474,38 +474,34 @@ class fstme:
 #
 #     def code(self, code, language = None, inherit = None):
 #         pass
-#
-#
-# #$$$ ____________ def toc __________________________________________________ #
-#
-#     def toc(self, mode='b'):
-#
-#         head = self.h(1, 'List of Content', inherit=True, add2toc=False, anum=False)
-#
-#         data = self.core.pinky.fstme.table(
-#             wrap   = [False, True],
-#             width  = [10,True],
-#             halign = ['r','l'],
-#             valign = ['u','u'],
-#             dtype  = ['t','t'],
-#             data   = self._toc_list,
-#             border = False,
-#             inherit= True,
-#         )
-#
-#         if not data: return
-#
-#         # if mode is begging
-#         if mode=='b':
-#             self.buffer = [head + '\n' + data + '\n\n\n'] + self.buffer
-#
-#         # if mode is end
-#         elif mode=='e':
-#             self.buffer += [head + '\n' + data]
-#
-#         # if mode is True
-#         elif mode==True:
-#             self.buffer += [head + '\n' + data]
+
+
+#$$$ ____________ def toc __________________________________________________ #
+
+    def toc(self, mode='b'):
+
+        head = self.h(1, 'List of Content', inherit=True, add2toc=False, anum=False)
+
+        data = self.core.pinky.fstme.table(
+            wrap   = [False, True],
+            width  = [10,True],
+            halign = ['r','l'],
+            valign = ['u','u'],
+            dtype  = ['t','t'],
+            data   = self._toc_list,
+            border = False,
+            inherit= True,
+        )
+
+        if not data: return
+
+        # if mode is begging
+        if mode=='b':
+            self.buffer = [head + '\n' + data + '\n\n\n'] + self.buffer
+
+        # if mode is end
+        elif mode=='e':
+            self.buffer += [head + '\n' + data]
 
 
 
@@ -528,12 +524,10 @@ class slave:
             getattr(self.data[id].setts, key)(val)
 
 
-
     def add(self, code):
         for tex in self.data.values():
             if tex.setts.active()==True:
                 tex.buffer += [code]
-            # tex.add(code, inherit, submodule, echo, presymbol, postsymbol)
 
 
     def push(self, active=None):

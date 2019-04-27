@@ -1,3 +1,15 @@
+'''
+------------------------------------------------------------------------------
+***** (b)acadra (app)lication(s) *****
+==============================================================================
+
+------------------------------------------------------------------------------
+Copyright (C) 2018 <bacadra@gmail.com> <https://github.com/bacadra>
+Team members developing this package:
++ Sebastian Balcerowiak <asiloisad> <asiloisad.93@gmail.com>
+------------------------------------------------------------------------------
+'''
+
 
 from bacadra.unise.si import MPa,mm,m,Hz,cu,s,kN,N,unise
 from bacadra.unise.umath import π,sqrt

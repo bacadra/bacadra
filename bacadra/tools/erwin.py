@@ -22,14 +22,11 @@ Team members developing this package:
 
 from . import fpack
 
-from .setts import sinit, tools
+from .setts import sinit
 
 #$ ____ class setts ________________________________________________________ #
 
 class setts(sinit):
-
-    def __init__(self):
-        self.tools = tools()
 
     def new(name, doc):
         '''
@@ -58,7 +55,9 @@ setts.new('e0000', 'bacadra error')
 
 setts.new('e0001', 'setts: Unknow setting')
 
+setts.new('e0066', 'BCDR_tools_ERROR_Translation_Not_Provided')
 
+setts.new('w0066', 'BCDR_tools_WARN_Translation_Not_Provided')
 
 
 
@@ -67,6 +66,9 @@ setts.new('e0001', 'setts: Unknow setting')
 #$$ ________ x0200 dbase ___________________________________________________ #
 
 
+#$$ ________ x0900 sofix ___________________________________________________ #
+
+setts.new('i0915', 'BCDR_sofix_INFO_mass')
 
 
 #$$ ________ make verrs ____________________________________________________ #
@@ -81,7 +83,6 @@ for key in dir(verrs):
 
 
 #$ ____ errors _____________________________________________________________ #
-
 
 try:
 
@@ -114,33 +115,10 @@ except:
 class BCDR(Exception):
     pass
 
-#$ ____ warnings ___________________________________________________________ #
-
-def BCDR_WARN(id, value=''):
-
-    if getattr(verrs.setts, id)():
-
-        print(fpack.berwin(
-            mode = 'BCDR',
-            code = id,
-            info = value,
-        ))
-
-#$ ____ infos ______________________________________________________________ #
-
-def BCDR_INFO(id, value=''):
-
-    if getattr(verrs.setts, id)():
-
-        print(fpack.berwin(
-            mode = 'BCDR',
-            code = id,
-            info = value,
-        ))
-
 #$ ____ erwin ______________________________________________________________ #
 
-def erwin(id, value=''):
+def erwin(id, value='', head=True, bott=True):
+
     if id[0]=='e':
         if hasattr(verrs, id):
             if getattr(verrs, id)():
@@ -148,11 +126,31 @@ def erwin(id, value=''):
         else:
                 raise BCDR(id+' (unknow!)' + '$$!$!$$' + value)
 
+    elif id[0]=='w' or id[0]=='i':
+        if hasattr(verrs, id):
+            if getattr(verrs, id)():
+                print(fpack.berwin(
+                    mode = 'BCDR',
+                    code = id,
+                    info = value,
+                    head = head,
+                    bott = bott,
+                ))
 
-    elif id[0]=='w':
-        return BCDR_WARN(id, value)
+        else:
+            print(fpack.berwin(
+                mode = 'BCDR',
+                code = id+' (unknow!)',
+                info = value,
+                head = head,
+                bott = bott,
+            ))
 
-    elif id[0]=='i':
-        return BCDR_INFO(id, value)
+    else:
+        raise BCDR('e0000'+'$$!$!$$' +
+            "Unknow erwin mode!\nTip: Please use only 'e', 'w' or 'i'")
+
+
+
 
 #$ ######################################################################### #

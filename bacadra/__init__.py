@@ -19,7 +19,29 @@ from .tools.setts import sinit
 
 class setts(sinit):
 
-    pass
+    def author(self, name=None, surname=None, company=None, logo=None, check=None):
+        '''Project author's details'''
+
+        if type(check)==str:
+            return self.tools.sgc(name='author:'+check,
+                value=eval(check), check=True)
+
+        if name   !=None: self.tools.gst('author:name'   , name   )
+        if surname!=None: self.tools.gst('author:surname', surname)
+        if company!=None: self.tools.gst('author:company', company)
+        if logo   !=None: self.tools.gst('author:logo'   , logo   )
+
+
+    def scope(self, data):
+        '''scope'''
+        return self.tools.gst('scope', data)
+
+
+    def master(self, core):
+        '''Master core'''
+        return self.tools.gst('master', core)
+
+
 
 #$ ____ class core ___________________________________________________________ #
 
@@ -28,6 +50,19 @@ class core:
 
     setts = setts()
 
+    setts.author(
+        name    = False,
+        surname = False,
+        company = False,
+        logo    = False,
+    )
+
+    setts.scope({})
+
+    setts.master(False)
+
+
+    ##############################
 
     from .unise.unise import unise
 
@@ -36,11 +71,16 @@ class core:
 
         from .tools.erwin import verrs
 
+        from .tools.erwin import erwin
+
         from .tools import fpack
+
+        from .tools.clang import clang
 
         def __init__(self, core=None):
 
-            pass
+            self.clang = self.clang(core=core)
+
 
     class pinky:
 
@@ -58,16 +98,38 @@ class core:
 
             self.fstme = self.fstme(core=core)
 
+
+    class sofix:
+
+        from .sofix.sbase import sbase
+
+        from .sofix.wgraf import wgraf
+
+        from .sofix.trade import trade
+
+        def __init__(self, core=None):
+
+            self.sbase = self.sbase(core=core)
+
+            self.wgraf = self.wgraf(core=core)
+
+            self.trade = self.trade(core=core)
+
+
     from .bapps.bapps import bapps
 
 
     def __init__(self):
+
+        self.core  = self
 
         self.setts = setts(master=self.setts.tools, root=self)
 
         self.tools = self.tools(core=self)
 
         self.pinky = self.pinky(core=self)
+
+        self.sofix = self.sofix(core=self)
 
         self.bapps = self.bapps(core=self)
 

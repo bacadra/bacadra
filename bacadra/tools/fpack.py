@@ -321,8 +321,9 @@ def is_canonical(version):
 # is_canonical('v0.2.dev1')
 # is_canonical('v0.2a1')
 
+#$ ____ fancy item _________________________________________________________ #
 
-#$ ____ def bhead __________________________________________________________ #
+#$$ ________ def bhead _____________________________________________________ #
 
 def bhead(title, width=75, clr='m'):
     len1 = int((width - len(title) - 6 - 10)/2)
@@ -330,12 +331,17 @@ def bhead(title, width=75, clr='m'):
 
     return color(len1*'-' + ' ' + '*'*5 + ' '*2 + title + ' '*2  + '*'*5 + ' '  + len2*'-', clr)
 
+#$$ ________ def bend ______________________________________________________ #
 
 def bend(width=75, clr='m'):
     return color(width*'-', clr)
 
+#$$ ________ def bitem _____________________________________________________ #
+
 def bitem(key, val, width):
     return '> {:{}s} = {}'.format(key,width,val)
+
+#$$ ________ def btable ____________________________________________________ #
 
 def btable(title, data, width=75, iwdith=True):
     if iwdith==True:
@@ -358,6 +364,8 @@ def btable(title, data, width=75, iwdith=True):
 
     pdata += [bend(width)]
     return '\n'.join(pdata)
+
+#$$ ________ def bstore ____________________________________________________ #
 
 def bstore(title, data, width=75, iwdith=True):
     if iwdith==True:
@@ -385,24 +393,26 @@ def bstore(title, data, width=75, iwdith=True):
     pdata += [bend(width)]
     return '\n'.join(pdata)
 
+#$$ ________ def berwin ____________________________________________________ #
 
-
-
-def berwin(mode, code, info, width=75):
+def berwin(mode, code, info, width=75, head=True, bott=True):
 
     if   code[0]=='e': clr = 'c'
     elif code[0]=='w': clr = 'y'
     elif code[0]=='i': clr = 'g'
 
     title = mode + ' : ' + code
-    pdata = [bhead(title, width, clr)]
+    if head:
+        pdata = [bhead(title, width, clr)]
+    else:
+        pdata = []
 
     info = str(info).split('\n')
     for i in range(len(info)):
         info[i] = textwrap.fill(str(info[i]), width=width)
     pdata += ['\n'.join(info)]
 
-    pdata += [bend(width, clr)]
+    if bott: pdata += [bend(width, clr)]
 
     return '\n'.join(pdata)
 

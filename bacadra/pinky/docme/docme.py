@@ -60,7 +60,7 @@ class docme:
     setts = setts()
 
     setts.cave(os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), 'templates'))
+        os.path.dirname(os.path.realpath(__file__)), 'temps'))
 
     setts.template(False)
 
