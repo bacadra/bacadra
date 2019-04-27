@@ -50,7 +50,7 @@
 %### ____________ minitoc __________________________________________________ %
 
 \usepackage[polish]{minitoc} % male spisy trosci po sekcjach
-%\usepackage{mtcoff} % wylacza minitoca
+% \usepackage{mtcoff} % wylacza minitoca
 \dominitoc % bedzie generowac toc rozdzialu
 %\dominilof % bedzie generowac tof rozdzialu
 %\dominilot % bedzie generowac tot rozdzialu
@@ -162,7 +162,11 @@
     \or Listopad% 11
     \or Grudzień% 12
   \fi}
+% \usepackage{datetime}
+% \renewcommand{\MONTH}{\monthnameenglish[\month]}
 \newcommand{\YEAR}{\number\year}
+
+
 
 % extra bold chars
 \usepackage[outline]{contour}
@@ -176,14 +180,14 @@
 	\renewcommand{\headrulewidth}{2.0pt}
 	\renewcommand{\footrulewidth}{2.0pt}
 
-  %<logo_path>%
+  %
 
-  \rhead{\small %<head_line_0>% \\
+  \rhead{\small % \\
   \medskip
-  %<head_line_1>%
+  %
   \smallskip}
-  \cfoot{\small %<author>%}
-  \fancyfoot[R]{\footnotesize{Strona \thepage\ z \pageref{LastPage}}}
+  \cfoot{\small }
+  \fancyfoot[R]{\footnotesize{Strona  \thepage\ z \pageref{LastPage}}}
   \fancyfoot[C]{\footnotesize{\textcolor{Gray}{\MONTH~\YEAR~r.}}} %<foot_line_left>%
 }
 
@@ -352,7 +356,7 @@
 
 %#### ________________ toc _________________________________________________ %
 
-\setcounter{tocdepth}{5}
+\setcounter{tocdepth}{2}
 
 % \usepackage{tocloft}
 
@@ -620,7 +624,7 @@
 ]{biblatex}
     % https://www.sharelatex.com/learn/Biblatex_citation_styles#Further_reading
     % https://www.sharelatex.com/learn/Bibliography_management_with_biblatex
-\addbibresource{%<bib_path>%}
+\addbibresource{main.bib}
 
 
 
@@ -642,8 +646,8 @@
 \renewcommand{\u}[1]{\underline{#1}} % underline
 \renewcommand{\t}[1]{\text{#1}}      % normal text
 \newcommand  {\m}[1]{\texttt{#1}}    % monospace
-
-\newcommand{\g}[1]{\textgreek{#1}} % textgreek
+\newcommand  {\ol}[1]{\overline{#1}}  % line over symbol
+\newcommand  {\g}[1]{\textgreek{#1}} % textgreek
 
 
 \newcommand{\ib}[1]{\textbf{\textit{#1}}}
@@ -681,15 +685,15 @@
 
 \newcommand{\figlab}[1]{\label{fig:#1}}       % figure label
 \NewDocumentCommand{\figref}{o m}{%
-    \IfNoValueTF{#1}{(Rys.~\ref{fig:#2})}{\hyperref[fig:#2]{#1}}}
+    \IfNoValueTF{#1}{(Rys..~\ref{fig:#2})}{\hyperref[fig:#2]{#1}}}
 
 \newcommand{\tablab}[1]{\label{tab:#1}}       % table label
 \NewDocumentCommand{\tabref}{o m}{
-    \IfNoValueTF{#1}{(Tab.~\ref{tab:#2})}{\hyperref[tab:#2]{#1}}}
+    \IfNoValueTF{#1}{(Tab..~\ref{tab:#2})}{\hyperref[tab:#2]{#1}}}
 
 \newcommand{\lstlab}[1]{\label{lst:#1}}       % code label
 \NewDocumentCommand{\lstref}{o m}{%
-    \IfNoValueTF{#1}{(Kod~\ref{lst:#2})}{\hyperref[lst:#2]{#1}}}
+    \IfNoValueTF{#1}{(Kod ~\ref{lst:#2})}{\hyperref[lst:#2]{#1}}}
 
 \newcommand{\equlab}[1]{\label{equ:#1}}       % equation label
 \NewDocumentCommand{\equref}{o m}{%
@@ -698,8 +702,8 @@
 
 %### ____________ date settings ____________________________________________ %
 
-%<date>%
-%<date_inc>%
+
+
 
 %# ____ document ___________________________________________________________ %
 
@@ -708,7 +712,7 @@
 
 % -------------------------------------------------------------------------- %
 
-%<title_page>%
+
 
 %## ________ lists _________________________________________________________ %
 
@@ -745,7 +749,23 @@
 
 % -------------------------------------------------------------------------- %
 
-%<0001>%
+test
+%
+\section{co jest kurw} 
+%
+\begin{center}
+\includegraphics[frame,width=0.999\linewidth,height=0.95\textheight,keepaspectratio]{../../../../../../d# pictures/a# temp/happy-bears-wallpaper.jpg}
+\end{center}
+%
+$a+b+c \cdot 2+2$
+%
+\begin{tabularx}{\textwidth}{q{3mm}q{80mm}L}
+\textbullet & to jest napis:&%
+$a=55\mathrm{\,kN}$
+\end{tabularx}
+%
+\clearpage
+%
 
 % -------------------------------------------------------------------------- %
 

@@ -15,7 +15,7 @@ Team members developing this package:
 #$ ____ import _____________________________________________________________ #
 
 import re
-
+import textwrap
 
 #$ ____ def translate _______________________________________________________ #
 
@@ -44,6 +44,8 @@ def dprint(d, indent=0, style='1'):
 
         code=''
         for key, value in d.items():
+            if type(value)==str: value = "'"+value+"'"
+            if type(key)==str: key = "'"+key+"'"
             code+=('\t' * indent + str(key)+':')
             if isinstance(value, dict):
                 code+='\n'+dprint(value, indent+1)
@@ -69,17 +71,24 @@ def nprec(value, notation='f', trail=False, significant=None, decimal=None, exp_
     posdot = value.index('.')
 
     # move dot
-    if notation in ['sci', 'scientific', 'e']:
+    if notation in ['sci', 'scientific', 'e', 'tex10', 'texe', '10']:
 
         # if dot in number
         if posdot<len(value):
             value.pop(posdot)
 
-        # insert new one at 2st position
-        value.insert(1,'.')
+        i=0
+        if posdot==1 and value[0]=='0':
+            for i in range(len(value)):
+                if value[i]!='0':
+                    break
+            value = value[i:]
 
         # save expontential
-        fexp = posdot-1
+        fexp = posdot-1-i
+
+        # insert new one at 2st position
+        value.insert(1,'.')
 
         # change posdto position
         posdot=1
@@ -168,22 +177,36 @@ def nprec(value, notation='f', trail=False, significant=None, decimal=None, exp_
 
         return sign+value
 
-    elif notation in ['sci', 'scientific', 'e']:
+    elif notation in ['sci', 'scientific', 'e', 'tex10', 'texe']:
 
-        value.append('e')
-
+        if notation in ['sci', 'scientific', 'e']:
+            value.append('e')
+        elif notation in ['10']:
+            value.append('*10**(')
+        elif notation in ['tex10']:
+            value.append('*10^{')
+        elif notation in ['texe']:
+            value.append(r' \mathrm{e}{')
         fexp = str(fexp)
 
         if type(exp_width)==int:
-
             if len(fexp) < exp_width:
-
-                fexp = '0'*(exp_width-len(fexp)) + fexp
+                if fexp[0]=='-':
+                    fexp=fexp[1:]
+                    madd='-'
+                else:
+                    madd=''
+                fexp = madd+'0'*(exp_width-len(fexp)-len(madd)) + fexp
 
         value.append(fexp)
 
         value = ''.join(value)
-        if value[2]=='e': value=value[0:1] + value[2:]
+        if notation in ['sci', 'scientific', 'e']:
+            if value[2]=='e': value=value[0:1] + value[2:]
+        elif notation in ['10']:
+            value = value+')'
+        elif notation in ['tex10','texe']:
+            value = value+'}'
 
         return sign+value
 
@@ -288,37 +311,6 @@ def cprint(*args, **kwargs):
     print(color(*args, **kwargs))
 
 
-#$ ____ class mdata ________________________________________________________ #
-
-class mdata:
-
-    def __init__(self, obj={}, **kwargs):
-        if kwargs:
-            obj.update(kwargs)
-        self.__keys__ = obj.keys()
-        for key in self.__keys__:
-            setattr(self, key, obj[key])
-
-    def __call__(self):
-
-        title = 'bacadra mapped object'
-        width = 75
-        len1 = int((width - len(title) - 6 - 10)/2)
-        len2 = (width - len(title) - 6- 10) - len1
-
-        data = [color(len1*'-' + ' ' + '*'*5 + ' '*2 + title + ' '*2  + '*'*5 + ' '  + len2*'*', 'm')]
-
-        max_width = 0
-        for key in self.__keys__:
-            if len(key)>max_width: max_width=len(key)
-
-        for key in self.__keys__:
-            val = getattr(self, key)
-            if type(val) is str: val = "'" + str(val) + "'"
-            data.append('> {:{}s} = {}'.format(key,max_width,val))
-
-        print('\n'.join(data))
-
 
 #$ ____ def is_canonical ___________________________________________________ #
 
@@ -332,14 +324,15 @@ def is_canonical(version):
 
 #$ ____ def bhead __________________________________________________________ #
 
-def bhead(title, width=75):
+def bhead(title, width=75, clr='m'):
     len1 = int((width - len(title) - 6 - 10)/2)
     len2 = (width - len(title) - 6- 10) - len1
 
-    return color(len1*'-' + ' ' + '*'*5 + ' '*2 + title + ' '*2  + '*'*5 + ' '  + len2*'-', 'm')
+    return color(len1*'-' + ' ' + '*'*5 + ' '*2 + title + ' '*2  + '*'*5 + ' '  + len2*'-', clr)
 
-def bend(width=75):
-    return color(width*'-', 'm')
+
+def bend(width=75, clr='m'):
+    return color(width*'-', clr)
 
 def bitem(key, val, width):
     return '> {:{}s} = {}'.format(key,width,val)
@@ -357,12 +350,80 @@ def btable(title, data, width=75, iwdith=True):
 
     for key,val in data.items():
         if type(val) is str: val = "'" + str(val) + "'"
-        pdata.append('> {:{}s} = {}'.format(key,iwdith,val))
+        # elif type(val) is unise: val = val(style='pretty')
+        pdata.append('> {:{}s} = {}'.format(key,iwdith,str(val)))
 
     if len(pdata)==1:
         pdata+=['There are no atributes.']
 
     pdata += [bend(width)]
     return '\n'.join(pdata)
+
+def bstore(title, data, width=75, iwdith=True):
+    if iwdith==True:
+        iwdith = 0
+        for key in data.keys():
+            if len(key)>iwdith: iwdith=len(key)
+
+    if title:
+        pdata = [bhead(title, width)]
+    else:
+        pdata = [bend(width)]
+
+    for key,val in data.items():
+
+        if 'd' in val: pdata.append('* '+val['d'])
+
+        if 'v' in val:
+
+            if type(val['v']) is str: val['v'] = "'" + str(val['v']) + "'"
+            pdata.append('> {:{}s} = {}'.format(key,iwdith,str(val['v'])))
+
+    if len(pdata)==1:
+        pdata+=['There are no atributes.']
+
+    pdata += [bend(width)]
+    return '\n'.join(pdata)
+
+
+
+
+def berwin(mode, code, info, width=75):
+
+    if   code[0]=='e': clr = 'c'
+    elif code[0]=='w': clr = 'y'
+    elif code[0]=='i': clr = 'g'
+
+    title = mode + ' : ' + code
+    pdata = [bhead(title, width, clr)]
+
+    info = str(info).split('\n')
+    for i in range(len(info)):
+        info[i] = textwrap.fill(str(info[i]), width=width)
+    pdata += ['\n'.join(info)]
+
+    pdata += [bend(width, clr)]
+
+    return '\n'.join(pdata)
+
+#$ ____ class mdata ________________________________________________________ #
+
+class mdata:
+
+    def __init__(self, obj=None, **kwargs):
+        if obj==None: obj={}
+        if kwargs:    obj.update(kwargs)
+        for key,val in obj.items():
+            setattr(self, key, val)
+
+    def __call__(self):
+        print(btable(
+            title='bacadra mapped object',
+            data={key:getattr(self, key) for key in self.__dict__},
+        ))
+
+
+
+
 
 #$ ######################################################################### #

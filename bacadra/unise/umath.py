@@ -21,35 +21,35 @@ from . import verrs
 e   = math.e
 
 def sin(x):
-    if type(x) == unise: x=x.d('')
+    if type(x) == unise: x=x.drop('')
     return math.sin(x)
 
 def cos(x):
-    if type(x) == unise: x=x.d('')
+    if type(x) == unise: x=x.drop('')
     return math.cos(x)
 
 def tan(x):
-    if type(x) == unise: x=x.d('')
+    if type(x) == unise: x=x.drop('')
     return math.tan(x)
 
 def cot(x):
-    if type(x) == unise: x=x.d('')
+    if type(x) == unise: x=x.drop('')
     return 1/math.tan(x)
 
 def asin(x):
-    if type(x) == unise: x=x.d('')
+    if type(x) == unise: x=x.drop('')
     return math.asin(x)
 
 def acos(x):
-    if type(x) == unise: x=x.d('')
+    if type(x) == unise: x=x.drop('')
     return math.acos(x)
 
 def atan(x):
-    if type(x) == unise: x=x.d('')
+    if type(x) == unise: x=x.drop('')
     return math.atan(x)
 
 def acot(x):
-    if type(x) == unise: x=x.d('')
+    if type(x) == unise: x=x.drop('')
     return 1/math.atan(x)
 
 def sqrt(x, n=2):
@@ -71,19 +71,19 @@ def floor(x, n=0, unit=None):
         return math.floor(x*10**n)/10**n
 
 def exp(x):
-    if type(x) == unise: x=x.d('')
+    if type(x) == unise: x=x.drop('')
     return math.exp(x)
 
 def log(x):
-    if type(x) == unise: x=x.d('')
+    if type(x) == unise: x=x.drop('')
     return math.log(x)
 
 def ln(x):
-    if type(x) == unise: x=x.d('')
+    if type(x) == unise: x=x.drop('')
     return math.log(x)
 
 def log10(x):
-    if type(x) == unise: x=x.d('')
+    if type(x) == unise: x=x.drop('')
     return math.log10(x)
 
 #$ ######################################################################### #

@@ -27,6 +27,10 @@ regme_recomp1 = re.compile(r'(\{?[a-zA-Z0-9α-ωΑ-Ω]\}?\_)([a-zA-Z0-9α-ωΑ-�
 
 regme_recomp2 = re.compile(r'(\_\{[a-zA-Z0-9α-ωΑ-Ω,]+)\_(?!\{)')
 
+regme_recomp3 = re.compile(r'\,\}')
+
+regme_overline = re.compile(r'([a-zA-Zα-ωΑ-Ω0-9])(_)([ |^|\n|~|\+|\-|\%|\@|=|\*|\(|\)|\{|\}|\$|\:])')
+
 # usuwanie gwiazdki przez jednostkami
 str_begin = r'(\*|\\cdot|~)[ ]*'
 str_unit  = r'(m|kg|s|K|rad|mrad|C|Hz|t|cm|mm|km|dm|N|kN|MN|GN|Pa|kPa|MPa|GPa|yr|day|hr|min)'
@@ -39,13 +43,13 @@ str_end   = r'( |\n|~|\+|\-|\%|\@|=|\*|\(|\)|{|}|\$|\:|$|\^|\\|/)'
 regme_unit2 = re.compile(str_begin + str_unit + str_end)
 
 str_begin = r'( |[0-9]|\n|~|\+|\-|\%|\@|=|\*|\(|\)|}|\$|\:)[ ]*'
-str_function = r'(arccos|arcsin|arctan|arg|cos|cosh|cot|coth|csc|deg|det|dim|exp|inf|lim|log|max|ln|min|sin|sinh|sup|tan|tanh|if|abs)'
+str_function = r'(arccos|arcsin|arctan|arg|cos|cosh|cot|coth|csc|deg|det|dim|exp|inf|lim|log|max|ln|min|sin|sinh|sup|tan|tanh|if|abs|sum)'
 str_end = r'(~*)([a-zA-Z0-9α-ωΑ-Ω\~\(\\\)]*)'
 regme_function1 = re.compile(str_begin + str_function + str_end)
 
 regme_mfrac = regex.compile(r'\(([^\(\)]*+(?:\((?1)\)[^\(\)]*)*+)\)\/\(([^\(\)]*+(?:\((?1)\)[^\(\)]*)*+)\)')
 
-regme_mfrac2 = regex.compile(r'([a-zA-Z0-9\\α-ωΑ-Ω\_\,]+)\/([a-zA-Z0-9\\α-ωΑ-Ω\_\,]+)')
+regme_mfrac2 = regex.compile(r'([\-a-zA-Z0-9\\α-ωΑ-Ω\_\,]+)\/([a-zA-Z0-9\\α-ωΑ-Ω\_\,]+)')
 
 regme_sbrac1 = re.compile(r'\(')
 regme_sbrac2 = re.compile(r':\\left\(')
@@ -58,7 +62,12 @@ regme_textstyle2 = regex.compile(r'\\(?:mt|trm)'+bm)
 regme_textstyle3 = regex.compile(r'\\(?:mi|i)'+bm)
 regme_textstyle4 = regex.compile(r'\\(?:mb|b)'+bm)
 regme_textstyle5 = regex.compile(r'\\(?:mm|tm)'+bm)
+regme_textstyle6 = regex.compile(r'&=')
 
+
+regme_symbol_space = re.compile(r'([a-zA-Zα-ωΑ-Ω0-9]+[a-zA-Z0-9α-ωΑ-Ω]*)( +)([a-zA-Zα-ωΑ-Ω]+[a-zA-Z0-9α-ωΑ-Ω]*)')
+
+regme_comma_space = re.compile(r'\, +')
 
 
 #$ ____ class Regme ________________________________________________________ #
@@ -122,8 +131,8 @@ class Regme:
         '''
 
         def root(text):
-            old = unise.setts.style
-            unise.setts.style = 'latex'
+            old = unise.setts.style()
+            unise.setts.style('latex')
             try:
                 a = [text.find('@')]
                 i = 0
@@ -182,7 +191,7 @@ class Regme:
                                 new += str(new1)
                     text = new
             finally:
-                unise.setts.style = old
+                unise.setts.style(old)
             return text
 
 
@@ -405,7 +414,20 @@ class Regme:
             text = regme_recomp1.sub(r'\1{\2}', text)
             for i in range(4):
                 text = regme_recomp2.sub(r'\1,', text)
+            text = regme_recomp3.sub(r'},', text)
             return text
+
+        if self.math_mode:  self.text = self.math_inline(root)
+        else:               self.text = root(self.text)
+
+#$$ ________ def overline __________________________________________________ #
+
+    def overline(self):
+        '''
+        '''
+
+        def root(text):
+            return regme_overline.sub(r'\\overline{\1}\3', text)
 
         if self.math_mode:  self.text = self.math_inline(root)
         else:               self.text = root(self.text)
@@ -580,9 +602,42 @@ class Regme:
             text = regme_textstyle3.sub(r'\\mathit{\1}'    , text)
             text = regme_textstyle4.sub(r'\\mathbf{\1}'    , text)
             text = regme_textstyle5.sub(r'\\mathtt{\1}'    , text)
+            text = regme_textstyle6.sub(r' = '     , text)
             return text
         if self.math_mode:  self.text = self.math_inline(root)
         else:               self.text = root(self.text)
+
+
+
+#$$ ________ def symbol_space ______________________________________________ #
+
+    def symbol_space(self):
+
+        def root(text):
+            while True:
+                text_old = text
+                text = regme_symbol_space.sub(r'\1 \\, \3', text)
+                if text_old==text:
+                    break
+            return text
+
+        if self.math_mode:  self.text = self.math_inline(root)
+        else:               self.text = root(self.text)
+
+
+#$$ ________ def comma_space _______________________________________________ #
+
+    def comma_space(self):
+
+        def root(text):
+            # return regme_comma_space.sub(r', \\, ', text)
+            return regme_comma_space.sub(r', \\ ', text)
+
+        if self.math_mode:  self.text = self.math_inline(root)
+        else:               self.text = root(self.text)
+
+
+
 
 #$ ____ def run ____________________________________________________________ #
 
@@ -608,6 +663,7 @@ class Regme:
             elif letter=='g': self.greek()
             elif letter=='h': self.bslash()
             elif letter=='s': self.subscript()
+            elif letter=='l': self.overline()
             elif letter=='u': self.unit_point()
             elif letter=='i': self.unit_noitalic()
             elif letter=='r': self.rmfunction()
@@ -616,10 +672,12 @@ class Regme:
             elif letter=='b': self.bracket()
             elif letter=='m': self.mcadenv()
             elif letter=='t': self.textstyle()
+            elif letter=='p': self.symbol_space()
+            elif letter=='c': self.comma_space()
 
         return self.text
 
-def regme(text, dict, code):
+def regme(text, code, dict={}):
     # create Regme instance
     self = Regme(text, dict, code)
 

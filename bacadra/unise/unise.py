@@ -16,55 +16,81 @@ Team members developing this package:
 
 import math
 import numpy as np
-from ..tools.setts import setts_init
+from ..tools.setts import sinit
 from ..tools.fpack import nprec
 from . import udict, verrs
 
 
 #$ ____ class setts ________________________________________________________ #
 
-class setts(setts_init):
+class setts(sinit):
 
-    def system(self, value=None, check=None, reset=None):
+#$$ ________ def system ____________________________________________________ #
+
+    def system(self, value=None):
         '''
         system of units.
         '''
-        return self.tools.gst('system', value, check, reset)
+        return self.tools.gst('system', value)
 
-    def syspro(self, value=None, check=None, reset=None):
+#$$ ________ def syspro ____________________________________________________ #
+
+    def syspro(self, value=None):
         '''
         Convert units to other system inplace. Can be localy changed in primary method.
         '''
-        return self.tools.gst('syspro', value, check, reset)
+        return self.tools.gst('syspro', value)
 
-    def sysadd(self, value=None, check=None, reset=None):
+#$$ ________ def sypost ____________________________________________________ #
+
+    def sypost(self, value=None):
         '''
-        sysadd convert units.
+        sypost convert units.
         '''
-        return self.tools.gst('sysadd', value, check, reset)
+        return self.tools.gst('sypost', value)
 
-    def style(self, value=None, check=None, reset=None):
-        return self.tools.gst('style', value, check, reset)
+#$$ ________ def style _____________________________________________________ #
 
-    def notation(self, value=None, check=None, reset=None):
-        return self.tools.gst('notation', value, check, reset)
+    def style(self, value=None):
+        return self.tools.gst('style', value)
 
-    def trail(self, value=None, check=None, reset=None):
-        return self.tools.gst('trail', value, check, reset)
+#$$ ________ def notation __________________________________________________ #
 
-    def significant(self, value=None, check=None, reset=None):
-        return self.tools.gst('significant', value, check, reset)
+    def notation(self, value=None):
+        return self.tools.gst('notation', value)
 
-    def decimal(self, value=None, check=None, reset=None):
-        return self.tools.gst('decimal', value, check, reset)
+#$$ ________ def trail _____________________________________________________ #
 
-    def exp_width(self, value=None, check=None, reset=None):
-        return self.tools.gst('exp_width', value, check, reset)
+    def trail(self, value=None):
+        return self.tools.gst('trail', value)
 
-    def echo(self, value=None, check=None, reset=None):
-        return self.tools.gst('echo', value, check, reset)
+#$$ ________ def significant _______________________________________________ #
 
+    def significant(self, value=None):
+        return self.tools.gst('significant', value)
 
+#$$ ________ def decimal ___________________________________________________ #
+
+    def decimal(self, value=None):
+        return self.tools.gst('decimal', value)
+
+#$$ ________ def exp_width _________________________________________________ #
+
+    def exp_width(self, value=None):
+        return self.tools.gst('exp_width', value)
+
+#$$ ________ def echo ______________________________________________________ #
+
+    def echo(self, value=None):
+        return self.tools.gst('echo', value)
+
+#$$ ________ def unit_value ________________________________________________ #
+
+    def unit_value(self, value=None):
+        '''
+        How to print unit value, eg. 1 or ''
+        '''
+        return self.tools.gst('unit_value', value)
 
 #$ ____ class unise ________________________________________________________ #
 
@@ -75,7 +101,7 @@ class unise:
     setts = setts()
     setts.system('si')
     setts.syspro(True)
-    setts.sysadd(False)
+    setts.sypost(False)
     setts.style('short')
     setts.notation('f')
     setts.trail(False)
@@ -83,12 +109,13 @@ class unise:
     setts.decimal(False)
     setts.exp_width(1)
     setts.echo(True)
+    setts.unit_value(1)
 
 #$$ ________ def __init__ __________________________________________________ #
 
-    def __init__(self, value=1, units=None, system=None):
+    def __init__(self, value=1, units=None, system=None, _setts_data=None):
 
-        self.setts = setts(self.setts, self)
+        self.setts = setts(master=self.setts.tools, root=self)
 
         if system==None: system = unise.setts.system()
 
@@ -103,6 +130,8 @@ class unise:
         # save units as dict
         self._units  = units
 
+        if _setts_data:
+            self.setts.tools.data = _setts_data
 
 
 #$$ ________ systems _______________________________________________________ #
@@ -161,7 +190,7 @@ class unise:
         'Wb' : (1, {'kg' : 1, 'm'  : 2, 's'  :-2, 'A'  :-1 }),
         'T'  : (1, {'kg' : 1, 's'  :-2, 'A'  :-1           }),
         'H'  : (1, {'kg' : 1, 'm'  : 2, 's'  :-2, 'A'  :-2 }),
-        '°C' : (1, {'K'  : 1                               }),
+        'Δ°C' : (1, {'K'  : 1                               }),
         'lm' : (1, {'cd' : 1                               }),
         'lx' : (1, {'m'  :-2, 'cd' : 1                     }),
         'Bq' : (1, {'s'  :-1                               }),
@@ -201,10 +230,10 @@ class unise:
         'Pressure'   : (1,     {'Pa': 1}),
     }
 
-    # system sysadd for Stucture Engineering, kN, m, °C, s
+    # system sypost for Stucture Engineering, kN, m, Δ°C, s
     base_si_ce = {
         'kg'  : (0.001 , {'kN': 1, 'm':-1, 's': 2         }),
-        'K'   : (1     , {'°C': 1                         }),
+        'K'   : (1     , {'Δ°C': 1                         }),
     }
 
 
@@ -213,7 +242,7 @@ class unise:
 
 #$$$ ____________ def base _________________________________________________ #
 
-    def base(self=None, system=True, sysadd=True):
+    def base(self=None, system=True, sypost=True):
         '''
         The system atribute type must be dictonary. Inside them we need include the fallowing type:
         {'<name>' : (<numerical object>,
@@ -227,21 +256,21 @@ class unise:
         if system==True:
             system = self.setts.system()
 
-        if sysadd==True:
-            sysadd = self.setts.sysadd()
+        if sypost==True:
+            sypost = self.setts.sypost()
 
-        if sysadd!=False:
-            sysadd = '_' + sysadd
+        if sypost!=False:
+            sypost = '_' + sypost
         else:
-            sysadd = ''
+            sypost = ''
 
-        return getattr(self, 'base_'+system+sysadd)
+        return getattr(self, 'base_'+system+sypost)
 
 
 #$$$ ____________ def add __________________________________________________ #
 
     @staticmethod
-    def add(name, value, units, overwrite=False):
+    def add(name, value, units, overwrite=True):
         '''
         Add child unit to current system. Current system can be check under self.system atribute. As input method want:
         - name - new name of unit, like "m" or "kN",
@@ -256,11 +285,19 @@ class unise:
             # if flag if False and name alredy exists, then raise error
             verrs.BCDR_unise_ERROR_Already_Exists(unise.setts.system(), name)
 
+        if type(units)==str:
+            # then convert string to dictonary
+            units = udict.str2dict(unise, units)
+
         # extend base dict
-        unise.base(sysadd=False).update({name:(value, units)})
+        if value and units:
+            body = (value, units)
+        else:
+            body = None
+        unise.base(sypost=False).update({name:body})
 
         # retur unise object
-        # return unise.get(name)
+        return unise.get(name)
 
 #$$$ ____________ def rem __________________________________________________ #
 
@@ -290,14 +327,17 @@ class unise:
 #$$$ ____________ def get __________________________________________________ #
 
     @classmethod
-    def get(self, units, system=None, sysadd=False):
+    def get(self, units, system=None, sypost=False):
         '''
         User input units as string type. This must be checked explicit, link in __init__(...). The set up _value and _units as copy from system definition if it exists, else return unisesystemERROR.
         This method must set up _value and _units or raise error!
         '''
 
+        if type(units) in [list,tuple]:
+            return [unise.get(units1, system, sypost) for units1 in units]
+
         system = self.setts.system(system, check=True)
-        base = self.base(system=system, sysadd=sysadd)
+        base = self.base(system=system, sypost=sypost)
 
         if units in base:
         # get value and unit from system defintion
@@ -325,15 +365,15 @@ class unise:
 
 #$$$ ____________ def primary ______________________________________________ #
 
-    def primary(self, system=True, sysadd=True, inplace=False, scheck=True, key_prefix=''):
+    def primary(self, system=True, sypost=True, inplace=False, scheck=True, key_prefix=''):
 
         if type(self)!=unise:
             if type(self)==list:
-                return [unise.primary(obj, system, sysadd, inplace) for obj in self]
+                return [unise.primary(obj, system, sypost, inplace) for obj in self]
             elif type(self)==tuple:
-                return tuple(unise.primary(obj, system, sysadd, inplace) for obj in self)
+                return tuple(unise.primary(obj, system, sypost, inplace) for obj in self)
             elif type(self)==np.ndarray:
-                return np.array([unise.primary(obj, system, sysadd, inplace) for obj in self])
+                return np.array([unise.primary(obj, system, sypost, inplace) for obj in self])
             else:
                 return self
 
@@ -418,7 +458,7 @@ class unise:
                 )
 
 
-        base = othe.base(system=system, sysadd=False)
+        base = othe.base(system=system, sypost=False)
 
         # get value
         cv  = othe._value
@@ -451,9 +491,9 @@ class unise:
                     # sum unit's power, which need to consider actual power
                     cd = udict.dsum(cd, udict.vmul(base_value[1], val))
 
-        if sysadd!=None and scheck:
+        if sypost!=None and scheck:
 
-            base = othe.base(system=system, sysadd=sysadd)
+            base = othe.base(system=system, sypost=sypost)
 
             od = {}
 
@@ -569,30 +609,29 @@ class unise:
             else:
                 return self
 
-
-        othe = unise(self._value, self._units)
-        othe.setts = self.setts
+        othe = unise(self._value, self._units,
+            _setts_data=self.setts.tools.data.copy())
         return othe
 
 
 #$$$ ____________ def drop _________________________________________________ #
 
-    def drop(self, units=None, cover=True, system=True, sysadd=True):
+    def drop(self, units=None, cover=True, system=True, sypost=True):
         '''
         Drop unit and return value alone. If dropped pattern unit is not explicit defined, then drop as system base. Is system is not explicited defined then use current system.
         '''
 
         if type(self)!=unise:
             if type(self)==list:
-                return [unise.drop(obj, units, cover, system, sysadd) for obj in self]
+                return [unise.drop(obj, units, cover, system, sypost) for obj in self]
             elif type(self)==tuple:
-                return tuple(unise.drop(obj, units, cover, system, sysadd) for obj in self)
+                return tuple(unise.drop(obj, units, cover, system, sypost) for obj in self)
             elif type(self)==np.ndarray:
-                return np.array([unise.drop(obj, units, cover, system, sysadd) for obj in self])
+                return np.array([unise.drop(obj, units, cover, system, sypost) for obj in self])
             else:
                 return self
 
-        self = self.primary(system=system, sysadd=sysadd)
+        self = self.primary(system=system, sypost=sypost)
 
         # if units is defined explicity
         # so if it is typed as string
@@ -606,11 +645,14 @@ class unise:
             units = self._units
 
         # create other value and run primary
-        othe = unise(1, units).primary(system=system, sysadd=sysadd, inplace=True)
+        othe = unise(1, units).primary(system=system, sypost=sypost, inplace=True)
 
         # divide number and sub units
-        ve = self._value / othe._value
-        ue = udict.dsub(self._units, othe._units)
+        if self._value!=0:
+            ve = self._value / othe._value
+            ue = udict.dsub(self._units, othe._units)
+        else:
+            ve, ue = 0, {}
 
         # if cover==True then convert must be fully
         if cover in [True, 'True','T'] and ue!={}:
@@ -653,9 +695,9 @@ class unise:
 
 #$$$ ____________ def call _________________________________________________ #
 
-    def call(self, code=None, units=None, decimal=None, significant=None, style=None, notation=None, trail=None, exp_width=None, cover=None, system=None, sysadd=None, inplace=None,
+    def call(self, code=None, units=None, decimal=None, significant=None, style=None, notation=None, trail=None, exp_width=None, cover=None, system=None, sypost=None, inplace=None, unit_value=None,
 
-    u=None, d=None, s=None, y=None, n=None, t=None, e=None, c=None, b=None, p=None, i=None):
+    u=None, d=None, s=None, y=None, n=None, t=None, e=None, c=None, b=None, p=None, i=None, v=None):
         '''
         Now call replace old method edit and show.
         '''
@@ -673,6 +715,7 @@ class unise:
         if cover       == None: cover       = c
         if system      == None: system      = b
         if inplace     == None: inplace     = i
+        if unit_value  == None: unit_value  = v
 
         if type(self)!=unise:
             if type(self)==list:
@@ -684,18 +727,15 @@ class unise:
             else:
                 return self
 
-
         if inplace==True:
             othe = self
         else:
             othe = self.copy()
 
-        if system or sysadd:
-            othe.primary(system=system, sysadd=sysadd, inplace=True)
+        if system and sypost:
+            othe.primary(system=system, sypost=sypost, inplace=True)
         elif system:
-            othe.primary(system=system,            inplace=True)
-        elif system:
-            othe.primary(               sysadd=sysadd, inplace=True)
+            othe.primary(system=system, inplace=True)
 
         if units:
             othe = othe.convert(units=units, cover=cover, inplace=True)
@@ -706,6 +746,7 @@ class unise:
         if notation    != None: othe.setts.notation    ( notation         )
         if trail       != None: othe.setts.trail       ( trail            )
         if exp_width   != None: othe.setts.exp_width   ( int(exp_width   ))
+        if unit_value  != None: othe.setts.unit_value  ( unit_value       )
 
         # return new object as self or other
         return othe
@@ -755,6 +796,50 @@ class unise:
 #$$$ ____________ def __rshift__ ___________________________________________ #
 
     __rshift__ = call
+
+
+#$$$ ____________ def tex __________________________________________________ #
+
+    @staticmethod
+    def tex(data):
+
+        if type(data)==list:
+
+            dim = 1
+            for row in data:
+                if type(row) in [list, np.ndarray]:
+                    dim = 2
+                    for row1 in row:
+                        if type(row1) in [list, np.ndarray]:
+                            dim = 3
+                            break
+
+            if dim==1:
+                code = r'\begin{bmatrix}'"\n"
+                code += '&'.join(format(val) for val in data)
+                code += "\n"r'\end{bmatrix}'
+
+            elif dim==2:
+                code = r'\begin{bmatrix}'"\n"
+                for row in data:
+                    if type(row) in [list, np.ndarray]:
+                        code += '&'.join(format(val) for val in row)
+                    else:
+                        code += format(row)
+                    code += r'\\'
+                code = code[:-2]+ "\n"r'\end{bmatrix}'
+
+            else:
+                code = format(data)
+
+        return code
+
+
+
+
+
+
+
 
 
 #$$ ________ decorators ____________________________________________________ #
@@ -1244,7 +1329,7 @@ class unise:
             o = othe.primary()
 
             # check compability
-            verrs.BCDR_unise_ERROR_Incompatible(s, o, '__lt__')
+            verrs.BCDR_unise_ERROR_Units_Incompatible(s, o, 'lt')
 
             if s._value < o._value:
                 return True
@@ -1262,7 +1347,7 @@ class unise:
 
         # else raise error
         else:
-            verrs.BCDR_unise_ERROR_Undefined_Operator('__lt__', self, othe)
+            verrs.BCDR_unise_ERROR_Undefined_Operator(self, othe, 'lt')
 
 
 
@@ -1287,7 +1372,7 @@ class unise:
             o = othe.primary()
 
             # check compability
-            verrs.BCDR_unise_ERROR_Incompatible(s, o, '__le__')
+            verrs.BCDR_unise_ERROR_Units_Incompatible(s, o, 'le')
 
             if s._value <= o._value:
                 return True
@@ -1305,7 +1390,7 @@ class unise:
 
         # else raise error
         else:
-            verrs.BCDR_unise_ERROR_Undefined_Operator('__le__', self, othe)
+            verrs.BCDR_unise_ERROR_Undefined_Operator(self, othe, 'le')
 
 #$$$ ____________ def __gt__ _______________________________________________ #
 
@@ -1345,7 +1430,7 @@ class unise:
             o = othe.primary()
 
             # check compability
-            verrs.BCDR_unise_ERROR_Incompatible(s, o, '__eq__')
+            verrs.BCDR_unise_ERROR_Units_Incompatible(s, o, 'eq')
 
             if s._value == o._value:
                 return True
@@ -1370,7 +1455,7 @@ class unise:
 
         # else raise error
         else:
-            verrs.BCDR_unise_ERROR_Undefined_Operator('__eq__', self, othe)
+            verrs.BCDR_unise_ERROR_Undefined_Operator(self, othe, 'eq')
 
 
 
@@ -1395,7 +1480,7 @@ class unise:
             o = othe.primary()
 
             # check compability
-            verrs.BCDR_unise_ERROR_Incompatible(s, o, '__ne__')
+            verrs.BCDR_unise_ERROR_Units_Incompatible(s, o, 'ne')
 
             if s._value != o._value:
                 return True
@@ -1420,7 +1505,7 @@ class unise:
 
         # else raise error
         else:
-            verrs.BCDR_unise_ERROR_Undefined_Operator('__ne__', self, othe)
+            verrs.BCDR_unise_ERROR_Undefined_Operator(self, othe, 'ne')
 
 
 #$$$ ____________ def __is__ _______________________________________________ #
@@ -1537,15 +1622,21 @@ class unise:
             significant = self.setts.significant(),
             decimal     = self.setts.decimal(),
             exp_width   = self.setts.exp_width(),
+            # unit_value  = self.setts.unit_value()
         )
+
+        if value=='1':
+            value=str(self.setts.unit_value())
+            if value in ['None', '0', 'N', 'n']:
+                value=''
 
         # convert style to lowercase
         style = self.setts.style().lower()
 
-        if   style == 'pretty': return self.__repr__pretty(self, value)
-        elif style == 'python': return self.__repr__python(self, value)
-        elif style == 'latex' : return self.__repr__latex(self, value)
-        elif style == 'short' : return self.__repr__short(self, value)
+        if   style in ['pretty','p']: return self.__repr__pretty(self, value)
+        elif style in ['python','y']: return self.__repr__python(self, value)
+        elif style in ['latex' ,'l']: return self.__repr__latex(self, value)
+        elif style in ['short' ,'s']: return self.__repr__short(self, value)
 
 #$$$ ____________ def __repr__pretty _______________________________________ #
 
@@ -1583,14 +1674,16 @@ class unise:
 
         # if-block depend on counter and denominator empty's
         # if all is empty
+        if value!='': value=value+' '
+
         if u=='' and d=='':
-            return value + ' [1]'
+            return value + '[1]'
         elif u=='':
-            return value + ' [1]/' + d
+            return value + '[1]/' + d
         elif d=='':
-            return value + ' ' + u
+            return value + u
         else:
-            return value + ' ' + u + '/' + d
+            return value + u + '/' + d
 
 
 #$$$ ____________ def __repr__short ________________________________________ #
@@ -1628,14 +1721,16 @@ class unise:
 
         # if-block depend on counter and denominator empty's
         # if all is empty
+        if value!='': value=value+' '
+
         if u==[] and d==[]:
-            return value + ' [1]'
+            return value + '[1]'
         elif u==[]:
-            return value + ' [1]/' + '[' + ' '.join(d) + ']'
+            return value + '[1]/' + '[' + ' '.join(d) + ']'
         elif d==[]:
-            return value + ' [' + ' '.join(u) + ']'
+            return value + '[' + ' '.join(u) + ']'
         else:
-            return value + ' [' + ' '.join(u) + ']/[' + ' '.join(d) + ']'
+            return value + '[' + ' '.join(u) + ']/[' + ' '.join(d) + ']'
 
 
 
@@ -1697,7 +1792,8 @@ class unise:
 
             u_str = u_str[u_str.rfind('/')+1:]
 
-            u_str = u_str.replace(r'°C',r'^{\circ}C')
+            u_str = u_str.replace(r'Δ',r'\mathrm{\Delta}')
+            u_str = u_str.replace(r'°',r'^{\circ}')
 
             if u_str=='%':
                 u_str = r'\%'
@@ -1722,14 +1818,16 @@ class unise:
 
         # if-block depend on counter and denominator empty's
         # if all is empty
+        if value!='': value=value+'\,'
+
         if u=='' and d=='':
-            return value
+            return value[:-2]
         elif u=='':
-            return value + r'\,(1)/(' + d[2:] + ')'
+            return value + r'(1)/(' + d[2:] + ')'
         elif d=='':
-            return value + u
+            return value + u[2:]
         else:
-            return value + r'\,\cfrac{' + u[2:] + '}{' + d[2:] + '}'
+            return value + r'\cfrac{' + u[2:] + '}{' + d[2:] + '}'
 
 
 

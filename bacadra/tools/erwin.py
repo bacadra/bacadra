@@ -17,92 +17,71 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
+
 #$ ######################################################################### #
 
-import textwrap
+from . import fpack
 
-from .fpack import color
-from .setts import setts_init
-
+from .setts import sinit, tools
 
 #$ ____ class setts ________________________________________________________ #
 
-class setts(setts_init):
+class setts(sinit):
+
+    def __init__(self):
+        self.tools = tools()
+
+    def new(name, doc):
+        '''
+        name -- code of error/warning/info like e0051
+        mname -- method name, like small description
+        '''
+
+        setattr(setts, name, lambda self, x=None: self.tools.gst(name, x))
+        getattr(setts, name).__doc__ = doc
 
 #$$ ________ general _______________________________________________________ #
 
-    original = lambda self, x=None: self.tools.gst('original', x)
-    traceback = lambda self, x=None: self.tools.gst('traceback', x)
+    def original(self, value=None):
+        '''Show original error menu'''
+        return self.tools.gst('original', value)
 
-#$$ ________ def new _______________________________________________________ #
+    def traceback(self, value=None):
+        '''Show traceback; work only with custom error msg'''
+        return self.tools.gst('traceback', value)
 
-def new(name, mname):
-    '''
-    name -- code of error/warning/info like e0051
-    mname -- method name, like small description
-    '''
-    setattr(setts, name, lambda self, x=None: self.tools.gst(name, x))
+
 
 #$$ ________ x0000 tools ___________________________________________________ #
 
-new('e0011', 'BCDR_tools_ERROR_Parse_Type')
+setts.new('e0000', 'bacadra error')
+
+setts.new('e0001', 'setts: Unknow setting')
+
+
+
+
 
 #$$ ________ x0100 unise ___________________________________________________ #
 
-new('e0111', 'BCDR_unise_ERROR_Incompatible')
-new('e0112', 'BCDR_unise_ERROR_Undefined_Operator')
-new('e0114', 'BCDR_unise_ERROR_Units_in_System')
-new('e0115', 'BCDR_unise_ERROR_Already_Exists')
-new('e0116', 'BCDR_unise_ERROR_Cover')
-new('e0117', 'BCDR_unise_ERROR_Power2unise')
-
-#$$ ________ x0600 pinky:texme _____________________________________________ #
-
-new('e0611', 'BCDR_pinky_texme_ERROR_Header_Level')
-new('e0621', 'BCDR_pinky_texme_ERROR_Type_Check')
-new('e0622', 'BCDR_pinky_texme_ERROR_String_Selector')
-new('e0623', 'BCDR_pinky_texme_ERROR_Invalid_Key')
-new('e0681', 'BCDR_pinky_texme_ERROR_Path_Error')
-new('e0682', 'BCDR_pinky_texme_ERROR_Evaluate')
-
-new('w0681', 'BCDR_pinky_texme_WARN_Path_Error')
-new('w0631', 'BCDR_pinky_texme_WARN_Scope_External')
-
-new('i0611', 'BCDR_pinky_texme_INFO_Scope')
+#$$ ________ x0200 dbase ___________________________________________________ #
 
 
 
 
+#$$ ________ make verrs ____________________________________________________ #
 
+verrs = setts()
+verrs.original(False)
+verrs.traceback(True)
 
-#$$ ________ x0700 pinky:rstme _____________________________________________ #
-
-#$$ ________ x0800 pinky:docme _____________________________________________ #
-
-
-
-#$ ____ class verrs ________________________________________________________ #
-
-class verrs:
-    setts = setts()
-    setts.original(False)
-    setts.traceback(True)
-
-    # activate all errors, warning and infos
-    for key in dir(setts):
-        if key[0] in 'ewi':
-            getattr(setts, key)(True)
-
-
-    def __init__(self, core=None):
-
-        self.core = core
-
-        self.setts = setts(self.setts, self)
-
+for key in dir(verrs):
+    if key[0] in 'ewi':
+        getattr(verrs, key)(True)
 
 
 #$ ____ errors _____________________________________________________________ #
+
 
 try:
 
@@ -111,25 +90,18 @@ try:
 
     def exception_handler(exception_type, exception, traceback):
 
-        if exception_type.__name__[:4]=='BCDR' and not verrs.setts.original():
+        if exception_type.__name__[:4]=='BCDR' and not verrs.original():
 
-                if verrs.setts.traceback()==True:
+                if verrs.traceback()==True:
                     print('\n'.join(traceback[:-2]))
 
-                title = exception_type.__name__
-                width = 75
-                len1 = int((width - len(title) - 6 - 10)/2)
-                len2 = (width - len(title) - 6- 10) - len1
+                id, exception = str(exception).split('$$!$!$$')
 
-                print(color(len1*'-' + ' ' + '*'*5 + ' '*2 + title + ' '*2  + '*'*5 + ' '  + len2*'*', 'c'))
-
-                # divide text by new line symbol
-                exception = str(exception).split('\n')
-                for i in range(len(exception)):
-                    exception[i] = textwrap.fill(str(exception[i]), width=width)
-                exception = '\n'.join(exception)
-
-                print(exception)
+                print(fpack.berwin(
+                    mode = exception_type.__name__,
+                    code = id,
+                    info = exception,
+                ))
 
         else:
             print(ipython.InteractiveTB.stb2text(traceback))
@@ -139,13 +111,8 @@ try:
 except:
     pass
 
-
-class BCDR_ERROR(Exception):
+class BCDR(Exception):
     pass
-
-def BCDR_ERRO(id, value=''):
-    if getattr(verrs.setts, id)():
-        raise BCDR_ERROR(value)
 
 #$ ____ warnings ___________________________________________________________ #
 
@@ -153,49 +120,39 @@ def BCDR_WARN(id, value=''):
 
     if getattr(verrs.setts, id)():
 
-        title = 'BCDR_WARN'
-        width = 75
-        len1 = int((width - len(title) - 6 - 10)/2)
-        len2 = (width - len(title) - 6- 10) - len1
-
-        print(color(len1*'-' + ' ' + '*'*5 + ' '*2 + title + ' '*2  + '*'*5 + ' '  + len2*'*', 'y'))
-
-        # divide text by new line symbol
-        value = str(value).split('\n')
-        for i in range(len(value)):
-            value[i] = textwrap.fill(str(value[i]), width=width)
-        value = '\n'.join(value)
-
-        print(value)
+        print(fpack.berwin(
+            mode = 'BCDR',
+            code = id,
+            info = value,
+        ))
 
 #$ ____ infos ______________________________________________________________ #
-
 
 def BCDR_INFO(id, value=''):
 
     if getattr(verrs.setts, id)():
 
-        title = 'BCDR_INFO'
-        width = 75
-        len1 = int((width - len(title) - 6 - 10)/2)
-        len2 = (width - len(title) - 6- 10) - len1
+        print(fpack.berwin(
+            mode = 'BCDR',
+            code = id,
+            info = value,
+        ))
 
-        print(color(len1*'-' + ' ' + '*'*5 + ' '*2 + title + ' '*2  + '*'*5 + ' '  + len2*'*', 'g'))
-
-        # divide text by new line symbol
-        value = str(value).split('\n')
-        for i in range(len(value)):
-            value[i] = textwrap.fill(str(value[i]), width=width)
-        value = '\n'.join(value)
-
-        print(value)
-
-
-#$ ____ geenral erwin ______________________________________________________ #
+#$ ____ erwin ______________________________________________________________ #
 
 def erwin(id, value=''):
-    if   id[0]=='e': return BCDR_ERRO(id, value)
-    elif id[0]=='w': return BCDR_WARN(id, value)
-    elif id[0]=='i': return BCDR_INFO(id, value)
+    if id[0]=='e':
+        if hasattr(verrs, id):
+            if getattr(verrs, id)():
+                raise BCDR(id + '$$!$!$$' + value)
+        else:
+                raise BCDR(id+' (unknow!)' + '$$!$!$$' + value)
+
+
+    elif id[0]=='w':
+        return BCDR_WARN(id, value)
+
+    elif id[0]=='i':
+        return BCDR_INFO(id, value)
 
 #$ ######################################################################### #
