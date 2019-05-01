@@ -1,12 +1,26 @@
-def doctest():
+
+# bacadra docstyle
+
+## General
+
+Project bacadra have introduce their own docstyle. This is due to the very personalized use of the package, like units.
+
+## Principles
+
+The general docstyle is assumed at the below example.
+
+~~~python
+def test_function():
     '''
     There are difference between None and NotOccur
 
     ***** Parameters *****
 
-    x: [type] <default value> {set of avaiable values} #letter
-
-        type examples: [letters via string] [str] [int] [numeric] [kN]
+    x: [type] (default value) {set of avaiable values} #letter
+        type ex   : [letters via string] [str] [int] [numeric] [kN]
+        default ex: (True), (15*kN)
+        set ex    : {1, True, 'val'}
+        lettter ex: #a, #c
 
     code: [str]
         the simplest description
@@ -14,7 +28,7 @@ def doctest():
     code: [unise:kN]
         the type must be input as unise:kN
 
-    y: {...} <'r'>
+    y: {...} ('r')
         parameter can gen one of value from set {..} and default 'r'
 
         y: {'execute', 'row', 'r'}
@@ -23,7 +37,7 @@ def doctest():
         y: {'execute2', 'row2', 'r2'}
             Description of part of set
 
-    data: [...] <None>
+    data: [...] (None)
         multitype can be inputed
 
         data: [tuple]
@@ -47,16 +61,16 @@ def doctest():
             *val*: [dict]
                 here is example of dict where keys are freezen, please remember about '' if string
 
-                'sqltype': [str] <NotOccur>
+                'sqltype': [str] (NotOccur)
                     it will be used to define type in sqlite database
 
-                'pytype': [list of strings] <NotOccur>
+                'pytype': [list of strings] (NotOccur)
                     it can be check if proper type inputed, please do not insert unise value into cell!
 
-                'unise': [str] <NotOccur>
+                'unise': [str] (NotOccur)
                     it will be check if value is input in proper unit, but also can be input without unit -> then treat is as this unit
 
-                'description': [dict] <NotOccur>
+                'description': [dict] (NotOccur)
                     description of column designing
 
                     *key: [str]
@@ -69,33 +83,35 @@ def doctest():
                 list of ids of primary columns
 
 
-    ***** Returns *****
+    ***** Output *****
 
     if a > b: [auto]
-        a + b
+        return a + b
 
-    ***** Yields *****
+    If function use yield insted returns then change
 
+    if a > b: [auto]
+        yield a + b
 
     ***** Erwin *****
 
-    (E) BCDR_ERROR:
+    Please mark what kind of erwin will be raised (e), (w), (i)
+
+    (e) BCDR_ERROR:
 
         BCDR_dbase_ERROR_Open_Database is called if divide by 0
-
-        BCDR_dbase_ERROR_Open_Database is called if divide by 0
-
 
     ***** Example *****
 
-
+    Small example how to use this function. The bigger one should be placed at other repositories.
 
     ***** Notes ******
 
-
+    Here you can plase link to website, book references etc.
 
     ***** See Also *****
 
-
+    Here is the best place to write reference to other methods, atributes etc.
 
     '''
+~~~
