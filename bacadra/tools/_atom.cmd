@@ -1,1 +1,0 @@
-"C:\Users\NO1\AppData\Local\atom\atom.exe" %cd%

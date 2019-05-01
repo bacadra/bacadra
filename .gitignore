@@ -2,8 +2,8 @@
 /setup.bat
 *__setup.bat
 *__setup.py
-*_backup/
-
+/#h#*
+bacadra_dev/
 __pycache__/
 *.py[cod]
 *$py.class

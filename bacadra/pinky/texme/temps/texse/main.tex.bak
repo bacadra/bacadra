@@ -1,0 +1,839 @@
+%# ____ template ___________________________________________________________ %
+%## ________ readme ________________________________________________________ %
+
+
+
+
+
+
+
+
+%## ________ general _______________________________________________________ %
+
+\documentclass[a4paper,  %
+              12pt,      %
+              oneside,   %
+              % draft,   %
+              hidelinks, %
+              ]{memoir}
+    %% https://en.wikibooks.org/wiki/LaTeX/Document_Structure
+
+%## ________ other1 ________________________________________________________ %
+
+%### ____________ silent ___________________________________________________ %
+
+\usepackage{silence}
+\WarningFilter{memoir}{You are using the caption package with the memoir class}
+\WarningFilter{minitoc(hints)}{W0023}
+\WarningFilter{minitoc(hints)}{W0024}
+\WarningFilter{minitoc(hints)}{W0028}
+\WarningFilter{minitoc(hints)}{W0030}
+\WarningFilter{minitoc(hints)}{W0033}
+\WarningFilter{minitoc(hints)}{W0078}
+\WarningFilter{minitoc(hints)}{W0079}
+\WarningFilter{minitoc(hints)}{W0080}
+\WarningFilter{minitoc(hints)}{W0099}
+
+%### ____________ reference ________________________________________________ %
+
+\usepackage{xparse}
+
+% solve the problem of space in filenames like includegraphics
+% Extended file name support for graphics
+% https://ctan.org/pkg/grffile?lang=en
+\usepackage[space,extendedchars]{grffile}
+
+%### ____________ nobottomtitles ___________________________________________ %
+
+\usepackage{needspace}
+    % stawianie wymagania odpowiedniej ilosci miejsca
+
+\usepackage{titlesec}
+    % uproszczona modyfikacja sections head
+
+%### ____________ minitoc __________________________________________________ %
+
+\usepackage[%<lang1>%]{minitoc} % male spisy trosci po sekcjach
+% \usepackage{mtcoff} % wylacza minitoca
+\dominitoc % bedzie generowac toc rozdzialu
+%\dominilof % bedzie generowac tof rozdzialu
+%\dominilot % bedzie generowac tot rozdzialu
+% \addto{\captionspolish}{% Nazwa spisu rozdzialu
+%   \renewcommand{\mtctitle}{Spis rozdziału}
+% }
+\setcounter{minitocdepth}{5} % globokosc poziomow minitoc
+%\mtcsetoffset{minitoc}{-1.15em}  % przesuniecie listy minitoc
+%\setlength{\mtcindent}{-0em} % rozszerzenie listy minitoc
+%\mtcsetrules{*}{off} % wylacza poziomie linie minotoca
+% \mtcaddchapter[Streszczenie]
+\mtcsettitle{minitoc}{}
+
+%## ________ math __________________________________________________________ %
+
+% musi byc na samym poczatku
+\usepackage{etoolbox}
+
+% znaki specjalne matematyczne
+% niestety musi byc ladowany na poczatku, przed jezykowymi
+\usepackage{amssymb}
+
+% pola matematyczne
+\usepackage{amsmath}
+
+% pola matematyczne
+\usepackage{breqn}
+
+% wyrownanie matmy
+\makeatletter
+\newcommand{\mathleft}{\@fleqntrue\@mathmargin0pt}
+\newcommand{\mathcenter}{\@fleqnfalse}
+\makeatother
+
+%## ________ language settings _____________________________________________ %
+
+%% prevent hyphen text
+%% must be inserted before babel package
+\usepackage[english=nohyphenation,polish=nohyphenation]{hyphsubst}
+
+\usepackage[greek,%<lang1>%]{babel}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage[T1]{fontenc}
+
+\usepackage[babel=true]{microtype}
+
+\usepackage{siunitx}
+
+\usepackage{newunicodechar}
+
+%% dummy text package
+\usepackage{lipsum}
+
+%% tworzy hiperlacza w dokumencie
+%% ,colorlinks=true
+\usepackage[bookmarksnumbered,unicode]{hyperref}
+
+%## ________ page style ____________________________________________________ %
+
+%### ____________ geometry _________________________________________________ %
+
+%% https://www.sharelatex.com/learn/Page_size_and_margins
+%% ustawienia marginesow, geometrii strony
+\usepackage{geometry}
+
+\geometry{
+    left       = 25mm, % lewy margines
+    right      = 25mm, % prawy margines
+    top        = 37mm,
+    headsep    = 5mm,
+    headheight = 18mm,
+    bottom     = 37mm,
+    footskip   = 15mm,
+	% showframe,
+}
+
+%% https://www.sharelatex.com/learn/Multiple_columns
+\usepackage{multicol}
+
+\usepackage{setspace}
+% \setlength{\parindent}{0pt}
+% \setlength{\parskip}{1em}
+
+% \raggedbottom % prevent to allotace text near bottom side, unanutaly, may be problematic
+
+%### ____________ header and footer ________________________________________ %
+
+% styl strony
+\usepackage{fancyhdr}
+
+% zwraca informacje o ilosci stron
+% uzywane w stopce
+\usepackage{lastpage}
+
+\newcommand{\MONTH}{%
+  \ifcase\month% 0
+    \or Styczeń% 1
+    \or Luty% 2
+    \or Marzec% 3
+    \or Kwiecień% 4
+    \or Maj% 5
+    \or Czerwiec% 6
+    \or Lipiec% 7
+    \or Sierpień% 8
+    \or Wrzesień% 9
+    \or Październik% 10
+    \or Listopad% 11
+    \or Grudzień% 12
+  \fi}
+%<lang5>%\usepackage{datetime}
+%<lang5>%\renewcommand{\MONTH}{\monthnameenglish[\month]}
+\newcommand{\YEAR}{\number\year}
+
+
+
+% extra bold chars
+\usepackage[outline]{contour}
+\contourlength{0.4pt}
+
+% rodzaj naglowka, plain -> tylko numerowanie stron
+\pagestyle{plain}
+
+\fancypagestyle{plain}{
+	\fancyhf{}
+	\renewcommand{\headrulewidth}{2.0pt}
+	\renewcommand{\footrulewidth}{2.0pt}
+
+  %<logo_path>%
+
+  \rhead{\small %<head_line_0>% \\
+  \medskip
+  %<head_line_1>%
+  \smallskip}
+  \cfoot{\small %<author>%}
+  \fancyfoot[R]{\footnotesize{%<lang6>% \thepage\ z \pageref{LastPage}}}
+  \fancyfoot[C]{\footnotesize{\textcolor{Gray}{\MONTH~\YEAR~r.}}} %<foot_line_left>%
+}
+
+\pagestyle{plain}
+
+%## ________ text style ____________________________________________________ %
+
+%% change font
+\usepackage{lmodern}
+% \usepackage{times}
+% \usepackage{kpfonts}
+% \usepackage{mathptmx}
+
+%% lamanie pierwszej linii po naglowku
+\usepackage{indentfirst}
+
+%% elementy plywajace, blokada obrazow
+%% \begin{figure}[H] ...
+\usepackage{float}
+
+\sloppy
+\frenchspacing % wylacza zwiekszone odestepy przy justowaniu na koncu zdania
+
+% turn off warning: Underfull \hbox (badness xxxx) in paragraph...
+\hbadness=100001
+
+% turn off warning: Overfull \hbox (xxxx too wide) detected at line...
+% \hfuzz=99999pt
+
+% https://www.sharelatex.com/learn/Using_colours_in_LaTeX#Reference_guide
+\usepackage[usenames, dvipsnames]{xcolor}
+
+% https://tex.stackexchange.com/questions/94799/how-do-i-color-table-columns
+% kolorowanie kolumn w tabelu
+\usepackage{colortbl}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{bcdr1}{rgb}{0.098,0.198,0.538}
+\definecolor{bcdr2}{rgb}{0.198,0.398,0.338}
+
+%## ________ title page ____________________________________________________ %
+
+%## ________ numbered elements _____________________________________________ %
+
+% \arabic{XXX}= 1,2,3,...
+% \alph{XXX}  = a,b,c,...
+% \Alph{XXX}  = A,B,C,...
+% \roman{XXX} = i,ii,iii,iv,...
+% \Roman{XXX} = I,II,III,IV,...
+
+%### ____________ heads ____________________________________________________ %
+%#### ________________ general _____________________________________________ %
+
+\setcounter{secnumdepth}{4}
+
+%#### ________________ chapter _____________________________________________ %
+
+\usepackage{xcolor,calc, blindtext}
+
+% usuwa head and foot na stronie z chapterem
+% \aliaspagestyle{chapter}{empty}
+
+%##### ____________________ style 1 ________________________________________ %
+
+\setSingleSpace{1.1}
+\SingleSpacing
+\definecolor{chaptercolor}{gray}{0.8}
+% helper macros
+\newcommand\numlifter[1]{\raisebox{-2cm}[0pt][0pt]{\smash{#1}}}
+\newcommand\numindent{\kern37pt}
+\newlength\chaptertitleboxheight
+\makechapterstyle{hansen}{
+  \renewcommand\printchaptername{\raggedleft}
+  \renewcommand\printchapternum{%
+    \begingroup%
+    \leavevmode%
+    \chapnumfont%
+    \strut%
+    \numlifter{\thechapter}%
+    \numindent%
+\endgroup%
+}
+  \renewcommand*{\printchapternonum}{%
+    \vphantom{\begingroup%
+      \leavevmode%
+      \chapnumfont%
+      \numlifter{\vphantom{9}}%
+      \numindent%
+      \endgroup}
+    \afterchapternum}
+  \setlength\midchapskip{0pt}
+  \setlength\beforechapskip{0.5\baselineskip}
+  \setlength{\afterchapskip}{3\baselineskip}
+  \renewcommand\chapnumfont{%
+    \fontsize{4cm}{0cm}%
+    \bfseries%
+    \sffamily%
+    \color{chaptercolor}%
+  }
+  \renewcommand\chaptitlefont{%
+    \normalfont%
+    \huge%
+    \bfseries%
+    \raggedleft%
+  }%
+  \settototalheight\chaptertitleboxheight{%
+    \parbox{\textwidth}{\chaptitlefont \strut bg\\bg\strut}}
+  \renewcommand\printchaptertitle[1]{%
+    \parbox[t][\chaptertitleboxheight][t]{\textwidth}{%
+      \microtypesetup{protrusion=false}% add this if you use microtype
+      \chaptitlefont\strut ##1\strut}%
+}}
+\chapterstyle{hansen}
+
+
+%##### ____________________ style 2 ________________________________________ %
+
+%O ptions: Sonny, Lenny, Glenn, Conny, Rejne, Bjarne, Bjornstrup
+% \usepackage[Bjornstrup]{fncychap}
+
+%#### ________________ section _____________________________________________ %
+
+% comment below to activate chapter section
+% \renewcommand{\thesection}{\arabic{section}}
+
+% zasady pozycjonowania naglowkow + format
+% \titleformat{\section}
+    % {\needspace{0.25\textheight}\Large\bfseries}{\thesection}{1em}{}
+
+
+%#### ________________ subsection __________________________________________ %
+
+% zasady pozycjonowania naglowkow + format
+% \titleformat{\subsection}
+    % {\needspace{0.20\textheight}\large\bfseries}{\thesubsection}{1em}{}
+
+
+
+%#### ________________ subsubsection _______________________________________ %
+
+% zasady pozycjonowania naglowkow + format
+% \titleformat{\susubsection}
+    % {\needspace{0.15\textheight}\normalfont\bfseries}{\thesusubsection}{1em}{}
+
+
+%#### ________________ paragraph ___________________________________________ %
+
+% \makeatletter
+% \renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+%     {3.25ex \@plus1ex \@minus.2ex}%
+%     {-1em}%
+%     {\normalfont\normalsize\bfseries}}
+% \makeatother
+
+%#### ________________ subparagraph ________________________________________ %
+
+% change style, no indent + new line
+% \makeatletter
+% \renewcommand\subparagraph{\@startsection{subparagraph}{5}{0em}
+%     {1.25ex \@plus 1ex \@minus .2ex}%
+%     {0.75ex plus 0.1ex}% space after heading
+%     {\normalfont\normalsize\bfseries}}
+% \makeatother
+
+%#### ________________ toc _________________________________________________ %
+
+\setcounter{tocdepth}{%<tocdepth>%}
+
+% \usepackage{tocloft}
+
+
+%### ____________ images ___________________________________________________ %
+%#### ________________ graphix _____________________________________________ %
+
+\usepackage{graphicx}
+    %% wczytywanie grafik "figure"
+
+\usepackage[export]{adjustbox}
+    %% dodawania ramki do grafik
+
+% sposob numerowania
+\renewcommand{\thefigure}{%
+    % \ifnum\value{subsection}>0
+		% \mbox{{\thesubsection}--\arabic{figure}}%
+    % \else
+	    \ifnum\value{section}>0
+		    \mbox{{\thesection}--\arabic{figure}}%
+		\else
+		    \ifnum\value{chapter}>0
+			    \mbox{{\thechapter}--\arabic{figure}}%
+			\else
+			    \mbox{0--\arabic{figure}}%
+			\fi
+	    \fi
+    % \fi
+  }%
+
+% resetowanie numeracji
+\counterwithin*{figure}{chapter}
+\counterwithin*{figure}{section}
+% \counterwithin*{figure}{subsection}
+
+%#### ________________ lof _________________________________________________ %
+
+%### ____________ tables ___________________________________________________ %
+
+%#### ________________ tabulary longtable___________________________________ %
+
+\usepackage{tabularx} % zaawansowane tabele, dodatek kolumny X
+
+% Q,q,L,l - do lewej
+% W,w,C,c - srodkowanie
+% E,e,R,r - do prawej
+% P,p     - justowanie
+% szerokosc stala np. Q[2]
+% szerokosc paramaetryczna np. Q[2] (czyli 2x X)
+% szerokosc parametryczna rowna jeden, np. L (czyli 1x X)
+% szerokosc minimalna, taka, aby tekst sie zmiescil
+
+\newcolumntype{Q}[1]{>{\hsize=#1\hsize\raggedright\arraybackslash}X}%
+\newcolumntype{q}[1]{>{\hsize=#1\raggedright\arraybackslash}X}%
+
+\newcolumntype{E}[1]{>{\hsize=#1\hsize\raggedleft\arraybackslash}X}%
+\newcolumntype{e}[1]{>{\hsize=#1\raggedleft\arraybackslash}X}%
+
+\newcolumntype{W}[1]{>{\hsize=#1\hsize\centering\arraybackslash}X}
+\newcolumntype{w}[1]{>{\hsize=#1\centering\arraybackslash}X}
+
+\newcolumntype{P}[1]{>{\hsize=#1\hsize}X}
+
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+% redefinicja vertical alignment
+% \renewcommand{\tabularxcolumn}[1]{m{#1}}
+
+\usepackage{longtable}
+\makeatletter
+\newif\ifLT@nocaption
+\preto\longtable{\LT@nocaptiontrue}
+\appto\endlongtable{%
+  \ifLT@nocaption
+    \addtocounter{table}{\m@ne}%
+  \fi}
+\preto\LT@caption{%
+  \noalign{\global\LT@nocaptionfalse}}
+\makeatother
+\usepackage{ltablex} % dzielenie dlugich tabeli
+\keepXColumns % utrzymanie szerokosci dla ltablex
+\usepackage{booktabs}
+\usepackage{makecell}
+\newcommand\tabitem{\makebox[3mm][r]{$-\,$~}}
+
+
+\newcommand{\hlineb}{\Xhline{1.3pt}}
+
+%#### ________________ tabular-numbering ___________________________________ %
+
+% sposob numerowania wzorow
+\renewcommand{\thetable}{%
+    % \ifnum\value{subsection}>0
+		% \mbox{{\thesubsection}--\arabic{table}}%
+    % \else
+	    \ifnum\value{section}>0
+		    \mbox{{\thesection}--\arabic{table}}%
+		\else
+		    \ifnum\value{chapter}>0
+			    \mbox{{\thechapter}--\arabic{table}}%
+			\else
+			    \mbox{0--\arabic{table}}%
+			\fi
+	    \fi
+    % \fi
+  }%
+
+% resetowanie numeracji wzorow
+\counterwithin*{table}{chapter}
+\counterwithin*{table}{section}
+% \counterwithin*{table}{subsection}
+
+%#### ________________ lot _________________________________________________ %
+
+
+%### ____________ eqs ______________________________________________________ %
+
+% sposob numerowania
+\renewcommand{\theequation}{%
+    % \ifnum\value{subsection}>0
+		% \mbox{{\thesubsection}--\arabic{equation}}%
+    % \else
+	    \ifnum\value{section}>0
+		    \mbox{{\thesection}--\arabic{equation}}%
+		\else
+		    \ifnum\value{chapter}>0
+			    \mbox{{\thechapter}--\arabic{equation}}%
+			\else
+			    \mbox{0--\arabic{equation}}%
+			\fi
+	    \fi
+    % \fi
+  }%
+
+% resetowanie numeracji
+\counterwithin*{equation}{chapter}
+\counterwithin*{equation}{section}
+% \counterwithin*{equation}{subsection}
+
+%### ____________ lst ______________________________________________________ %
+
+\usepackage{listings}
+
+% zmiana nazwy iteratora blokow
+\renewcommand{\lstlistingname}{Kod}
+
+% List of Algorithms -> List of Algorithms
+% \renewcommand{\lstlistlistingname}{Spis}
+
+\AtBeginDocument{%
+\renewcommand{\thelstlisting}{%
+    % \ifnum\value{subsection}>0
+		% \mbox{{\thesubsection}--\arabic{lstlisting}}%
+    % \else
+	    \ifnum\value{section}>0
+		    \mbox{{\thesection}--\arabic{lstlisting}}%
+		\else
+		    \ifnum\value{chapter}>0
+			    \mbox{{\thechapter}--\arabic{lstlisting}}%
+			\else
+			    \mbox{0--\arabic{lstlisting}}%
+			\fi
+	    \fi
+    % \fi
+  }%
+\counterwithin*{lstlisting}{chapter}
+\counterwithin*{lstlisting}{section}
+% \counterwithin*{lstlisting}{subsection}
+}
+
+\lstdefinestyle{bcdr0}{
+    frame             = single,
+    backgroundcolor   = \color{white},
+    % language          = Python,
+    aboveskip         = 3mm,
+    belowskip         = 3mm,
+    showstringspaces  = false,
+    keepspaces        = true,
+    xleftmargin       = 22pt,
+    xrightmargin      = 4pt,
+    framexleftmargin  = 20pt,
+    basicstyle        = {\footnotesize\ttfamily},
+    numbers           = left, % left, right, none
+    numbersep         = 5pt,
+    numberstyle       = \tiny\color{gray},
+    keywordstyle      = \color{blue},
+    commentstyle      = \color{dkgreen},
+    stringstyle       = \color{mauve},
+    breaklines        = true, % sets automatic line breaking
+    postbreak         = \mbox{\textcolor{red}{$\hookrightarrow$}\space},
+                        % znak po nowej linii, po softwrapie
+    breakatwhitespace = true,  % sets if  breks should only at whitespace
+    tabsize           = 4,
+    basewidth         = {0.51em, 0.45em},
+    belowcaptionskip  = 12pt,
+    texcl             = true,
+    escapeinside      = {;@}{\^^M},
+    % mathescape        = true,
+    extendedchars     = true,
+    literate          = {ą}{{\k a}}1
+                        {Ą}{{\k A}}1
+                        {ż}{{\. z}}1
+                        {Ż}{{\. Z}}1
+                        {ź}{{\' z}}1
+                        {Ź}{{\' Z}}1
+                        {ć}{{\' c}}1
+                        {Ć}{{\' C}}1
+                        {ę}{{\k e}}1
+                        {Ę}{{\k E}}1
+                        {ó}{{\' o}}1
+                        {Ó}{{\' O}}1
+                        {ń}{{\' n}}1
+                        {Ń}{{\' N}}1
+                        {ś}{{\' s}}1
+                        {Ś}{{\' S}}1
+                        {ł}{{\l}}1
+                        {Ł}{{\L}}1
+                        {ρ}{{\g{r}}}1
+                        {α}{{\g{a}}}1
+                        {β}{{\g{b}}}1
+                        {μ}{{\g{m}}}1
+                        {δ}{{\g{d}}}1
+                        {Δ}{{\g{D}}}1
+                        {σ}{{\g{s}}}1
+                        {τ}{{\g{t}}}1
+                        {θ}{{\g{q}}}1
+                        {ρ}{{\g{r}}}1
+                        {ε}{{\g{e}}}1
+                        {γ}{{\g{g}}}1
+                        {°}{{$^{\circ}$}}1
+}
+
+\lstdefinestyle{bcdr_rst_tables}{
+    style             = bcdr0,
+    frame             = none,
+}
+
+\lstdefinestyle{bcdr1}{
+    style             = bcdr0,
+    language          = Python,
+}
+
+
+%## ________ other2 ________________________________________________________ %
+
+%### ____________ caption __________________________________________________ %
+
+\usepackage{caption}
+\captionsetup{
+   labelfont     = bf,
+   justification = centering,
+   width         = 0.9\textwidth,
+}
+
+%### ____________ biblatex _________________________________________________ %
+
+\usepackage[autostyle]{csquotes}
+\usepackage[
+    backend=biber,
+    sorting=nty,
+    isbn=false,
+    style=numeric, %alphabetic,
+]{biblatex}
+    % https://www.sharelatex.com/learn/Biblatex_citation_styles#Further_reading
+    % https://www.sharelatex.com/learn/Bibliography_management_with_biblatex
+\addbibresource{%<bib_path>%}
+
+
+
+
+
+%### ____________ absolutelynopagebreak ____________________________________ %
+
+% srodowisko do prevent page break, uwazac!
+\newenvironment{absolutelynopagebreak}
+  {\par\nobreak\vfil\penalty0\vfilneg
+   \vtop\bgroup}
+  {\par\xdef\tpd{\the\prevdepth}\egroup
+   \prevdepth=\tpd}
+
+%### ____________ shortcuts ________________________________________________ %
+
+\renewcommand{\b}[1]{\textbf{#1}}    % bold
+\renewcommand{\i}[1]{\textit{#1}}    % italic
+\renewcommand{\u}[1]{\underline{#1}} % underline
+\renewcommand{\t}[1]{\text{#1}}      % normal text
+\newcommand  {\m}[1]{\texttt{#1}}    % monospace
+\newcommand  {\ol}[1]{\overline{#1}}  % line over symbol
+\newcommand  {\g}[1]{\textgreek{#1}} % textgreek
+
+
+\newcommand{\ib}[1]{\textbf{\textit{#1}}}
+\newcommand{\bi}[1]{\textbf{\textit{#1}}}
+
+\newcommand{\ub}[1]{\textbf{\underline{#1}}}
+\newcommand{\bu}[1]{\textbf{\underline{#1}}}
+
+\newcommand{\iu}[1]{\underline{\textit{#1}}}
+\newcommand{\ui}[1]{\underline{\textit{#1}}}
+
+\newcommand{\ibu}[1]{\textbf{\underline{\textit{#1}}}}
+\newcommand{\iub}[1]{\textbf{\underline{\textit{#1}}}}
+\newcommand{\biu}[1]{\textbf{\underline{\textit{#1}}}}
+\newcommand{\bui}[1]{\textbf{\underline{\textit{#1}}}}
+\newcommand{\uib}[1]{\textbf{\underline{\textit{#1}}}}
+\newcommand{\ubi}[1]{\textbf{\underline{\textit{#1}}}}
+
+\newcommand{\mn}[1]{\mathnormal{#1}}
+\newcommand{\mt}[1]{\mathrm{#1}}
+\newcommand{\trm}[1]{\textrm{#1}}
+\newcommand{\mi}[1]{\mathit{#1}}
+\newcommand{\mb}[1]{\mathbf{#1}}
+\newcommand{\mm}[1]{\mathtt{#1}}
+
+
+
+\newcommand{\bcdrfa}[1]{\textcolor{bcdr1}{\m{\b{#1}}}}
+\newcommand{\bcdrfb}[1]{\textcolor{bcdr2}{\m{\b{#1}}}}
+\newcommand{\bcdrfc}[1]{\textcolor{black}{\m{\b{#1}}}}
+
+\newcommand{\hedlab}[1]{\label{hed:#1}}       % header label
+\NewDocumentCommand{\hedref}{o m}{%
+    \IfNoValueTF{#1}{(\ref{hed:#2})}{\hyperref[hed:#2]{#1}}}
+
+\newcommand{\figlab}[1]{\label{fig:#1}}       % figure label
+\NewDocumentCommand{\figref}{o m}{%
+    \IfNoValueTF{#1}{(%<lang2>%.~\ref{fig:#2})}{\hyperref[fig:#2]{#1}}}
+
+\newcommand{\tablab}[1]{\label{tab:#1}}       % table label
+\NewDocumentCommand{\tabref}{o m}{
+    \IfNoValueTF{#1}{(%<lang3>%.~\ref{tab:#2})}{\hyperref[tab:#2]{#1}}}
+
+\newcommand{\lstlab}[1]{\label{lst:#1}}       % code label
+\NewDocumentCommand{\lstref}{o m}{%
+    \IfNoValueTF{#1}{(%<lang4>%~\ref{lst:#2})}{\hyperref[lst:#2]{#1}}}
+
+\newcommand{\equlab}[1]{\label{equ:#1}}       % equation label
+\NewDocumentCommand{\equref}{o m}{%
+    \IfNoValueTF{#1}{(\ref{equ:#2})}{\hyperref[equ:#2]{#1}}}
+
+
+%### ____________ date settings ____________________________________________ %
+
+%<date>%
+%<date_inc>%
+
+%# ____ document ___________________________________________________________ %
+
+\begin{document}
+\adjustmtc
+
+% -------------------------------------------------------------------------- %
+
+%<title_page>%
+
+%## ________ lists _________________________________________________________ %
+
+%### ____________ toc ______________________________________________________ %
+
+\tableofcontents
+
+% \tableofcontents*
+% \addcontentsline{toc}{section}{Spis treści} % add as section
+
+\clearpage
+
+%### ____________ lof ______________________________________________________ %
+
+% \listoffigures*
+
+% \clearpage
+
+%### ____________ lot ______________________________________________________ %
+
+% \listoftables*
+
+% \clearpage
+
+%## ________ project _______________________________________________________ %
+
+% -------------------------------------------------------------------------- %
+
+%<beg1>%
+
+% -------------------------------------------------------------------------- %
+
+%<beg2>%
+
+% -------------------------------------------------------------------------- %
+
+%<0001>%
+
+% -------------------------------------------------------------------------- %
+
+%<0002>%
+
+% -------------------------------------------------------------------------- %
+
+%<0003>%
+
+% -------------------------------------------------------------------------- %
+
+%<0004>%
+
+% -------------------------------------------------------------------------- %
+
+%<0005>%
+
+% -------------------------------------------------------------------------- %
+
+%<0006>%
+
+% -------------------------------------------------------------------------- %
+
+%<0007>%
+
+% -------------------------------------------------------------------------- %
+
+%<0008>%
+
+% -------------------------------------------------------------------------- %
+
+%<0009>%
+
+% -------------------------------------------------------------------------- %
+
+%<end1>%
+
+% -------------------------------------------------------------------------- %
+
+%<end2>%
+
+% -------------------------------------------------------------------------- %
+\begin{appendices}
+
+%<apx1>%
+
+% -------------------------------------------------------------------------- %
+
+%<apx2>%
+
+% -------------------------------------------------------------------------- %
+
+%<apx3>%
+
+% -------------------------------------------------------------------------- %
+
+%<apx4>%
+
+\end{appendices}
+% -------------------------------------------------------------------------- %
+
+%<las1>%
+
+% -------------------------------------------------------------------------- %
+
+%<las2>%
+
+% -------------------------------------------------------------------------- %
+
+%## ________ bibliografy ___________________________________________________ %
+
+\clearpage
+
+\printbibliography                        % add to toc as chapter
+% \printbibliography[heading=subbibintoc] % add to toc as section
+
+% \printbibliography[type=article,title={Articles only}]
+% \printbibliography[type=book,title={Books only}]
+%
+% \printbibliography[keyword={physics},title={Physics-related only}]
+% \printbibliography[keyword={latex},title={\LaTeX-related only}]
+
+\end{document}

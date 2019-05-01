@@ -14,41 +14,42 @@ Team members developing this package:
 
 #$ ____ import _____________________________________________________________ #
 
-from ..tools.erwin  import erwin
+from .erwin  import erwin
 
 #$ ____ errors _____________________________________________________________ #
 
-def BCDR_dbase_ERROR_Open_Database():
-    erwin('e0201',
-        'Connection to database is not established\n'
-        'Tip: Open database with .connect() method\n'
-        'Tip: Database can be opened in memory, then just type path=":memory:"'
-        'Tip: Default path is set as ":memory:" :)'
+def BCDR_tools_ERROR_setts_get_unknow(name):
+    erwin('e0001',
+    f'Unknow setting <{name}>\n'
+    'Tip: please check that init method set'
     )
 
-def BCDR_dbase_ERROR_Parse_Type(allow_type, type_value):
-    erwin('e0211',
-        'Variable type is not allowed! Parse process requires correct type.\n'
-        f'Tip: Given variable type <{type_value}>\n'
-        f'Tip: Correct type <{allow_type}>'
+def BCDR_tools_ERROR_Translation_Not_Provided():
+    erwin('e0066',
+        'Please check translation, there is no one kwargs!'
     )
 
-def BCDR_dbase_ERROR_undefined_transaction_mode(command, mode, allow):
-    erwin('e0203',
-        f'Undefined transaction mode <{mode}>!\n'
-        f'Tip: caller command <{command}>'
-        f"Tip: you can use {allow}"
-
+def BCDR_tools_ERROR_Letters_check(driver, letters):
+    erwin('e0071',
+        'Letter do not occur in driver string!\n'
+        f'Tip: valid string <{driver}>\n'
+        f'Tip: given string <{letters}>'
     )
 
+def BCDR_tools_WARN_Letters_check(driver, letters):
+    erwin('w0071',
+        'Letter do not occur in driver string!\n'
+        f'Tip: valid string <{driver}>\n'
+        f'Tip: given string <{letters}>'
+    )
 
 #$ ____ warnings ___________________________________________________________ #
 
-def BCDR_dbase_WARN_Already_Closed():
-    erwin('w0202',
-        'Databse already closed. Nothing to save.\n'
-        'Tip: You can not add new data as long as database connection is close'
-        )
+def BCDR_tools_WARN_Translation_Not_Provided(language, newlang, text):
+    erwin('w0066',
+        f'Please check translation, there is no text in given language <{language}>. \nTip: instead of return next one avaiable <{newlang}>.'+
+        (f'\nTip: returned new text -> {text}')
+    )
 
 #$ ____ infos ______________________________________________________________ #
 
