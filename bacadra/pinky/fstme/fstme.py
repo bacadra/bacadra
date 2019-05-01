@@ -71,7 +71,7 @@ class setts(sinit):
 
     def path(self, folder_path=None, check=None):
         '''
-        Output path related to actual state of kernel. In mostly case it refer to input file. The existing of folder will be checked during template coping.
+        Output path related to actual state of kernel. In mostly case it refer to input file. Please refer to the file.
         '''
 
         path = self.tools.chk('path', folder_path)
@@ -83,13 +83,13 @@ class setts(sinit):
 
             if hasattr(self.tools.root, 'core') and hasattr(self.tools.root.core, 'dbase'):
 
-                if self.tools.core.dbase.setts.path()==':memory:':
+                if self.tools.root.core.dbase.setts.path()==':memory:':
                     return 'main.bfst'
 
                 else:
 
                     return os.path.splitext(
-                        self.tools.core.dbase.setts.path())[0]+ '.bfst'
+                        self.tools.root.core.dbase.setts.path())[0]+ '.bfst'
 
             else:
                     return 'main.bfst'
@@ -205,7 +205,7 @@ class fstme:
         # depend on setting echo in "t" print code or not
         # do not test it in every generate method!!!
         if 'x' in self.setts.echo(echo, check=True):
-            print(f'[pinky.fstme.{submodule}]\n{code}')
+            print(f'***** pinky.fstme.{submodule}] *****\n{code}')
 
 
 

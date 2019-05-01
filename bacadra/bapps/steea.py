@@ -10,9 +10,11 @@ Team members developing this package:
 ------------------------------------------------------------------------------
 '''
 
+import numpy as np
 
 from bacadra.unise.si import MPa,mm,m,Hz,cu,s,kN,N,unise
-from bacadra.unise.umath import π,sqrt
+
+from bacadra.unise.umath import π,sqrt,ln,exp
 
 #$ ____ class steea ________________________________________________________ #
 
@@ -71,6 +73,102 @@ class steea:
         α_imp = self.α_imp(α_imp)
         φ = 0.5*(1+α_imp*(λ_-0.2)+λ_**2)
         return min(1, 1/(φ+sqrt(φ**2-λ_**2)))
+
+
+
+#$$ ________ def estimate __________________________________________________ #
+
+def estimate(self, f_y=None, f_u=None, V_x_Q=True, V_x_min=0.1):
+
+    def est1(data):
+        # macierz -j zmiennych losowych
+        # x = np.array([310,353,270,310]*MPa)
+        x = data
+
+        # liczba wyników badań lub symulacji numerycznych
+        n = len(x)
+
+        # wartość obliczeniowa współczynnika konwersji
+        # jeśli nie jest on zawarty w współczynniku częściowym γ_M
+        η_d = 1
+
+        # wspolczynnik rozkladu nieznany
+        if V_x_Q is False:
+            k_n = np.interp(
+                n,
+                [3   ,4   ,5   ,6   ,8,10  ,20  ,30  ,1000],
+                [3.37,2.36,2.33,2.18,2,1.92,1.76,1.73,1.64],
+            )
+
+            k_d_n = np.interp(
+                n,
+                [4   ,5   ,6   ,8   ,10  ,20  ,30  ,1000],
+                [11.4,7.85,6.36,5.07,4.51,3.64,3.44,3.04],
+            )
+
+        # wspolczynnik rozkladu znany
+        elif V_x_Q is True:
+            k_n = np.interp(
+                n,
+                [1   ,2   ,3   ,4   ,5   ,6   ,8   ,10  ,20  ,30  ,1000],
+                [2.31,2.01,1.89,1.83,1.80,1.77,1.47,1.72,1.68,1.67,1.64],
+            )
+
+            k_d_n = np.interp(
+                n,
+                [1   ,2   ,3   ,4   ,5   ,6   ,8   ,10  ,20  ,30  ,1000],
+                [4.36,3.77,3.56,3.44,3.37,3.33,3.27,3.23,3.16,3.13,3.04],
+            )
+
+        # średnia z próby n wyników
+        m_y = (sum(ln(x_i.drop('MPa')) for x_i in x))*unise(1,'MPa') / n
+
+        # współczynnik obliczeniowy przypisany kwantylowi wartości charakterystycznej
+        s_y = max(
+            V_x_min*unise(1,'MPa'),
+
+            sqrt(1/(n-1)*sum([(ln(x_i.d('MPa'))*unise(1,'MPa')-m_y)**2
+                for x_i in x]))
+            )
+
+        # D7.2 Oszacowanie wartości charakterystycznych
+        f_k = η_d * exp((m_y - k_n*s_y).drop('MPa'))*unise(1,'MPa')
+
+        # D7.3 Bezpośrednie oszacowanie wartości obliczeniowych do sprawdzania stanów granicznych nośności ULS
+        f_d = η_d * exp((m_y - k_d_n * s_y).d('MPa'))*unise(1,'MPa')
+
+
+
+        return {
+            'data'    : data,
+            'len'     : len(data),
+            'η_d'     : η_d,
+            'k_n'     : k_n,
+            'k_d'     : k_d_n,
+            'm_y'     : m_y.s('MPa'),
+            's_y'     : s_y.s('MPa'),
+            'f_k'     : f_k.s('MPa'),
+            'f_d'     : f_d.s('MPa'),
+            'γ_m'     : f_k / f_d,
+            'V_x_min' : V_x_min,
+        }
+
+    obj = {
+        'f_y':  est1(f_y),
+        'f_u':  est1(f_u),
+    }
+
+    obj.max = {
+        'γ_m': max(obj.f_y.γ_m, obj.f_y.γ_m)
+    }
+
+    return obj
+
+
+
+
+
+
 
 
 

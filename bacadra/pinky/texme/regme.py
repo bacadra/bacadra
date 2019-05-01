@@ -37,8 +37,8 @@ str_unit  = r'(m|kg|s|K|rad|mrad|C|Hz|t|cm|mm|km|dm|N|kN|MN|GN|Pa|kPa|MPa|GPa|yr
 str_end   = r'( |\n|~|\+|\-|\%|\@|=|\*|\(|\)|{|}|\$|\:|$|\^|\\|/)'
 regme_unit1 = re.compile(str_begin + str_unit + str_end)
 
-# prostowanie jednostek
-str_begin = r'( |[0-9]|\n|~|\+|\-|\%|\@|=|\*|\(|\)|\{|}|\$|\:|/|\\)[ ]*'
+# prostowanie jednostek, uwaga, usunieto \{ z begin
+str_begin = r'( |[0-9]|\n|~|\+|\-|\%|\@|=|\*|\(|\)|}|\$|\:|/|\\)[ ]*'
 str_end   = r'( |\n|~|\+|\-|\%|\@|=|\*|\(|\)|{|}|\$|\:|$|\^|\\|/)'
 regme_unit2 = re.compile(str_begin + str_unit + str_end)
 
@@ -564,7 +564,7 @@ class Regme:
 
     def bracket(self):
         '''
-        convert bracket to left and right
+        Convert bracket to left and right
         '''
 
         def root(text):
@@ -612,6 +612,7 @@ class Regme:
 #$$ ________ def symbol_space ______________________________________________ #
 
     def symbol_space(self):
+        '''Create space between symbols'''
 
         def root(text):
             while True:
@@ -628,6 +629,7 @@ class Regme:
 #$$ ________ def comma_space _______________________________________________ #
 
     def comma_space(self):
+        '''Create space after comma in vector'''
 
         def root(text):
             # return regme_comma_space.sub(r', \\, ', text)

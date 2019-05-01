@@ -47,6 +47,54 @@ class setts(sinit):
 
 
 class core:
+    '''
+    core
+    ====
+
+    Core package represent project object. There most of bacadra object is depend core package.
+
+
+    ***** Main packages *****
+    -------------------------
+
+    class tools:
+        Pack of usefool tools
+
+        class verrs:
+            manage errors, warnings and infos of bacadra program
+
+        def erwin:
+            Raise bacadra error, warning or info
+
+        module fpack:
+            Pack of tools which are not connected to the core package.
+            There are mdata class, float number formatter etc
+
+        class clang:
+            Manage language of bacadra interface and output.
+
+    dbase:
+
+
+    pinky:
+
+        texme:
+
+        docme:
+
+        fstme:
+
+    sofix:
+
+        sbase:
+
+        wgraf:
+
+        trade:
+
+    bapps:
+
+    '''
 
     setts = setts()
 
@@ -66,6 +114,7 @@ class core:
 
     from .unise.unise import unise
 
+    from .dbase.dbase import dbase
 
     class tools:
 
@@ -125,6 +174,8 @@ class core:
 
         self.setts = setts(master=self.setts.tools, root=self)
 
+        self.dbase = self.dbase(core=self)
+
         self.tools = self.tools(core=self)
 
         self.pinky = self.pinky(core=self)
@@ -134,5 +185,7 @@ class core:
         self.bapps = self.bapps(core=self)
 
 
+
+bcdr = core
 
 #$ ######################################################################### #

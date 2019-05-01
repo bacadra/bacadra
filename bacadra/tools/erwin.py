@@ -28,7 +28,9 @@ from .setts import sinit
 
 class setts(sinit):
 
-    def new(name, doc):
+    _default_mode = {}
+
+    def new(name, mode, doc):
         '''
         name -- code of error/warning/info like e0051
         mname -- method name, like small description
@@ -36,6 +38,8 @@ class setts(sinit):
 
         setattr(setts, name, lambda self, x=None: self.tools.gst(name, x))
         getattr(setts, name).__doc__ = doc
+
+        setts._default_mode[name] = mode
 
 #$$ ________ general _______________________________________________________ #
 
@@ -51,24 +55,60 @@ class setts(sinit):
 
 #$$ ________ x0000 tools ___________________________________________________ #
 
-setts.new('e0000', 'bacadra error')
+setts.new('e0000', True,  'bacadra error')
 
-setts.new('e0001', 'setts: Unknow setting')
+setts.new('w0000', True,  'bacadra warning')
 
-setts.new('e0066', 'BCDR_tools_ERROR_Translation_Not_Provided')
+setts.new('i0000', True,  'bacadra info')
 
-setts.new('w0066', 'BCDR_tools_WARN_Translation_Not_Provided')
 
+setts.new('e0001', True, 'BCDR_tools_ERROR_setts_get_unknow')
+
+setts.new('e0066', True, 'BCDR_tools_ERROR_Translation_Not_Provided')
+
+setts.new('e0071', False, 'BCDR_tools_ERROR_Letters_not_occur')
+
+
+setts.new('w0066', True, 'BCDR_tools_WARN_Translation_Not_Provided')
+
+setts.new('w0071', True, 'BCDR_tools_WARN_Letters_not_occur')
 
 
 #$$ ________ x0100 unise ___________________________________________________ #
 
 #$$ ________ x0200 dbase ___________________________________________________ #
 
+setts.new('e0201', True, 'BCDR_dbase_ERROR_Open_Database')
+
+setts.new('e0211', True, 'BCDR_dbase_ERROR_Parse_Type')
+
+
+setts.new('w0202', True, 'BCDR_dbase_WARN_Already_Closed')
+
+#$$ ________ x0600 pinky:texme _____________________________________________ #
+
+setts.new('e0611', True, 'BCDR_pinky_texme_ERROR_Header_Level')
+
+setts.new('e0621', True, 'BCDR_pinky_texme_ERROR_Type_Check')
+
+setts.new('e0622', True, 'BCDR_pinky_texme_ERROR_String_Selector')
+
+setts.new('e0623', True, 'BCDR_pinky_texme_ERROR_Invalid_Key')
+
+setts.new('e0625', True, 'BCDR_pinky_texme_ERROR_unknow_mode_page')
+
+setts.new('e0681', True, 'BCDR_pinky_texme_ERROR_Path_Error')
+
+setts.new('e0682', True, 'BCDR_pinky_texme_ERROR_Evaluate')
+
+
+setts.new('w0681', True, 'BCDR_pinky_texme_WARN_Path_Error')
+
+setts.new('w0631', True, 'BCDR_pinky_texme_WARN_Scope_External')
 
 #$$ ________ x0900 sofix ___________________________________________________ #
 
-setts.new('i0915', 'BCDR_sofix_INFO_mass')
+setts.new('i0915', True, 'BCDR_sofix_INFO_mass')
 
 
 #$$ ________ make verrs ____________________________________________________ #
@@ -79,7 +119,7 @@ verrs.traceback(True)
 
 for key in dir(verrs):
     if key[0] in 'ewi':
-        getattr(verrs, key)(True)
+        getattr(verrs, key)(setts._default_mode[key])
 
 
 #$ ____ errors _____________________________________________________________ #

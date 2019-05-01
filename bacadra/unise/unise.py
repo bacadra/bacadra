@@ -15,9 +15,15 @@ Team members developing this package:
 #$ ____ import _____________________________________________________________ #
 
 import math
+
 import numpy as np
+
+from fractions import Fraction
+
 from ..tools.setts import sinit
+
 from ..tools.fpack import nprec
+
 from . import udict, verrs
 
 
@@ -92,6 +98,12 @@ class setts(sinit):
         '''
         return self.tools.gst('unit_value', value)
 
+#$$ ________ def as_fraction _______________________________________________ #
+
+    def as_fraction(self, value=None):
+        return self.tools.gst('as_fraction', value)
+
+
 #$ ____ class unise ________________________________________________________ #
 
 class unise:
@@ -99,17 +111,30 @@ class unise:
 #$$ ________ setts _________________________________________________________ #
 
     setts = setts()
+
     setts.system('si')
+
     setts.syspro(True)
+
     setts.sypost(False)
+
     setts.style('short')
+
     setts.notation('f')
+
     setts.trail(False)
+
     setts.significant(False)
+
     setts.decimal(False)
+
     setts.exp_width(1)
+
     setts.echo(True)
+
     setts.unit_value(1)
+
+    setts.as_fraction(False)
 
 #$$ ________ def __init__ __________________________________________________ #
 
@@ -233,7 +258,7 @@ class unise:
     # system sypost for Stucture Engineering, kN, m, Δ°C, s
     base_si_ce = {
         'kg'  : (0.001 , {'kN': 1, 'm':-1, 's': 2         }),
-        'K'   : (1     , {'Δ°C': 1                         }),
+        'K'   : (1     , {'Δ°C': 1                        }),
     }
 
 
@@ -248,6 +273,26 @@ class unise:
         {'<name>' : (<numerical object>,
                      <dictonary with unit power>)}
         if unit should be base unit, then just type {'<name>':(None)}
+
+        ***** Parameters *****
+
+        system: [dict, bool] (True)
+
+            *key*: [str]
+                name of the units
+
+            *key*: [tuple, None]
+                key[0] - [numeric] numerical weight
+                key[1] - [dict]
+
+                    *key*: [str]
+                        name of the base unit
+
+                    *val*: [numeric]
+                        power of the base unit
+
+        sypost: [dict, bool]
+
         '''
 
         # class and object method in one
@@ -366,6 +411,22 @@ class unise:
 #$$$ ____________ def primary ______________________________________________ #
 
     def primary(self, system=True, sypost=True, inplace=False, scheck=True, key_prefix=''):
+        '''
+
+        ***** Parameters *****
+
+        system: [str, bool] (True)
+
+        sypost: [str, bool] (True)
+
+        inplace: [bool] (False)
+
+        scheck: [bool] (True)
+
+        key_prefix: [str] ('')
+
+        '''
+
 
         if type(self)!=unise:
             if type(self)==list:
@@ -539,6 +600,15 @@ class unise:
         Convert unit to other one. Convert as defualt return new one object of unise, but inplace flag can convert inplace.
 
         If cover flags==True, then units must full cover old unit stack. New units can be input as dict, as string or as unise.
+
+
+        ***** Parameters *****
+
+        units: [str, dict]
+
+        cover: [bool] (False)
+
+        inplace: [bool] False
         '''
 
         if type(self)!=unise:
@@ -619,6 +689,16 @@ class unise:
     def drop(self, units=None, cover=True, system=True, sypost=True):
         '''
         Drop unit and return value alone. If dropped pattern unit is not explicit defined, then drop as system base. Is system is not explicited defined then use current system.
+
+        ***** Parameters *****
+
+        self: [unise, list, tuple, np.ndarray, others]
+
+        units: [dict, str] (None)
+
+        cover: [bool] (True)
+
+
         '''
 
         if type(self)!=unise:
@@ -673,6 +753,13 @@ class unise:
     def gdim(self, primary=True, system=True):
         '''
         Get dimension of unise.
+
+
+        ***** Parameters *****
+
+        primary: [bool] (True)
+
+        system: [bool, str] (True)
         '''
 
         if type(self)!=unise:
@@ -695,11 +782,47 @@ class unise:
 
 #$$$ ____________ def call _________________________________________________ #
 
-    def call(self, code=None, units=None, decimal=None, significant=None, style=None, notation=None, trail=None, exp_width=None, cover=None, system=None, sypost=None, inplace=None, unit_value=None,
+    def call(self, code=None, units=None, decimal=None, significant=None, style=None, notation=None, trail=None, exp_width=None, cover=None, system=None, sypost=None, inplace=None, unit_value=None, as_fraction=None,
 
-    u=None, d=None, s=None, y=None, n=None, t=None, e=None, c=None, b=None, p=None, i=None, v=None):
+    u=None, d=None, s=None, y=None, n=None, t=None, e=None, c=None, b=None, p=None, i=None, v=None, f=None):
         '''
-        Now call replace old method edit and show.
+        With call method you can create new unise object depend on your old with one command change all parameters. It's helpful to create front unise to print in eg. texme.
+
+
+        ***** Parameters *****
+
+        code: [letters via string] (None)
+            special interface to one-liner f-string define
+            eg. 'ukN:d2:td:cT' mean units-kN, decimal-2, trail-decimal, cover-True
+
+        units: #u [dict, str] (None)
+            convert units to new one, conversion can be full or not
+
+        decimal: #d [int, int via string] (None)
+
+        significant: #s [int, int via string] (None)
+
+        style: #y [str] (None)
+
+        notation: #n [str] (None)
+
+        trail: #t [str] (None)
+
+        exp_width: #e [int, int via string] (None)
+
+        cover: #c [bool] (None)
+
+        system: #b [str] (None)
+
+        sypost: #p [str] (None)
+
+        inplace: #i [bool] (None)
+
+        unit_value: #v (None)
+
+        as_fraction: #f [bool] (None)
+
+
         '''
 
         if code:
@@ -716,6 +839,7 @@ class unise:
         if system      == None: system      = b
         if inplace     == None: inplace     = i
         if unit_value  == None: unit_value  = v
+        if as_fraction == None: as_fraction = f
 
         if type(self)!=unise:
             if type(self)==list:
@@ -747,6 +871,7 @@ class unise:
         if trail       != None: othe.setts.trail       ( trail            )
         if exp_width   != None: othe.setts.exp_width   ( int(exp_width   ))
         if unit_value  != None: othe.setts.unit_value  ( unit_value       )
+        if as_fraction != None: othe.setts.as_fraction ( as_fraction      )
 
         # return new object as self or other
         return othe
@@ -754,6 +879,15 @@ class unise:
 #$$$ ____________ def format _______________________________________________ #
 
     def format(self, code='', style2ltx=True, out2repr=True):
+        '''
+        ***** Parameters *****
+
+        code: [letters via string]
+
+        style2ltx: [bool] (True)
+
+        out2repr: [bool] (True)
+        '''
 
         if type(self)!=unise:
             if type(self)==list:
@@ -801,18 +935,15 @@ class unise:
 #$$$ ____________ def tex __________________________________________________ #
 
     @staticmethod
-    def tex(data):
+    def tex(data, mode=1, drop=False):
 
-        if type(data)==list:
+        if drop==True: data = unise.drop(data)
 
-            dim = 1
-            for row in data:
-                if type(row) in [list, np.ndarray]:
-                    dim = 2
-                    for row1 in row:
-                        if type(row1) in [list, np.ndarray]:
-                            dim = 3
-                            break
+        if type(data)==list and mode==1:
+
+            dim = [2 if type(dim1) in [list, np.ndarray] else 1 for dim1 in data]
+
+            dim = min(dim)
 
             if dim==1:
                 code = r'\begin{bmatrix}'"\n"
@@ -832,12 +963,7 @@ class unise:
             else:
                 code = format(data)
 
-        return code
-
-
-
-
-
+            return code
 
 
 
@@ -1615,20 +1741,28 @@ class unise:
         '''
 
         # prepare numeric data
-        value = nprec(
-            value       = self._value,
-            notation    = self.setts.notation(),
-            trail       = self.setts.trail(),
-            significant = self.setts.significant(),
-            decimal     = self.setts.decimal(),
-            exp_width   = self.setts.exp_width(),
-            # unit_value  = self.setts.unit_value()
-        )
+        if type(self._value) in [int, float]:
+            value = nprec(
+                value       = self._value,
+                notation    = self.setts.notation(),
+                trail       = self.setts.trail(),
+                significant = self.setts.significant(),
+                decimal     = self.setts.decimal(),
+                exp_width   = self.setts.exp_width(),
+            )
+
+            if self.setts.as_fraction() in [True,'True','T']:
+                value = str(Fraction(value))
+
+        # prepare other types of data like fraction or lists
+        else:
+            value=str(self._value)
 
         if value=='1':
             value=str(self.setts.unit_value())
-            if value in ['None', '0', 'N', 'n']:
+            if value in ['None', 'N', 'n', 'F', 'False', False]:
                 value=''
+
 
         # convert style to lowercase
         style = self.setts.style().lower()

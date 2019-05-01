@@ -15,17 +15,23 @@ Team members developing this package:
 #$ ____ import _____________________________________________________________ #
 
 import os
+
 import inspect
+
 import shutil
+
 import subprocess
+
 import importlib.util
 
 from IPython.display import Image, Latex, HTML, Markdown, display
 
-from ...tools.fpack import translate
+from ...tools.fpack import translate, letchk
+
 from ...tools.setts import sinit
 
 from . import verrs
+
 from .regme import regme
 
 
@@ -38,9 +44,26 @@ class setts(sinit):
 
     def force_copy(self, value=None, check=None):
         '''
-        Force update of template, if true new files will be copy indepened of existsing .tex.bak file.
-        '''
+        Force update of project folder,
 
+
+        ***** Parameters *****
+
+        value: [bool] (None)
+            if True new files will be copy indepened of existsing .tex.bak file.
+
+        check: [bool] (None)
+            if True new value will be returned insted setted
+
+
+        ***** Returns *****
+
+        if check==True:
+            the setted value
+        else:
+            None
+
+        '''
         return self.tools.sgc('force_copy', value, check)
 
 
@@ -48,46 +71,104 @@ class setts(sinit):
 
     def path(self, folder_path=None, check=None):
         '''
-        Output path related to actual state of kernel. In mostly case it refer to input file. The existing of folder will be checked during template coping.
-        '''
+        Output path related to actual state of kernel. In mostly case it refer to input file. The existing of folder will be checked during template coping. Please refer only to the main folder of tex project.
 
-        return self.tools.sgc('path', folder_path, check)
+        ***** Parameters *****
+
+        folder_path: [str]
+
+        ***** Returns *****
+
+        if check==True:
+            the setted value
+        else:
+            None
+
+        '''
+        path = self.tools.chk('path', folder_path)
+
+        if path==True:
+
+            self.tools.set('path', True)
+
+
+            if hasattr(self.tools.root, 'core') and hasattr(self.tools.root.core, 'dbase'):
+
+                if self.tools.root.core.dbase.setts.path()==':memory:':
+                    return './tex'
+
+                else:
+
+                    return './'+os.path.splitext(
+                        self.tools.root.core.dbase.setts.path())[0]
+
+            else:
+                    return 'main.bfst'
+
+        else:
+            return self.tools.sgc('path', folder_path, check)
 
 
 
 #$$ ________ def source ____________________________________________________ #
 
-    def source(self, folder_path=None, filename=None, check=None, mode='pn'):
+    def source(self, get='', folder_path=None, filename=None, check=None):
         '''
+        Path of the destination tex project.
 
-        eg.
 
-        folder_path==None, filename==None, check==None, mode==pn:
+        ***** Parameters *****
+
+        get: [letters via string] ('')
+            'j' -- join it
+
+        folder_path: #p [str] (None)
+            if !=None then value will be set
+
+        filename: #n [str] (None)
+            if !=None then value will be set
+
+        check: [str] (None)
+
+
+        ***** Return & Example *****
+
+        folder_path==None, filename==None, check==None, get=='pn':
             return joined path
 
-        folder_path==None, filename==None, check==None, mode==p or n:
+        folder_path==None, filename==None, check==None, get=='p' or 'n':
             return path or name
 
-        folder_path!=None, filename!=None, check==None, mode...
-            set path, set name
+        folder_path!=None, filename!=None, check==None, get=='':
+            set path, set name, return None
 
-        folder_path!=None, filename!=None, check==True, mode==pn:
-            return joined path with new value
+        folder_path!=None, filename!=None, check==True, get=='pn':
+            check new value, return joined path
 
         '''
 
+        if 'j' in get:
+            get = get.replace('j', '')
+            join = True
 
-        folder_path = self.tools.sgc('source:folder_path', folder_path, check)
+        else:
+            join = False
 
-        filename    = self.tools.sgc('source:filename'   , filename, check)
+        data = self.tools.multiname(
+        _get=get, _check=check, _base='source',
+        _sub={'p':'folder_path', 'n':'filename'},
 
-        if folder_path and filename:
+        folder_path=folder_path, filename=filename,
+        )
 
-            if   mode=='pn': return os.path.join(folder_path, filename)
+        if get=='pn' and join==True:
+            return os.path.join(*data)
 
-            elif mode=='p' : return folder_path
+        else:
+            return data
 
-            elif mode=='n' : return filename
+
+
 
 
 
@@ -99,13 +180,17 @@ class setts(sinit):
 
         if name:
 
-            self.source(folder_path=os.path.join(
-                cave, name), filename=filename)
+            self.source(
+                folder_path = os.path.join(cave, name),
+                filename    = 'main.tex'
+            )
 
 
             # load external methods depend on template
 
-            path = self.source(filename='main.py', check=True)
+            path = self.source(get='pnj', filename='main.py', check=True)
+
+            print(path)
 
             spec = importlib.util.spec_from_file_location("external", path)
 
@@ -156,18 +241,31 @@ class setts(sinit):
         '''
         Atribute <echo> set the output of base methods in texme class. It provide letters interface "hmpt" which can turn on/off
 
-        > "h" -- colorful html header,
-        > "m" -- rendered latex math equation,
-        > "p" -- rendered picture with constant width,
-        > "t" -- rendered tables (don't work yet),
-        > "c" -- code cell (don't work yet),
-        > "x" -- plain tex code which will be included into tex document.
+        ***** Parameters *****
 
-        User can type value as True then will be set "hmp" configuration or False then no output will be produced.
+        code: [letters via string] (None)
+            "h" -- colorful html header,
+            "m" -- rendered latex math equation,
+            "p" -- rendered picture with constant width,
+            "t" -- rendered tables (don't work yet),
+            "c" -- code cell (don't work yet),
+            "x" -- plain tex code which will be included into tex document.
+            User can type value as True then will be set "hmp" configuration or False then no output will be produced.
+
+        check: [bool] (None)
+
+
+        ***** Returns *****
+
+        if code==None:
+            return saved 'echo' value
         '''
 
         if   code==True : code='hmp'
         elif code==False: code=''
+
+        # run validating procedure
+        if code!=None: letchk('hmptcx', code, 'valid')
 
         return self.tools.sgc(name='echo', value=code, check=check)
 
@@ -178,7 +276,6 @@ class setts(sinit):
         '''
         If true then code is returned, if false code is added to buffer.
         '''
-
         return self.tools.sgc('inherit', value, check)
 
 
@@ -192,79 +289,165 @@ class setts(sinit):
 
     def autolabel(self, code=None, check=None):
         '''
-        label is dict with dew substitute labels types.
-        h -- header
-        p -- picture
-        f -- file
-        c -- code
+        auto generate label for setted latex types.
+
+        ***** Parameters *****
+
+        code: [letters via string] (None)
+            h -- header
+            p -- picture
+            f -- file
+            c -- code
+            User can type value as True then will be set "p" configuration or False then no output will be produced.
+
+        check: [bool] (None)
+
+        ***** Returns *****
+
+        if code==None:
+            return saved 'autolabel' value
         '''
 
         if   code==True : code='p'
         elif code==False: code=''
 
+        # run validating procedure
+        if code!=None: letchk('hpfc', code, 'valid')
+
         return self.tools.sgc(name='autolabel', value=code, check=check)
+
 
 
 #$$ ________ def re ________________________________________________________ #
 
-    def re(self, xt=None, ht=None, pc=None, mt=None, me=None, mo=None, tc=None, td=None, ce=None, cc=None, fc=None, check=None):
+    def re(self, get='', xt=None, ht=None, pc=None, mt=None, me=None, mo=None, tc=None, td=None, ce=None, cc=None, fc=None, check=None):
         '''
-        xt  - text    + text             | item + text
-        ht  - head    + text
-        pc  - picture + caption
-        mt  - math    + text             | item + math
-        me  - math    + equation         | item + math
-        mo  - math    + echo             | item + math
-        tc  - table   + caption
-        td  - table   + data & header
-        ce  - code    + code
-        cc  - code    + caption
-        fc  - file    + caption
+        Regular expresion packages for other tasks.
+
+        Avaiable letters for regular expresion's filter:
+
+            '$': self.mmode()
+                Toogle math_mode
+
+            'e': self.eval()
+                Detect and eval math in string closed by @..@
+
+            'o': self.orphan()
+                Convert orphan to ~orphan
+
+            'g': self.greek()
+                Translate original greek to latex greek
+
+            'h': self.bslash()
+
+            's': self.subscript()
+
+            'l': self.overline()
+
+            'u': self.unit_point()
+                Delete dot symbol between number and unit
+
+            'i': self.unit_noitalic()
+                Change font for unit to straight
+
+            'r': self.rmfunction()
+
+            'f': self.math_fraction()
+                Convert math ()/() to frac{}{} and a/b to frac{a}{b}
+
+            'y': self.symbols()
+                Convert most popular symbols
+
+            'b': self.bracket()
+                Convert bracket to left( and right)
+
+            'm': self.mcadenv()
+
+            't': self.textstyle()
+                Only to display math in hydrogen latex python
+
+            'p': self.symbol_space()
+                Create space between symbols
+
+            'c': self.comma_space()
+                Create space after comma in vector
+
+        ***** Parameters *****
+
+            get: [str, list of str]
+                the input name will be returned,
+                eg. get='xt' return xt
+                eg. get=['xt','ht'] return [xt,ht]
+
+            xt: [letters via string]
+                text + text | item + text
+
+            ht: [letters via string]
+                head + text
+
+            pc: [letters via string]
+                pict + caption
+
+            mt: [letters via string]
+                math + text | item + math
+
+            me: [letters via string]
+                math + equation | item + math
+
+            mo: [letters via string]
+                math + echo | item + math
+
+            tc: [letters via string]
+                tabl + caption
+
+            td: [letters via string]
+                tabl + data & header
+
+            ce: [letters via string]
+                code + code
+
+            cc: [letters via string]
+                code + caption
+
+            fc: [letters via string]
+                file + caption
+
+        ***** Returns *****
         '''
 
-        if type(check)==str:
-            return self.tools.sgc(name='re:'+check,
-                value=eval(check), check=True)
+        return self.tools.multiname(
+        _get=get, _check=check, _base='re', _driver='$eoghsluirfybmtpc',
 
-        if xt!=None: self.tools.sgc(name='re:xt', value=xt, check=False)
-        if ht!=None: self.tools.sgc(name='re:ht', value=ht, check=False)
-        if pc!=None: self.tools.sgc(name='re:pc', value=pc, check=False)
-        if mt!=None: self.tools.sgc(name='re:mt', value=mt, check=False)
-        if me!=None: self.tools.sgc(name='re:me', value=me, check=False)
-        if mo!=None: self.tools.sgc(name='re:mo', value=mo, check=False)
-        if tc!=None: self.tools.sgc(name='re:tc', value=tc, check=False)
-        if td!=None: self.tools.sgc(name='re:td', value=td, check=False)
-        if ce!=None: self.tools.sgc(name='re:ce', value=ce, check=False)
-        if cc!=None: self.tools.sgc(name='re:cc', value=cc, check=False)
-        if fc!=None: self.tools.sgc(name='re:fc', value=fc, check=False)
+        xt=xt, ht=ht, pc=pc, mt=mt, me=me, mo=mo, tc=tc, td=td, ce=ce, cc=cc, fc=fc,
+        )
 
 #$$ ________ def float _____________________________________________________ #
 
-    def float(self, pic=None, tab=None, check=None):
+    def float(self, get='', pic=None, tab=None, check=None):
         '''
         p -- picture
         t -- table
         '''
 
-        if type(check)==str:
-            return self.tools.sgc(name='float:'+check,
-                value=eval(check), check=True)
+        return self.tools.multiname(
+        _get=get, _check=check, _base='float', _sub={'p':'pic', 't':'tab'},
 
-        if pic!=None: self.tools.sgc(name='float:pic', value=pic, check=False)
-        if tab!=None: self.tools.sgc(name='float:tab', value=tab, check=False)
-
+        pic=pic, tab=tab,
+        )
 
 
 #$$ ________ def picset ____________________________________________________ #
 
-    def picset(self, root=None, display_width=None, check=None):
+    def picset(self, get='', root=None, display_width=None, check=None):
 
-        if type(check)==str:
-            return self.tools.sgc(name='picset:'+check,
-                value=eval(check), check=True)
+        return self.tools.multiname(
+        _get=get, _check=check, _base='float',
+        _sub={'r':'root', 't':'wisplay_width'},
 
-        if root !=None: self.tools.sgc(name='picset:root' , value=root , check=False)
-        if display_width!=None: self.tools.sgc(name='picset:display_width', value=display_width, check=False)
+        root=root, display_width=display_width,
+        )
+
+
 
 #$$ ________ def headset ___________________________________________________ #
 
@@ -278,16 +461,12 @@ class setts(sinit):
 
 #$$ ________ def itemset ___________________________________________________ #
 
-    def itemset(self, lvl=None, width=None, check=None):
+    def itemset(self, get='', lvl=None, width=None, check=None):
+        return self.tools.multiname(
+        _get=get, _check=check, _base='itemset', _sub={'l':'lvl', 'w':'width'},
 
-        if type(check)==str:
-            return self.tools.sgc(name='itemset:'+check,
-                value=eval(check), check=True)
-
-        if lvl!=None  : self.tools.sgc(name='itemset:lvl'  , value=lvl  , check=False)
-        if width!=None: self.tools.sgc(name='itemset:width', value=width, check=False)
-
-
+        lvl=lvl, width=width,
+        )
 
 #$$ ________ def fclib _____________________________________________________ #
 
@@ -387,7 +566,7 @@ class texme:
 
     setts.force_copy(False)
 
-    setts.path(r'.\tex')
+    setts.path(True)
 
     setts.source(folder_path=r'.\src', filename='main.tex')
 
@@ -415,6 +594,7 @@ class texme:
         td ='e$fcbuilsyr$hgo',
         ce ='',
         cc ='e$fcbuilsyr$hgo',
+        fc ='e$fcbuilsyr$hgo',
     )
 
     setts.float(
@@ -495,7 +675,7 @@ class texme:
         # depend on setting echo in "t" print code or not
         # do not test it in every generate method!!!
         if 'x' in self.setts.echo(echo, check=True):
-            print(f'[pinky.texme.{submodule}]\n{code}')
+            print(f'***** pinky.texme.{submodule}] *****\n{code}')
 
 
 #$$$ ____________ def clear _________________________________________ #
@@ -540,21 +720,21 @@ class texme:
             self.bib_update()
 
             # at least copy dir from input to output
-            shutil.copytree(self.setts.source(mode='p'), self.setts.path())
+            shutil.copytree(self.setts.source(get='p'), self.setts.path())
 
 
         # if force mode is deactive
         else:
             # exists of path is alredy done
             # save base path
-            path = self.setts.source()
+            path = self.setts.source(get='pnj')
 
             # if output folder exists, then check if bak folder exists
             if os.path.exists(path):
                 os.remove(path)
 
             if not os.path.exists(path + '.bak'):
-                pathT = self.setts.source() + '.bak'
+                pathT = self.setts.source(get='pnj') + '.bak'
                 shutil.copyfile(pathT, path)
 
 #$$$ ____________ def _dictonary ___________________________________________ #
@@ -594,7 +774,7 @@ class texme:
         # output main tex file path
         path1 = os.path.join(
             self.setts.path(),
-            self.setts.source(mode='n'),
+            self.setts.source(get='n'),
         )
 
         # output main tex file path bak file
@@ -619,7 +799,7 @@ class texme:
         if shell_escape: sett += '--shell-escape'
 
         code = 'cd "{0}" & pdflatex {1} "{2}"'.format(
-            self.setts.source(mode='p'), sett, self.setts.source(mode='n'))
+            self.setts.source(get='p'), sett, self.setts.source(get='n'))
         p = subprocess.Popen(code, shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT)
@@ -635,7 +815,7 @@ class texme:
     def _bib_loader(self, mode='biber', output=False):
         '''Start BiB compilating. There are needed bibtex software. BiB root must have the extension .bib.'''
 
-        name_noext = os.path.basename(os.path.splitext(self.setts.source(mode='n'))[0])
+        name_noext = os.path.basename(os.path.splitext(self.setts.source(get='n'))[0])
 
         # if bibtex:
         if mode=='bibtex':
@@ -674,11 +854,11 @@ class texme:
             ext_list.append('.mlt' + str(i))
             ext_list.append('.mtc' + str(i))
 
-        name_noext = os.path.basename(os.path.splitext(self.setts.source(mode='n'))[0])
+        name_noext = os.path.basename(os.path.splitext(self.setts.source(get='n'))[0])
 
         for ext in ext_list:
-            if os.path.exists(os.path.join(self.setts.source(mode='p'), name_noext) + ext):
-                os.remove(os.path.join(self.setts.source(mode='p'), name_noext) + ext)
+            if os.path.exists(os.path.join(self.setts.source(get='p'), name_noext) + ext):
+                os.remove(os.path.join(self.setts.source(get='p'), name_noext) + ext)
 
 #$$$ ____________ def make _________________________________________________ #
 
@@ -789,42 +969,75 @@ class texme:
 
     def page(self, mode, val1=None, active=None, inherit=None, echo=None):
         '''
-        Check reference:
+        ***** Parameters *****
+
+        mode: {...}
+
+            mode: {'clearpage', 'cp'}
+                Clearpage statment break page and block range for float items.
+
+            mode: {'cleardoublepage', 'cdp'}
+                Clearpage statment break page and block range for float items.
+
+            mode: {'npage','np','newpage'}
+                Clearpage statment break page and don't block range for float items.
+
+            mode: {'pagebreak', 'pb'}
+
+            mode: {'goodbreak', 'gp'}
+
+            mode: {'absolutelynopagebreak-b', 'anpbb', 'ab'}
+
+            mode: {'absolutelynopagebreak-e', 'anpbe', 'ae'}
+
+            mode: {'vspace', 'vs'}
+
+            mode: {'newline', 'nl'}
+
+            mode: {'appendices-b', 'apb'}
+
+            mode: {'appendices-e', 'ape'}
+
+        val1: [...]
+
+            val1: [int]
+                if mode in ['vspace', 'vs']
+
+        active: [bool] (None)
+
+        inherit: [bool] (None)
+
+        echo: [letters via string]: (None)
+
+
+        ***** Notes ******
 
         https://tex.stackexchange.com/questions/45609/is-it-wrong-to-use-clearpage-instead-of-newpage
 
         https://tex.stackexchange.com/questions/9852/what-is-the-difference-between-page-break-and-new-page
-
         '''
 
         # if user want to overwrite global active atribute
         if not self.setts.active(active, check=True): return
 
         if inherit in ['beg','end']:
-            if type(mode) in [tuple, list]:
-                if len>1: val1 = mode[1]
-                if len>2: val2 = mode[2]
-                mode = mode[0]
+
+            if type(mode)==tuple:
+                return self.page(*mode)
+
+            elif type(mode)==dict:
+                return self.page(**mode)
 
         if mode in [None]:
             code=None
 
         elif mode in ['clearpage', 'cp']:
-            '''
-            Clearpage statment break page and block range for float items.
-            '''
             code = r'\clearpage'
 
         elif mode in ['cleardoublepage', 'cdp']:
-            '''
-            Clearpage statment break page and block range for float items.
-            '''
             code = r'\cleardoublepage'
 
         elif mode in ['npage','np','newpage']:
-            '''
-            Clearpage statment break page and don't block range for float items.
-            '''
             code = r'\newpage'
 
         elif mode in ['pagebreak', 'pb']:
@@ -852,10 +1065,7 @@ class texme:
             code = r'\end{appendices}'
 
         else:
-            verrs.BCDR_pinky_texme_ERROR_General(
-                'e0625', 'Unknow mode of page method!\n'
-                'Tip: look into manual...'
-            )
+            verrs.BCDR_pinky_texme_ERROR_unknow_mode_page(mode)
 
         if inherit=='beg':
             inherit = True
@@ -883,6 +1093,25 @@ class texme:
     def text(self, text, re_xt=None, strip=True, active=None, inherit=None, echo=None, pbeg=None, pend=None):
         '''
         Add formated text to tex document. Text can be striped and filter regme changed.
+
+
+        ***** Parameters *****
+
+        text: [str]
+
+        re_xt: [letters via string]
+
+        strip: [bool]
+
+        active: [bool]
+
+        inherit: [bool]
+
+        echo: [letters via string]
+
+        pbeg: [str]
+
+        pend: [str]
         '''
 
         # if user want to overwrite global active atribute
@@ -894,7 +1123,7 @@ class texme:
 
         # use global settings
         self.setts.tools.check = True
-        re_xt = self.setts.re(xt=re_xt)
+        re_xt = self.setts.re(['xt'], xt=re_xt)
         self.setts.tools.check = False
 
         # use filter regme
@@ -918,6 +1147,31 @@ class texme:
 
     def head(self, lvl, text, label=None, text2=None, re_ht=None, without_number=False, minitoc=None, active=None, inherit=None, echo=None, pbeg=None, pend=None):
         '''
+        ***** Parameters *****
+
+        lvl: [int]
+
+        text: [str]
+
+        label: [bool, str]
+
+        text2: [str]
+
+        re_ht: [str]
+
+        without_number: [bool]
+
+        minitoc: [bool]
+
+        active: [bool]
+
+        inherit: [bool]
+
+        echo: [letters via string]
+
+        pbeg: [bool]
+
+        pend: [end]
         '''
 
         # if user want to overwrite global active atribute
@@ -930,7 +1184,7 @@ class texme:
         # use global settings
         self.setts.tools.check = True
         echo  = self.setts.echo(echo)
-        re_ht = self.setts.re(re_ht)
+        re_ht = self.setts.re(['ht'], ht=re_ht)
         minitoc = False
         self.setts.tools.check = False
 
@@ -1036,11 +1290,11 @@ class texme:
 
         # use global settings
         self.setts.tools.check = True
-        echo     = self.setts.echo     ( echo               )
-        re_pc    = self.setts.re       ( re_pc                 )
-        pic_root = self.setts.picset(root, check= 'root')
+        echo     = self.setts.echo(echo)
+        re_pc    = self.setts.re(['pc'], pc=re_pc)
+        pic_root = self.setts.picset(['root'], root)
         # label    = self.setts.label    (p=label , check='p')
-        float    = self.setts.float    (pic=float , check='pic')
+        float    = self.setts.float    (['pic'], pic=float)
         self.setts.tools.check = False
 
         # save inputed path
@@ -1248,7 +1502,7 @@ class texme:
 
         if 'p' in echo:
             display(Image(
-                pathA, width=self.setts.picset(check='display_width')
+                pathA, width=self.setts.picset(['display_width'])
             ))
 
         return self.add(
@@ -1284,9 +1538,13 @@ class texme:
         # use global settings
         self.setts.tools.check = True
         echo    = self.setts.echo  ( echo  )
-        re_mt = self.setts.re(mt=re_mt, check='mt')
-        re_me = self.setts.re(mt=re_me, check='me')
-        re_mo = self.setts.re(mt=re_mo, check='mo')
+
+        re_mt, re_me, re_mo = self.setts.re(
+            get = ['mt', 'me', 'mo'],
+            mt  = re_mt,
+            me  = re_me,
+            mo  = re_mo,
+        )
         self.setts.tools.check = False
 
         if strip: equation = equation.strip()
@@ -1385,9 +1643,8 @@ class texme:
         # use global settings
         self.setts.tools.check = True
         echo  = self.setts.echo  ( echo  )
-        re_tc = self.setts.re(tc=re_tc, check='tc')
-        re_td = self.setts.re(tc=re_td, check='td')
-        float = self.setts.float(tab=float, check='tab')
+        re_tc, re_td = self.setts.re(['tc', 'td'], tc=re_tc, td=re_td)
+        float = self.setts.float(['tab'], tab=float)
         self.setts.tools.check = False
 
         if caption:
@@ -1447,144 +1704,144 @@ class texme:
 #$$$ ____________ def code _________________________________________________ #
 
     def code(self, code, caption='', label='', style=None, language=None, re=None, strip=True, mathescape=True, active=None, inherit=None, echo=None, pbeg=None, pend=None):
+        pass
 
-        # if user want to overwrite global active atribute
-        if not self.setts.active(active, check=True): return
-
-        # if page is typed
-        pbeg = self.page(pbeg, inherit='beg')
-        pend = self.page(pend, inherit='end')
-
-        # use global settings
-        self.setts.tools.check = True
-        echo     = self.setts.echo     ( echo               )
-        re       = self.setts.re       ( re                 )
-        label    = self.setts.label    ( c=label , check='c')
-        style    = self.setts.lststyle(
-            style if style!='rst' else 'bcdr_rst_tables')
-        self.setts.tools.check = False
-
-        if mathescape:
-            var1 = ', mathescape'
-        else:
-            var1 = ''
-
-        if language:
-            var2 = ',language={' + language + '}'
-        else:
-            var2 = ''
-
-        if style:
-            style = ',style={' + style + '}'
-        else:
-            style = ''
-
-        caption = regme(caption, re['cc'])
-
-        if code == True:
-            self._temp = [inspect.currentframe().f_back.f_lineno]
-
-            tex = translate('\\begin{lstlisting}[caption={%1}%2%3%5%4]'
-                ,{
-                    '%1': caption,
-                    '%2': ',label={'+label+'},' if label else '',
-                    '%4': var1,
-                    '%3': var2,
-                    '%5': style,
-                })
-
-        elif code == False:
-            self._temp.append(
-                inspect.currentframe().f_back.f_lineno - 1)
-
-            tex = '%%%-TO-REPLACE-%%%' + str(self._temp)
-
-            self._add('c-replace', tex, inherit)
-
-            tex = '\n\\end{lstlisting}'
-
-        elif type(code) == str:
-
-            tex = translate('\\begin{lstlisting}[caption={%1}%2%3%5%4]'
-                ,{
-                    '%1': caption,
-                    '%2': ',label={'+label+'},' if label else '',
-                    '%4': var1,
-                    '%3': var2,
-                    '%5': style,
-                })
-
-            code = regme(code, re['ce'])
-
-            if strip:
-                code = code.strip()
-
-            tex += '\n' + code + '\n'
-            tex += '\\end{lstlisting}'
-
-
-        return self.add(
-            submodule = 'c',
-            code      = tex,
-            inherit   = inherit,
-            echo      = echo,
-        )
-    c = code
+    #     # if user want to overwrite global active atribute
+    #     if not self.setts.active(active, check=True): return
+    #
+    #     # if page is typed
+    #     pbeg = self.page(pbeg, inherit='beg')
+    #     pend = self.page(pend, inherit='end')
+    #
+    #     # use global settings
+    #     self.setts.tools.check = True
+    #     echo     = self.setts.echo     ( echo               )
+    #     re       = self.setts.re       ( re                 )
+    #     label    = self.setts.label    ( c=label , check='c')
+    #     style    = self.setts.lststyle(
+    #         style if style!='rst' else 'bcdr_rst_tables')
+    #     self.setts.tools.check = False
+    #
+    #     if mathescape:
+    #         var1 = ', mathescape'
+    #     else:
+    #         var1 = ''
+    #
+    #     if language:
+    #         var2 = ',language={' + language + '}'
+    #     else:
+    #         var2 = ''
+    #
+    #     if style:
+    #         style = ',style={' + style + '}'
+    #     else:
+    #         style = ''
+    #
+    #     caption = regme(caption, re['cc'])
+    #
+    #     if code == True:
+    #         self._temp = [inspect.currentframe().f_back.f_lineno]
+    #
+    #         tex = translate('\\begin{lstlisting}[caption={%1}%2%3%5%4]'
+    #             ,{
+    #                 '%1': caption,
+    #                 '%2': ',label={'+label+'},' if label else '',
+    #                 '%4': var1,
+    #                 '%3': var2,
+    #                 '%5': style,
+    #             })
+    #
+    #     elif code == False:
+    #         self._temp.append(
+    #             inspect.currentframe().f_back.f_lineno - 1)
+    #
+    #         tex = '%%%-TO-REPLACE-%%%' + str(self._temp)
+    #
+    #         self._add('c-replace', tex, inherit)
+    #
+    #         tex = '\n\\end{lstlisting}'
+    #
+    #     elif type(code) == str:
+    #
+    #         tex = translate('\\begin{lstlisting}[caption={%1}%2%3%5%4]'
+    #             ,{
+    #                 '%1': caption,
+    #                 '%2': ',label={'+label+'},' if label else '',
+    #                 '%4': var1,
+    #                 '%3': var2,
+    #                 '%5': style,
+    #             })
+    #
+    #         code = regme(code, re['ce'])
+    #
+    #         if strip:
+    #             code = code.strip()
+    #
+    #         tex += '\n' + code + '\n'
+    #         tex += '\\end{lstlisting}'
+    #
+    #
+    #     return self.add(
+    #         submodule = 'c',
+    #         code      = tex,
+    #         inherit   = inherit,
+    #         echo      = echo,
+    #     )
+    # c = code
 
 
 
 #$$$ ____________ def file _________________________________________________ #
 
     def file(self, path, caption=None, label=None, first_line=0, last_line=1e10, absolute_path=False, language='Python', re=None, active=None, inherit=None, echo=None, pbeg=None, pend=None):
-        '''
-        '''
+        pass
 
-        # if user want to overwrite global active atribute
-        if not self.setts.active(active, check=True): return
-
-        # if page is typed
-        pbeg = self.page(pbeg, inherit='beg')
-        pend = self.page(pend, inherit='end')
-
-        # use global settings
-        self.setts.tools.check = True
-        echo     = self.setts.echo     ( echo               )
-        label    = self.setts.label    ( f=label , check='f')
-        re       = self.setts.re       ( re                 )
-        self.setts.tools.check = False
-
-        if language:
-            var2 = ',language={' + language + '}'
-        else:
-            var2 = ''
-
-        pathA = os.path.abspath(path).replace('\\', '/')
-
-        if absolute_path:
-            path = pathA
-        else:
-            path = os.path.relpath(path, self.path).replace('\\', '/')
-
-        if label==True:
-            label = os.path.basename(path)
-        else:
-            label = ''
-
-        tex = '\\lstinputlisting[language=%5, firstline=%3, lastline=%4, caption={%1}, label={%2}, inputencoding=utf8, mathescape]{%6}'
-        tex = tex.replace('%1', regme(caption, re['fc']))
-        tex = tex.replace('%2', label)
-        tex = tex.replace('%3', first_line)
-        tex = tex.replace('%4', last_line)
-        tex = tex.replace('%5', var2)
-        tex = tex.replace('%6', path.replace('\\', '/'))
-
-        return self.add(
-            submodule = 'f',
-            code      = tex,
-            inherit   = inherit,
-            echo      = echo,
-        )
-    f = file
+    #     # if user want to overwrite global active atribute
+    #     if not self.setts.active(active, check=True): return
+    #
+    #     # if page is typed
+    #     pbeg = self.page(pbeg, inherit='beg')
+    #     pend = self.page(pend, inherit='end')
+    #
+    #     # use global settings
+    #     self.setts.tools.check = True
+    #     echo     = self.setts.echo     ( echo               )
+    #     label    = self.setts.label    ( f=label , check='f')
+    #     re       = self.setts.re       ( re                 )
+    #     self.setts.tools.check = False
+    #
+    #     if language:
+    #         var2 = ',language={' + language + '}'
+    #     else:
+    #         var2 = ''
+    #
+    #     pathA = os.path.abspath(path).replace('\\', '/')
+    #
+    #     if absolute_path:
+    #         path = pathA
+    #     else:
+    #         path = os.path.relpath(path, self.path).replace('\\', '/')
+    #
+    #     if label==True:
+    #         label = os.path.basename(path)
+    #     else:
+    #         label = ''
+    #
+    #     tex = '\\lstinputlisting[language=%5, firstline=%3, lastline=%4, caption={%1}, label={%2}, inputencoding=utf8, mathescape]{%6}'
+    #     tex = tex.replace('%1', regme(caption, re['fc']))
+    #     tex = tex.replace('%2', label)
+    #     tex = tex.replace('%3', first_line)
+    #     tex = tex.replace('%4', last_line)
+    #     tex = tex.replace('%5', var2)
+    #     tex = tex.replace('%6', path.replace('\\', '/'))
+    #
+    #     return self.add(
+    #         submodule = 'f',
+    #         code      = tex,
+    #         inherit   = inherit,
+    #         echo      = echo,
+    #     )
+    # f = file
 
 
 #$$$ ____________ def item _________________________________________________ #
@@ -1603,9 +1860,7 @@ class texme:
 
         # use global settings
         self.setts.tools.check = True
-        width = self.setts.itemset(width=width, check='width')
-        lvl = self.setts.itemset(lvl=lvl, check='lvl')
-        # re_ht = self.setts.re(re_ht)
+        lvl, width = self.setts.itemset('lw', width=width, lvl=lvl)
         self.setts.tools.check = False
 
         # simple resolve empty text box
@@ -1787,12 +2042,14 @@ class texme:
 
 class slave:
 
+#$$ ________ def __init__ __________________________________________________ #
 
     def __init__(self, othe, core=None):
         self.othe = othe
         self.core = core
         self.data = {}
 
+#$$ ________ def new _______________________________________________________ #
 
     def new(self, id, **kwargs):
         self.data[id] = texme(core=self.core)
@@ -1800,7 +2057,7 @@ class slave:
         for key,val in kwargs.items():
             getattr(self.data[id].setts, key)(val)
 
-
+#$$ ________ def add _______________________________________________________ #
 
     def add(self, code):
         for tex in self.data.values():
@@ -1808,11 +2065,13 @@ class slave:
                 tex.buffer += [code]
             # tex.add(code, inherit, submodule, echo, presymbol, postsymbol)
 
+#$$ ________ def push ______________________________________________________ #
 
     def push(self, active=None):
         for tex in self.data.values():
             tex.push(active)
 
+#$$ ________ def active ____________________________________________________ #
 
     def active(self, mode, id=None):
         if id==None: id=list(self.data.keys())
@@ -1822,83 +2081,9 @@ class slave:
         else:
             self.data[id].setts.active(mode)
 
+#$$ ________ def __call__ __________________________________________________ #
 
     def __call__(self, id):
         return self.data[id]
-
-
-
-
-
-
-        # if path==None and name==None and check!=True:
-        #
-        #     if mode=='pn':
-        #
-        #         return os.path.join(
-        #             self.tools.get('source_path'),
-        #             self.tools.get('source_name'),
-        #         )
-        #
-        #     elif mode=='p':
-        #
-        #         return self.tools.get('source_path')
-        #
-        #     elif mode=='n':
-        #
-        #         return self.tools.get('source_name')
-        #
-        # elif check!=True:
-        #
-        #     if path!=None: self.tools.set('source_path', path)
-        #
-        #     if name!=None: self.tools.set('source_name', name)
-        #
-        #
-        # elif check==True:
-        #
-        #     path = self.tools.chk('source_path', path)
-        #
-        #     name = self.tools.chk('source_name', name)
-        #
-        #     if mode=='pn':
-        #
-        #         return os.path.join(path, name)
-        #
-        #     elif mode=='p':
-        #
-        #         return path
-        #
-        #     elif mode=='n':
-        #
-        #         return name
-
-
-
-
-
-
-        # if path!=None: self.tools.set('source_path', path)
-        #
-        # if name!=None: self.tools.set('source_name', name)
-        #
-        # if path!=None or name!=None: return
-        #
-        # path = self.tools.get('source_path')
-        #
-        # name = self.tools.get('source_name')
-        #
-        # if mode=='pn':
-        #
-        #     return os.path.join(
-        #         self.tools.get('source_path'),
-        #         self.tools.get('source_name'),
-        #     )
-        #
-        #
-        # elif mode=='p': return self.tools.get('source_path')
-        #
-        # elif mode=='n': return self.tools.get('source_name')
-
 
 #$ ######################################################################### #

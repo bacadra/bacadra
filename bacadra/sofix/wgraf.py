@@ -219,6 +219,7 @@ class wgraf:
 
 
 
+
 #$$ ________ def _del_old_jpg ______________________________________________ #
 
     def _del_old_jpg(self):
